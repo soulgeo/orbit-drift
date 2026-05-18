@@ -214,7 +214,7 @@ if (downloadRaylib) then
 
         includedirs {raylib_dir .. "/src" }
 
-        flags { "ShadowedVariables"}
+        buildoptions { "-Wshadow" }
         platform_defines()
 
         filter "action:vs*"
