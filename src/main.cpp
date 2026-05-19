@@ -1,77 +1,96 @@
-#include <cmath>
-#include <string>
-
 #include "raylib.h"
-#include "raymath.h"
+#include <cmath>
 
-using namespace std;
+#define MAX_COLUMNS 20
 
-int main() {
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+int main(void) {
+    const int screenWidth = 1600;
+    const int screenHeight = 900;
 
-    const int screenWidth = 800;
-    const int screenHeight = 600;
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     InitWindow(screenWidth, screenHeight, "Orbit Drift");
 
-    SetTargetFPS(60);
+    Vector2 screenCenter = {screenWidth / 2.0f, screenHeight / 2.0f};
 
-    Vector2 triangleAnchorPoint = {screenWidth / 2.0f, screenHeight / 2.0f};
+    // Define the camera to look into our 3d world (position, target, up vector)
+    Camera camera = {0};
+    camera.position = (Vector3){0.0f, 2.0f, 4.0f};  // Camera position
+    camera.target = (Vector3){0.0f, 2.0f, 0.0f};    // Camera looking at point
+    camera.up = (Vector3){0.0f, 1.0f, 0.0f};        // Camera up vector (rotation towards target)
+    camera.fovy = 60.0f;                            // Camera field-of-view Y
+    camera.projection = CAMERA_PERSPECTIVE;         // Camera projection type
 
-    const float speed = 5.0f;
+    float cameraAngleX = 0.0f;       // Yaw
+    float cameraAngleY = 0.5f;       // Pitch
+    float cameraDistance = 6.0f;
 
-    Vector2 trianglePeak, triangleBaseLeft, triangleBaseRight;
+    // Generates some random columns
+    float heights[MAX_COLUMNS] = {0};
+    Vector3 positions[MAX_COLUMNS] = {0};
+    Color colors[MAX_COLUMNS] = {0};
 
-    // Game Loop
-    while (!WindowShouldClose()) {
+    for (int i = 0; i < MAX_COLUMNS; i++) {
+        heights[i] = (float)GetRandomValue(1, 12);
+        positions[i] = (Vector3){
+            (float)GetRandomValue(-15, 15), 
+            heights[i] / 2.0f, 
+            (float)GetRandomValue(-15, 15)
+        };
+        colors[i] = (Color){
+            static_cast<unsigned char>(GetRandomValue(20, 255)), 
+            static_cast<unsigned char>(GetRandomValue(10, 55)), 
+            30, 255
+        };
+    }
 
+    SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
+
+    // Main game loop
+    while (!WindowShouldClose())  // Detect window close button or ESC key
+    {
         Vector2 mousePosition = GetMousePosition();
-        float angle = Vector2LineAngle(triangleAnchorPoint, mousePosition);
+        Vector2 mouseDistance = {
+            mousePosition.x - screenCenter.x,
+            mousePosition.y - screenCenter.y
+        };
+        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) camera.target.z -= 0.1f;
+        if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) camera.target.z += 0.1f;
+        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) camera.target.x += 0.1f;
+        if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) camera.target.x -= 0.1f;
 
-        // Update
-        if (IsKeyDown(KEY_W)) triangleAnchorPoint.y -= speed;
-        if (IsKeyDown(KEY_S)) triangleAnchorPoint.y += speed;
+        cameraAngleX += mouseDistance.x * -0.00005f;
+        cameraAngleY += mouseDistance.y * 0.00005f;
 
-        if (IsKeyDown(KEY_A)) triangleAnchorPoint.x -= speed;
-        if (IsKeyDown(KEY_D)) triangleAnchorPoint.x += speed;
+        cameraDistance -= GetMouseWheelMove() * 2.0f;
 
-        trianglePeak = {triangleAnchorPoint.x - 35.0f * -cos(angle),
-                        triangleAnchorPoint.y - 35.0f * sin(angle)};
+        camera.position.x = camera.target.x + cameraDistance * std::cos(cameraAngleY) * std::sin(cameraAngleX);
+        camera.position.y = camera.target.y + cameraDistance * std::sin(cameraAngleY);
+        camera.position.z = camera.target.z + cameraDistance * std::cos(cameraAngleY) * std::cos(cameraAngleX);
 
-        triangleBaseLeft = {triangleAnchorPoint.x - 15.0f * cos(PI/2.0f - angle),
-                            triangleAnchorPoint.y - 15.0f * sin(PI/2.0f - angle)};
-        triangleBaseRight = {triangleAnchorPoint.x + 15.0f * cos(PI/2.0f - angle),
-                             triangleAnchorPoint.y + 15.0f * sin(PI/2.0f - angle)};
-
-        // Draw
         BeginDrawing();
-        //////////////////
+            ClearBackground(BLACK);
+            BeginMode3D(camera);
+                DrawPlane((Vector3){0.0f, 0.0f, 0.0f}, (Vector2){32.0f, 32.0f}, DARKGRAY);  // Draw ground
+                DrawCube((Vector3){-16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, BLUE);  // Draw a blue wall
+                DrawCube((Vector3){16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, LIME);  // Draw a green wall
+                DrawCube((Vector3){0.0f, 2.5f, 16.0f}, 32.0f, 5.0f, 1.0f, GOLD);  // Draw a yellow wall
 
-        ClearBackground(BLACK);
-        DrawTriangle(trianglePeak, triangleBaseLeft, triangleBaseRight,
-                     RAYWHITE);
+                // Draw some cubes around
+                for (int i = 0; i < MAX_COLUMNS; i++) {
+                    DrawCube(positions[i], 2.0f, heights[i], 2.0f, colors[i]);
+                    DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
+                }
 
-        DrawText(("Angle: " + to_string(angle)).c_str(), 50, 30, 16, RAYWHITE);
-
-        DrawText(("Peak x: " + to_string(trianglePeak.x)).c_str(), 50, 50, 16, RAYWHITE);
-        DrawText(("Peak y: " + to_string(trianglePeak.y)).c_str(), 50, 70, 16, RAYWHITE);
-
-        DrawText(("Base Left x: " + to_string(triangleBaseLeft.x)).c_str(), 50, 90, 16, RAYWHITE);
-        DrawText(("Base Left y: " + to_string(triangleBaseLeft.y)).c_str(), 50, 110, 16, RAYWHITE);
-
-        DrawText(("Base Right x: " + to_string(triangleBaseRight.x)).c_str(), 50, 130, 16, RAYWHITE);
-        DrawText(("Base Right y: " + to_string(triangleBaseRight.y)).c_str(), 50, 150, 16, RAYWHITE);
-
-        DrawText(("Anchor Point x: " + to_string(triangleAnchorPoint.x)).c_str(), 50, 170, 16, RAYWHITE);
-        DrawText(("Anchor Point y: " + to_string(triangleAnchorPoint.y)).c_str(), 50, 190, 16, RAYWHITE);
-
-        DrawText(("Mouse x: " + to_string(mousePosition.x)).c_str(), 50, 210, 16, RAYWHITE);
-        DrawText(("Mouse y: " + to_string(mousePosition.y)).c_str(), 50, 230, 16, RAYWHITE);
-
-        //////////////////
+                // Draw player cube
+                DrawCube(camera.target, 0.5f, 0.5f, 0.5f, PURPLE);
+                DrawCubeWires(camera.target, 0.5f, 0.5f, 0.5f, DARKPURPLE);
+            EndMode3D();
         EndDrawing();
     }
 
     CloseWindow();
+
     return 0;
 }
