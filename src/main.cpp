@@ -1,96 +1,149 @@
+#include "commands.hpp"
+#include "input_handler.hpp"
 #include "raylib.h"
-#include <cmath>
+#include "raymath.h"
+#include "game_object.hpp"
 
+#define SCREEN_WIDTH 1600
+#define SCREEN_HEIGHT 900
 #define MAX_COLUMNS 20
 
+struct PlayerShip : public GameObject {
+    float forwardSpeed = 0.2f;
+    float panSpeed = 0.002f;
+    float rollSpeed = 0.02f;
+};
+
 int main(void) {
-    const int screenWidth = 1600;
-    const int screenHeight = 900;
-
+    //================================================================================== 
+    // Initialize Window
     SetConfigFlags(FLAG_MSAA_4X_HINT);
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
 
-    InitWindow(screenWidth, screenHeight, "Orbit Drift");
+    Vector2 screenCenter = {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
 
-    Vector2 screenCenter = {screenWidth / 2.0f, screenHeight / 2.0f};
-
-    // Define the camera to look into our 3d world (position, target, up vector)
+    // Initialize Camera
     Camera camera = {0};
-    camera.position = (Vector3){0.0f, 2.0f, 4.0f};  // Camera position
-    camera.target = (Vector3){0.0f, 2.0f, 0.0f};    // Camera looking at point
-    camera.up = (Vector3){0.0f, 1.0f, 0.0f};        // Camera up vector (rotation towards target)
-    camera.fovy = 60.0f;                            // Camera field-of-view Y
-    camera.projection = CAMERA_PERSPECTIVE;         // Camera projection type
+    camera.up = (Vector3){0.0f, 1.0f, 0.0f};
+    camera.fovy = 60.0f;
+    camera.projection = CAMERA_PERSPECTIVE;
+    float cameraDistance = 4.0f;
 
-    float cameraAngleX = 0.0f;       // Yaw
-    float cameraAngleY = 0.5f;       // Pitch
-    float cameraDistance = 6.0f;
+    PlayerShip playerShip;
 
-    // Generates some random columns
+    // Load Player Model
+    Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
+    Model playerModel = LoadModelFromMesh(coneMesh);
+    Matrix baseRotation = MatrixRotateX(-90.0f * DEG2RAD);
+    
+    // Initialize Input Handler & Define Keybinds
+    InputHandler inputHandler;
+    
+    Command* cmdW = new MoveForwardCommand(playerShip.forwardSpeed);
+    Command* cmdS = new MoveBackCommand(playerShip.forwardSpeed);
+    Command* cmdA = new MoveLeftCommand(playerShip.forwardSpeed);
+    Command* cmdD = new MoveRightCommand(playerShip.forwardSpeed);
+    Command* cmdE = new RollCWCommand(playerShip.rollSpeed);
+    Command* cmdQ = new RollCCWCommand(playerShip.rollSpeed);
+
+    inputHandler.bindButtonW(cmdW);
+    inputHandler.bindButtonS(cmdS);
+    inputHandler.bindButtonA(cmdA);
+    inputHandler.bindButtonD(cmdD);
+    inputHandler.bindButtonE(cmdE);
+    inputHandler.bindButtonQ(cmdQ);
+
+    // Obstacle generation
     float heights[MAX_COLUMNS] = {0};
     Vector3 positions[MAX_COLUMNS] = {0};
     Color colors[MAX_COLUMNS] = {0};
 
     for (int i = 0; i < MAX_COLUMNS; i++) {
         heights[i] = (float)GetRandomValue(1, 12);
-        positions[i] = (Vector3){
-            (float)GetRandomValue(-15, 15), 
-            heights[i] / 2.0f, 
-            (float)GetRandomValue(-15, 15)
-        };
+        positions[i] = (Vector3){(float)GetRandomValue(-15, 15), heights[i] / 2.0f, (float)GetRandomValue(-15, 15)};
         colors[i] = (Color){
-            static_cast<unsigned char>(GetRandomValue(20, 255)), 
-            static_cast<unsigned char>(GetRandomValue(10, 55)), 
-            30, 255
-        };
+            (unsigned char)GetRandomValue(20, 255), 
+            (unsigned char)GetRandomValue(10, 55), 
+            30, 255};
     }
 
-    SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+    SetTargetFPS(60);
 
-    // Main game loop
-    while (!WindowShouldClose())  // Detect window close button or ESC key
+    //================================================================================== 
+    // Main Loop
+    while (!WindowShouldClose())
     {
+        // =============================================================================
+        // Process Input via Input Handler
+        InputHandler::CommandList activeInputs = inputHandler.handleInput();
+        for (size_t i = 0; i < activeInputs.count; ++i) {
+            activeInputs.commands[i]->execute(playerShip);
+        }
+
+        // =============================================================================
+        // Panning / Rotation Update (Kept in Main)
         Vector2 mousePosition = GetMousePosition();
-        Vector2 mouseDistance = {
+        Vector2 mouseDistance = { 
             mousePosition.x - screenCenter.x,
-            mousePosition.y - screenCenter.y
+            mousePosition.y - screenCenter.y 
         };
-        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) camera.target.z -= 0.1f;
-        if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) camera.target.z += 0.1f;
-        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) camera.target.x += 0.1f;
-        if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) camera.target.x -= 0.1f;
 
-        cameraAngleX += mouseDistance.x * -0.00005f;
-        cameraAngleY += mouseDistance.y * 0.00005f;
+        float localYaw   = mouseDistance.x * -playerShip.panSpeed * GetFrameTime();
+        float localPitch = mouseDistance.y * -playerShip.panSpeed * GetFrameTime();
 
-        cameraDistance -= GetMouseWheelMove() * 2.0f;
+        Matrix yawMat = MatrixRotateY(localYaw);
+        Matrix pitchMat = MatrixRotateX(localPitch);
+        Matrix deltaRotation = MatrixMultiply(pitchMat, yawMat);
 
-        camera.position.x = camera.target.x + cameraDistance * std::cos(cameraAngleY) * std::sin(cameraAngleX);
-        camera.position.y = camera.target.y + cameraDistance * std::sin(cameraAngleY);
-        camera.position.z = camera.target.z + cameraDistance * std::cos(cameraAngleY) * std::cos(cameraAngleX);
+        // Accumulate rotation directly onto the ship's current transform
+        playerShip.transform = MatrixMultiply(deltaRotation, playerShip.transform);
 
+        // =============================================================================
+        // Visuals & Camera Update
+        
+        // Update model visual rotation matching the ship state
+        playerModel.transform = MatrixMultiply(baseRotation, playerShip.transform);
+
+        // Extract orientation and tracking data straight from GameObject methods
+        Vector3 currentPosition = playerShip.getPosition();
+        Vector3 forward = playerShip.getForward();
+        Vector3 up = playerShip.getUp();
+
+        // Position camera smoothly behind the target
+        camera.target = currentPosition;
+        Vector3 lookOffset = Vector3Scale(forward, -cameraDistance);
+        Vector3 heightOffset = Vector3Scale(up, 1.5f); 
+        camera.position = Vector3Add(Vector3Add(currentPosition, lookOffset), heightOffset);
+        camera.up = up; 
+
+        // =============================================================================
+        // Draw Scene
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode3D(camera);
-                DrawPlane((Vector3){0.0f, 0.0f, 0.0f}, (Vector2){32.0f, 32.0f}, DARKGRAY);  // Draw ground
-                DrawCube((Vector3){-16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, BLUE);  // Draw a blue wall
-                DrawCube((Vector3){16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, LIME);  // Draw a green wall
-                DrawCube((Vector3){0.0f, 2.5f, 16.0f}, 32.0f, 5.0f, 1.0f, GOLD);  // Draw a yellow wall
+                DrawPlane((Vector3){0.0f, 0.0f, 0.0f}, (Vector2){32.0f, 32.0f}, DARKGRAY);
+                DrawCube((Vector3){-16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, BLUE);
+                DrawCube((Vector3){16.0f, 2.5f, 0.0f}, 1.0f, 5.0f, 32.0f, LIME);
+                DrawCube((Vector3){0.0f, 2.5f, 16.0f}, 32.0f, 5.0f, 1.0f, GOLD);
 
-                // Draw some cubes around
                 for (int i = 0; i < MAX_COLUMNS; i++) {
                     DrawCube(positions[i], 2.0f, heights[i], 2.0f, colors[i]);
                     DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
                 }
 
-                // Draw player cube
-                DrawCube(camera.target, 0.5f, 0.5f, 0.5f, PURPLE);
-                DrawCubeWires(camera.target, 0.5f, 0.5f, 0.5f, DARKPURPLE);
+                // Passed 0,0,0 because playerModel.transform has orientation AND translation embedded
+                DrawModel(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
+                DrawModelWires(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
             EndMode3D();
         EndDrawing();
     }
 
-    CloseWindow();
+    // Cleanup resources
+    UnloadModel(playerModel);
+    
+    delete cmdW; delete cmdS; delete cmdA; 
+    delete cmdD; delete cmdE; delete cmdQ;
 
+    CloseWindow();
     return 0;
 }
