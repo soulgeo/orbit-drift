@@ -112,7 +112,7 @@ public:
     RollCWCommand(float rollSpeed) : speed(rollSpeed) {}
     
     void execute(GameObject& object) override {
-        object.rotateRoll(speed);
+        object.rotateRoll(-speed);
     }
 };
 
@@ -123,7 +123,7 @@ public:
     RollCCWCommand(float rollSpeed) : speed(rollSpeed) {}
     
     void execute(GameObject& object) override {
-        object.rotateRoll(-speed);
+        object.rotateRoll(speed);
     }
 };
 

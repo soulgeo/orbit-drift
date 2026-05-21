@@ -46,12 +46,12 @@ int main(void) {
     Command* cmdE = new RollCWCommand(playerShip.rollSpeed);
     Command* cmdQ = new RollCCWCommand(playerShip.rollSpeed);
 
-    inputHandler.bindButtonW(cmdW);
-    inputHandler.bindButtonS(cmdS);
-    inputHandler.bindButtonA(cmdA);
-    inputHandler.bindButtonD(cmdD);
-    inputHandler.bindButtonE(cmdE);
-    inputHandler.bindButtonQ(cmdQ);
+    inputHandler.bindKey(KEY_W, cmdW);
+    inputHandler.bindKey(KEY_S, cmdS);
+    inputHandler.bindKey(KEY_A, cmdA);
+    inputHandler.bindKey(KEY_D, cmdD);
+    inputHandler.bindKey(KEY_E, cmdE);
+    inputHandler.bindKey(KEY_Q, cmdQ);
 
     // Obstacle generation
     float heights[MAX_COLUMNS] = {0};

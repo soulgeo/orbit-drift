@@ -20,20 +20,17 @@ Vector3 GameObject::getUp()      const { return (Vector3){ transform.m4,  transf
 Vector3 GameObject::getRight()   const { return (Vector3){ transform.m0,  transform.m1,  transform.m2 }; }
 
 void GameObject::moveLocalForward(float distance) {
-    Vector3 displacement = Vector3Scale(getForward(), distance);
-    Matrix moveMat = MatrixTranslate(displacement.x, displacement.y, displacement.z);
+    Matrix moveMat = MatrixTranslate(0.0f, 0.0f, -distance);
     this->transform = MatrixMultiply(moveMat, this->transform);
 }
 
 void GameObject::moveLocalRight(float distance) {
-    Vector3 displacement = Vector3Scale(getRight(), distance);
-    Matrix moveMat = MatrixTranslate(displacement.x, displacement.y, displacement.z);
+    Matrix moveMat = MatrixTranslate(distance, 0.0f, 0.0f);
     this->transform = MatrixMultiply(moveMat, this->transform);
 }
 
 void GameObject::moveLocalUp(float distance) {
-    Vector3 displacement = Vector3Scale(getUp(), distance);
-    Matrix moveMat = MatrixTranslate(displacement.x, displacement.y, displacement.z);
+    Matrix moveMat = MatrixTranslate(0.0f, distance, 0.0f);
     this->transform = MatrixMultiply(moveMat, this->transform);
 }
 

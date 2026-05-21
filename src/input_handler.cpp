@@ -1,20 +1,36 @@
 #include "raylib.h"
 #include "input_handler.hpp"
+#include <vector>
+
+struct InputHandlerImpl {
+    std::vector<int> activeKeyCodes;
+};
+
+InputHandler::InputHandler() {
+    impl_ = new InputHandlerImpl();
+}
+
+InputHandler::~InputHandler() {
+    delete impl_;
+}
+
+void InputHandler::bindKey(int key, Command *command) {
+    keyBindings_[key] = command;
+    impl_->activeKeyCodes.push_back(key);
+}
 
 InputHandler::CommandList InputHandler::handleInput() {
     CommandList list;
-    auto addCommand = [&](Command* cmd) {
-        if (cmd && list.count < MAX_SIMULTANEOUS_INPUTS) {
-            list.commands[list.count++] = cmd;
+    
+    for (int key : impl_->activeKeyCodes) {
+        if (list.count >= MAX_SIMULTANEOUS_INPUTS) break;
+        
+        if (IsKeyDown(key)) {
+            Command* cmd = keyBindings_[key];
+            if (cmd != nullptr) {
+                list.commands[list.count++] = cmd;
+            }
         }
-    };
-
-    if (IsKeyDown(KEY_X)) addCommand(buttonW_);
-    if (IsKeyDown(KEY_A)) addCommand(buttonA_);
-    if (IsKeyDown(KEY_S)) addCommand(buttonS_);
-    if (IsKeyDown(KEY_D)) addCommand(buttonD_);
-    if (IsKeyDown(KEY_Q)) addCommand(buttonQ_);
-    if (IsKeyDown(KEY_E)) addCommand(buttonE_);
-
+    }
     return list;
 }
