@@ -15,6 +15,7 @@ public:
 
     GameObject* getGameObject(std::string name);
 
+    void updateGameObjects();
 private:
     GameImpl* impl_;
 };

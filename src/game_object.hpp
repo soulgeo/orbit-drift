@@ -11,6 +11,9 @@ public:
     // Master matrix tracking position and orientation
     Matrix transform = MatrixIdentity();
 
+    Model *model = nullptr;
+    Matrix modelBaseRotation = MatrixIdentity();
+
     // Getters
     Vector3 getPosition() const;
     Vector3 getForward() const;
@@ -41,6 +44,11 @@ public:
     virtual void rotateYaw(float angleRad); // Rotation around Up axis
     virtual void rotateRoll(float angleRad); // Rotation around Forward axis
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
+
+    // Frame by frame behavior
+    virtual void onUpdate();
+protected:
+    virtual void update() {};
 };
 
 #endif // GAMEOBJECT_HPP

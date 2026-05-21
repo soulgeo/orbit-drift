@@ -24,3 +24,9 @@ GameObject* Game::getGameObject(std::string name){
     }
     return nullptr;
 }
+
+void Game::updateGameObjects() {
+    for (const auto& [name, object] : impl_->gameObjects) {
+        object->onUpdate();
+    }
+}

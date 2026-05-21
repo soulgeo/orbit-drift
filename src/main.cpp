@@ -38,6 +38,8 @@ int main() {
     Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
     Model playerModel = LoadModelFromMesh(coneMesh);
     Matrix baseRotation = MatrixRotateX(-90.0f * DEG2RAD);
+    playerShip->modelBaseRotation = baseRotation;
+    playerShip->model = &playerModel;
     
     // Initialize Input Handler & Define Keybinds
     InputHandler inputHandler;
@@ -84,25 +86,9 @@ int main() {
         }
 
         // =============================================================================
-        // Panning / Rotation Update
-        Vector2 mousePosition = GetMousePosition();
-        Vector2 mouseDistance = { 
-            mousePosition.x - screenCenter.x,
-            mousePosition.y - screenCenter.y 
-        };
-
-        float localYaw   = mouseDistance.x * -playerShip->panSpeed * GetFrameTime();
-        float localPitch = mouseDistance.y * -playerShip->panSpeed * GetFrameTime();
-
-        playerShip->rotatePitch(localPitch);
-        playerShip->rotateYaw(localYaw);
-
-        // =============================================================================
         // Visuals & Camera Update
+        game.updateGameObjects();
         
-        // Update model visual rotation matching the ship state
-        playerModel.transform = MatrixMultiply(baseRotation, playerShip->transform);
-
         // Extract orientation and tracking data straight from GameObject methods
         Vector3 currentPosition = playerShip->getPosition();
         Vector3 forward = playerShip->getForward();
