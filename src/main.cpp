@@ -1,19 +1,11 @@
-#include "commands.hpp"
 #include "game.hpp"
-#include "input_handler.hpp"
 #include "raylib.h"
 #include "raymath.h"
-#include "game_object.hpp"
+#include "game_objects.hpp"
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define MAX_COLUMNS 20
-
-struct PlayerShip : public GameObject {
-    float forwardSpeed = 0.2f;
-    float panSpeed = 0.004f;
-    float rollSpeed = 0.02f;
-};
 
 int main() {
     //================================================================================== 
@@ -23,13 +15,6 @@ int main() {
 
     Vector2 screenCenter = {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
 
-    // Initialize Camera
-    Camera camera = {0};
-    camera.up = (Vector3){0.0f, 1.0f, 0.0f};
-    camera.fovy = 60.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
-    float cameraDistance = 3.0f;
-
     // Initialize Game
     Game game;
     PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
@@ -37,26 +22,16 @@ int main() {
     // Load Player Model
     Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
     Model playerModel = LoadModelFromMesh(coneMesh);
-    Matrix baseRotation = MatrixRotateX(-90.0f * DEG2RAD);
-    playerShip->modelBaseRotation = baseRotation;
+    Matrix baseRotation = 
+    playerShip->modelBaseRotation = MatrixRotateX(-90.0f * DEG2RAD);;
     playerShip->model = &playerModel;
     
-    // Initialize Input Handler & Define Keybinds
-    InputHandler inputHandler;
-    
-    Command* cmdW = new MoveForwardCommand(playerShip->forwardSpeed);
-    Command* cmdS = new MoveBackCommand(playerShip->forwardSpeed);
-    Command* cmdA = new MoveLeftCommand(playerShip->forwardSpeed);
-    Command* cmdD = new MoveRightCommand(playerShip->forwardSpeed);
-    Command* cmdE = new RollCWCommand(playerShip->rollSpeed);
-    Command* cmdQ = new RollCCWCommand(playerShip->rollSpeed);
-
-    inputHandler.bindKey(KEY_W, cmdW);
-    inputHandler.bindKey(KEY_S, cmdS);
-    inputHandler.bindKey(KEY_A, cmdA);
-    inputHandler.bindKey(KEY_D, cmdD);
-    inputHandler.bindKey(KEY_E, cmdE);
-    inputHandler.bindKey(KEY_Q, cmdQ);
+    // Initialize Camera
+    Camera camera = {0};
+    camera.up = (Vector3){0.0f, 1.0f, 0.0f};
+    camera.fovy = 60.0f;
+    camera.projection = CAMERA_PERSPECTIVE;
+    float cameraDistance = 3.0f;
 
     // Obstacle generation
     float heights[MAX_COLUMNS] = {0};
@@ -78,16 +53,7 @@ int main() {
     // Main Loop
     while (!WindowShouldClose())
     {
-        // =============================================================================
-        // Process Input via Input Handler
-        InputHandler::CommandList activeInputs = inputHandler.handleInput();
-        for (size_t i = 0; i < activeInputs.count; ++i) {
-            activeInputs.commands[i]->execute(*playerShip);
-        }
-
-        // =============================================================================
-        // Visuals & Camera Update
-        game.updateGameObjects();
+        game.update();
         
         // Extract orientation and tracking data straight from GameObject methods
         Vector3 currentPosition = playerShip->getPosition();
@@ -116,8 +82,8 @@ int main() {
                     DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
                 }
 
-                DrawModel(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
-                DrawModelWires(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
+                DrawModel(*playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
+                DrawModelWires(*playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
             EndMode3D();
         EndDrawing();
     }
@@ -126,10 +92,8 @@ int main() {
     // Cleanup resources
     UnloadModel(playerModel);
     
-    delete cmdW; delete cmdS; delete cmdA; 
-    delete cmdD; delete cmdE; delete cmdQ;
-
     CloseWindow();
 
     return 0;
 }
+

@@ -11,6 +11,14 @@ struct GameImpl {
 Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
+
+    // Input
+    inputHandler.bindKey(KEY_W, "move_forward");
+    inputHandler.bindKey(KEY_S, "move_back");
+    inputHandler.bindKey(KEY_A, "move_left");
+    inputHandler.bindKey(KEY_D, "move_right");
+    inputHandler.bindKey(KEY_E, "roll_cw");
+    inputHandler.bindKey(KEY_Q, "roll_ccw");
 }
 
 Game::~Game() {
@@ -25,7 +33,16 @@ GameObject* Game::getGameObject(std::string name){
     return nullptr;
 }
 
-void Game::updateGameObjects() {
+void Game::update() {
+    InputHandler::CommandList activeInputs = inputHandler.handleInput();
+    GameObject* controlledObject = getGameObject("player");
+
+    if (controlledObject) {
+        for (const std::string& action : activeInputs.commands) {
+            controlledObject->handleAction(action);
+        }
+    }
+
     for (const auto& [name, object] : impl_->gameObjects) {
         object->onUpdate();
     }

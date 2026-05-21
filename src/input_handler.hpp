@@ -1,8 +1,8 @@
 #ifndef INPUTHANDLER_HPP
 #define INPUTHANDLER_HPP
 
-#include "commands.hpp"
 #include <array>
+#include <string>
 
 struct InputHandlerImpl;
 
@@ -14,13 +14,13 @@ public:
     static constexpr size_t MAX_SIMULTANEOUS_INPUTS = 6;
 
     struct CommandList {
-        std::array<Command*, MAX_SIMULTANEOUS_INPUTS> commands{};
+        std::array<std::string, MAX_SIMULTANEOUS_INPUTS> commands{};
         size_t count = 0;
     };
 
     CommandList handleInput();
 
-    void bindKey(int key, Command* command);
+    void bindKey(int key, std::string command);
 
 private:
     InputHandlerImpl* impl_; 

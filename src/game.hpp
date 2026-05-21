@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "game_object.hpp"
+#include "input_handler.hpp"
 #include <string>
 
 struct GameImpl;
@@ -15,7 +16,9 @@ public:
 
     GameObject* getGameObject(std::string name);
 
-    void updateGameObjects();
+    InputHandler inputHandler;
+
+    void update();
 private:
     GameImpl* impl_;
 };

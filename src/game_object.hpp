@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include <string>
 
 class GameObject {
 public:
@@ -47,6 +48,8 @@ public:
 
     // Frame by frame behavior
     virtual void onUpdate();
+    virtual void handleAction(const std::string& action) {};
+
 protected:
     virtual void update() {};
 };

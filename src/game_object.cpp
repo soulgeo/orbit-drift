@@ -97,3 +97,4 @@ void GameObject::onUpdate(){
     update();
     model->transform = MatrixMultiply(modelBaseRotation, transform);
 }
+
