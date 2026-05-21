@@ -4,13 +4,13 @@
 #include "raymath.h"
 #include "game_object.hpp"
 
-#define SCREEN_WIDTH 1600
-#define SCREEN_HEIGHT 900
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
 #define MAX_COLUMNS 20
 
 struct PlayerShip : public GameObject {
     float forwardSpeed = 0.2f;
-    float panSpeed = 0.002f;
+    float panSpeed = 0.004f;
     float rollSpeed = 0.02f;
 };
 
@@ -27,7 +27,7 @@ int main(void) {
     camera.up = (Vector3){0.0f, 1.0f, 0.0f};
     camera.fovy = 60.0f;
     camera.projection = CAMERA_PERSPECTIVE;
-    float cameraDistance = 4.0f;
+    float cameraDistance = 3.0f;
 
     PlayerShip playerShip;
 
@@ -91,12 +91,8 @@ int main(void) {
         float localYaw   = mouseDistance.x * -playerShip.panSpeed * GetFrameTime();
         float localPitch = mouseDistance.y * -playerShip.panSpeed * GetFrameTime();
 
-        Matrix yawMat = MatrixRotateY(localYaw);
-        Matrix pitchMat = MatrixRotateX(localPitch);
-        Matrix deltaRotation = MatrixMultiply(pitchMat, yawMat);
-
-        // Accumulate rotation directly onto the ship's current transform
-        playerShip.transform = MatrixMultiply(deltaRotation, playerShip.transform);
+        playerShip.rotatePitch(localPitch);
+        playerShip.rotateYaw(localYaw);
 
         // =============================================================================
         // Visuals & Camera Update
@@ -112,7 +108,7 @@ int main(void) {
         // Position camera smoothly behind the target
         camera.target = currentPosition;
         Vector3 lookOffset = Vector3Scale(forward, -cameraDistance);
-        Vector3 heightOffset = Vector3Scale(up, 1.5f); 
+        Vector3 heightOffset = Vector3Scale(up, 2.5f); 
         camera.position = Vector3Add(Vector3Add(currentPosition, lookOffset), heightOffset);
         camera.up = up; 
 
@@ -131,13 +127,13 @@ int main(void) {
                     DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
                 }
 
-                // Passed 0,0,0 because playerModel.transform has orientation AND translation embedded
                 DrawModel(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
                 DrawModelWires(playerModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
             EndMode3D();
         EndDrawing();
     }
 
+    //================================================================================== 
     // Cleanup resources
     UnloadModel(playerModel);
     
