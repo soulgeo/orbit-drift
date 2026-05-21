@@ -19,10 +19,10 @@ public:
     };
 
     CommandList handleInput();
+
     void bindKey(int key, Command* command);
 
 private:
-    std::array<Command*, 350> keyBindings_{nullptr};
     InputHandlerImpl* impl_; 
 };
 

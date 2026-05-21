@@ -4,6 +4,7 @@
 
 struct InputHandlerImpl {
     std::vector<int> activeKeyCodes;
+    std::array<Command*, 350> keyBindings{nullptr};
 };
 
 InputHandler::InputHandler() {
@@ -15,7 +16,7 @@ InputHandler::~InputHandler() {
 }
 
 void InputHandler::bindKey(int key, Command *command) {
-    keyBindings_[key] = command;
+    impl_->keyBindings[key] = command;
     impl_->activeKeyCodes.push_back(key);
 }
 
@@ -26,7 +27,7 @@ InputHandler::CommandList InputHandler::handleInput() {
         if (list.count >= MAX_SIMULTANEOUS_INPUTS) break;
         
         if (IsKeyDown(key)) {
-            Command* cmd = keyBindings_[key];
+            Command* cmd = impl_->keyBindings[key];
             if (cmd != nullptr) {
                 list.commands[list.count++] = cmd;
             }
