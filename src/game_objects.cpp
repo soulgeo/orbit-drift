@@ -15,6 +15,8 @@ void PlayerShip::update() {
 }
 
 void PlayerShip::handleAction(const std::string& action){
+    if (action == "move_up") {moveLocalUp(forwardSpeed*GetFrameTime());}
+    if (action == "move_down") {moveLocalUp(-forwardSpeed*GetFrameTime());}
     if (action == "move_forward") {moveLocalForward(forwardSpeed*GetFrameTime());}
     if (action == "move_back") {moveLocalForward(-forwardSpeed*GetFrameTime());}
     if (action == "move_left") {moveLocalRight(-forwardSpeed*GetFrameTime());}

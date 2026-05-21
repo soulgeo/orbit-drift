@@ -13,6 +13,8 @@ Game::Game() {
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
 
     // Input
+    inputHandler.bindKey(KEY_SPACE, "move_up");
+    inputHandler.bindKey(KEY_LEFT_SHIFT, "move_down");
     inputHandler.bindKey(KEY_W, "move_forward");
     inputHandler.bindKey(KEY_S, "move_back");
     inputHandler.bindKey(KEY_A, "move_left");
