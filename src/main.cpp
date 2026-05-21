@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include "game.hpp"
 #include "input_handler.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -14,7 +15,7 @@ struct PlayerShip : public GameObject {
     float rollSpeed = 0.02f;
 };
 
-int main(void) {
+int main() {
     //================================================================================== 
     // Initialize Window
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -29,7 +30,9 @@ int main(void) {
     camera.projection = CAMERA_PERSPECTIVE;
     float cameraDistance = 3.0f;
 
-    PlayerShip playerShip;
+    // Initialize Game
+    Game game;
+    PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
 
     // Load Player Model
     Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
@@ -39,12 +42,12 @@ int main(void) {
     // Initialize Input Handler & Define Keybinds
     InputHandler inputHandler;
     
-    Command* cmdW = new MoveForwardCommand(playerShip.forwardSpeed);
-    Command* cmdS = new MoveBackCommand(playerShip.forwardSpeed);
-    Command* cmdA = new MoveLeftCommand(playerShip.forwardSpeed);
-    Command* cmdD = new MoveRightCommand(playerShip.forwardSpeed);
-    Command* cmdE = new RollCWCommand(playerShip.rollSpeed);
-    Command* cmdQ = new RollCCWCommand(playerShip.rollSpeed);
+    Command* cmdW = new MoveForwardCommand(playerShip->forwardSpeed);
+    Command* cmdS = new MoveBackCommand(playerShip->forwardSpeed);
+    Command* cmdA = new MoveLeftCommand(playerShip->forwardSpeed);
+    Command* cmdD = new MoveRightCommand(playerShip->forwardSpeed);
+    Command* cmdE = new RollCWCommand(playerShip->rollSpeed);
+    Command* cmdQ = new RollCCWCommand(playerShip->rollSpeed);
 
     inputHandler.bindKey(KEY_W, cmdW);
     inputHandler.bindKey(KEY_S, cmdS);
@@ -77,33 +80,33 @@ int main(void) {
         // Process Input via Input Handler
         InputHandler::CommandList activeInputs = inputHandler.handleInput();
         for (size_t i = 0; i < activeInputs.count; ++i) {
-            activeInputs.commands[i]->execute(playerShip);
+            activeInputs.commands[i]->execute(*playerShip);
         }
 
         // =============================================================================
-        // Panning / Rotation Update (Kept in Main)
+        // Panning / Rotation Update
         Vector2 mousePosition = GetMousePosition();
         Vector2 mouseDistance = { 
             mousePosition.x - screenCenter.x,
             mousePosition.y - screenCenter.y 
         };
 
-        float localYaw   = mouseDistance.x * -playerShip.panSpeed * GetFrameTime();
-        float localPitch = mouseDistance.y * -playerShip.panSpeed * GetFrameTime();
+        float localYaw   = mouseDistance.x * -playerShip->panSpeed * GetFrameTime();
+        float localPitch = mouseDistance.y * -playerShip->panSpeed * GetFrameTime();
 
-        playerShip.rotatePitch(localPitch);
-        playerShip.rotateYaw(localYaw);
+        playerShip->rotatePitch(localPitch);
+        playerShip->rotateYaw(localYaw);
 
         // =============================================================================
         // Visuals & Camera Update
         
         // Update model visual rotation matching the ship state
-        playerModel.transform = MatrixMultiply(baseRotation, playerShip.transform);
+        playerModel.transform = MatrixMultiply(baseRotation, playerShip->transform);
 
         // Extract orientation and tracking data straight from GameObject methods
-        Vector3 currentPosition = playerShip.getPosition();
-        Vector3 forward = playerShip.getForward();
-        Vector3 up = playerShip.getUp();
+        Vector3 currentPosition = playerShip->getPosition();
+        Vector3 forward = playerShip->getForward();
+        Vector3 up = playerShip->getUp();
 
         // Position camera smoothly behind the target
         camera.target = currentPosition;
@@ -141,5 +144,6 @@ int main(void) {
     delete cmdD; delete cmdE; delete cmdQ;
 
     CloseWindow();
+
     return 0;
 }

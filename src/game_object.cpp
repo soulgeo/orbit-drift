@@ -15,10 +15,14 @@ void GameObject::setPositionZ(float z) {
     this->transform.m14 = z; 
 }
 void GameObject::setPosition(float x, float y, float z) {
-    setPositionX(x); setPositionY(y); setPositionZ(z);
+    setPositionX(x); 
+    setPositionY(y); 
+    setPositionZ(z);
 }
 void GameObject::setPosition(Vector3 position) {
-    setPositionX(position.x); setPositionY(position.y); setPositionZ(position.z);
+    setPositionX(position.x); 
+    setPositionY(position.y); 
+    setPositionZ(position.z);
 }
 void GameObject::moveGlobalX(float deltaX) { this->transform.m12 += deltaX; }
 void GameObject::moveGlobalY(float deltaY) { this->transform.m13 += deltaY; }
@@ -34,6 +38,7 @@ void GameObject::moveGlobal(Vector3 delta) {
 
 //================================================================================== 
 // Local Movement
+
 Vector3 GameObject::getPosition() const { 
     return (Vector3){ transform.m12, transform.m13, transform.m14 }; 
 }
