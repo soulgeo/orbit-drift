@@ -2,6 +2,9 @@
 
 class PlayerShip : public GameObject {
 public:
+    PlayerShip();
+    ~PlayerShip();
+
     float forwardSpeed = 12.0f;
     float panSpeed = 0.004f;
     float rollSpeed = 1.0f;
@@ -11,5 +14,13 @@ public:
 };
 
 class Planet : public GameObject {
+public:
+    Planet();
+    ~Planet();
 
+    float radius;
+    float gravityForce;
+    float rotationSpeed;
+
+    void update() override;
 };

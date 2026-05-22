@@ -1,6 +1,20 @@
 #include "game_objects.hpp"
 #include "raylib.h"
 
+PlayerShip::PlayerShip() {
+    // Load Player Model
+    Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
+    Model playerModel = LoadModelFromMesh(coneMesh);
+    Matrix baseRotation = 
+    modelBaseRotation = MatrixRotateX(-90.0f * DEG2RAD);;
+    model = playerModel;
+}
+
+PlayerShip::~PlayerShip() {
+    // Unload Player Model
+    UnloadModel(model);
+}
+
 void PlayerShip::update() {
     Vector2 mousePosition = GetMousePosition();
     Vector2 mouseDistance = { 

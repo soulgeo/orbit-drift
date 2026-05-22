@@ -1,10 +1,6 @@
 #include "game_object.hpp"
 #include "raymath.h"
 
-GameObject::~GameObject() {
-    delete model;
-}
-
 //================================================================================== 
 // Global Movement
 
@@ -95,6 +91,6 @@ void GameObject::rotate(float deltaPitch, float deltaYaw, float deltaRoll) {
 // Frame by frame behavior
 void GameObject::onUpdate(){
     update();
-    model->transform = MatrixMultiply(modelBaseRotation, transform);
+    model.transform = MatrixMultiply(modelBaseRotation, transform);
 }
 

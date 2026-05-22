@@ -17,13 +17,6 @@ int main() {
     Game game;
     PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
 
-    // Load Player Model
-    Mesh coneMesh = GenMeshCone(0.2f, 0.5f, 16);
-    Model playerModel = LoadModelFromMesh(coneMesh);
-    Matrix baseRotation = 
-    playerShip->modelBaseRotation = MatrixRotateX(-90.0f * DEG2RAD);;
-    playerShip->model = &playerModel;
-    
     // Initialize Camera
     Camera camera = {0};
     camera.up = (Vector3){0.0f, 1.0f, 0.0f};
@@ -80,18 +73,15 @@ int main() {
                     DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
                 }
 
-                DrawModel(*playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
-                DrawModelWires(*playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
+                DrawModel(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
+                DrawModelWires(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
             EndMode3D();
         EndDrawing();
     }
-
     //================================================================================== 
     // Cleanup resources
-    UnloadModel(playerModel);
     
     CloseWindow();
 
     return 0;
 }
-

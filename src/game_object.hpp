@@ -7,12 +7,12 @@
 
 class GameObject {
 public:
-    virtual ~GameObject();
+    virtual ~GameObject() {};
 
     // Master matrix tracking position and orientation
     Matrix transform = MatrixIdentity();
 
-    Model *model = nullptr;
+    Model model;
     Matrix modelBaseRotation = MatrixIdentity();
 
     // Getters
