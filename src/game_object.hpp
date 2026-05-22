@@ -3,7 +3,8 @@
 
 #include "raylib.h"
 #include "raymath.h"
-#include <string>
+
+class Game;
 
 class GameObject {
 public:
@@ -34,6 +35,7 @@ public:
     virtual void moveGlobalZ(float deltaZ);
     virtual void moveGlobal(float deltaX, float deltaY, float deltaZ);
     virtual void moveGlobal(Vector3 delta);
+    virtual void moveGlobalVel(Vector3 velocity);
 
     // Local Movement
     virtual void moveLocalRight(float distance);
@@ -47,11 +49,10 @@ public:
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
     // Frame by frame behavior
-    virtual void onUpdate();
-    virtual void handleAction(const std::string& action) {};
+    virtual void onUpdate(Game& game);
 
 protected:
-    virtual void update() {};
+    virtual void update(Game& game) {};
 };
 
 #endif // GAMEOBJECT_HPP

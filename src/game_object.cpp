@@ -35,6 +35,11 @@ void GameObject::moveGlobal(Vector3 delta) {
     moveGlobalX(delta.x); moveGlobalY(delta.y); moveGlobalZ(delta.z); 
 }
 
+void GameObject::moveGlobalVel(Vector3 velocity) {
+    Vector3 displacement = Vector3Scale(velocity, GetFrameTime());
+    moveGlobal(displacement);
+}
+
 //================================================================================== 
 // Local Movement
 
@@ -89,8 +94,8 @@ void GameObject::rotate(float deltaPitch, float deltaYaw, float deltaRoll) {
 
 //================================================================================== 
 // Frame by frame behavior
-void GameObject::onUpdate(){
-    update();
+void GameObject::onUpdate(Game& game){
+    update(game);
     model.transform = MatrixMultiply(modelBaseRotation, transform);
 }
 

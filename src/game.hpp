@@ -20,8 +20,12 @@ public:
 
     bool isPaused = false;
 
+    bool isActiveInput(std::string input);
+
     void update();
+
     void draw();
+
 private:
     GameImpl* impl_;
 };

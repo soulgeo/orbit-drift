@@ -5,7 +5,6 @@
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define MAX_COLUMNS 20
 
 int main() {
     //================================================================================== 
@@ -54,6 +53,10 @@ int main() {
             BeginMode3D(camera);
                 game.draw();
             EndMode3D();
+
+            if (playerShip->isInGravitySOI) {
+                DrawText("IN GRAVITY", 20, 40, 40, YELLOW);
+            }
         EndDrawing();
     }
     //================================================================================== 

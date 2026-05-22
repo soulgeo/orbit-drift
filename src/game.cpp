@@ -8,16 +8,23 @@
 
 struct GameImpl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> gameObjects;
+    InputHandler::CommandList activeInputs;
 };
 
 Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
     impl_->gameObjects["planet1"] = std::make_unique<Planet>(
-        10.0f, (Vector3){30.0f, 5.0f, 30.0f}
+        (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f
     );
     impl_->gameObjects["planet2"] = std::make_unique<Planet>(
-        20.0f, (Vector3){50.0f, 10.0f, -100.0f}
+        (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f
+    );
+    impl_->gameObjects["planet3"] = std::make_unique<Planet>(
+        (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f
+    );
+    impl_->gameObjects["planet4"] = std::make_unique<Planet>(
+        (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f
     );
 
     // Keybinds
@@ -46,9 +53,9 @@ GameObject* Game::getGameObject(std::string name){
 
 void Game::update() {
     // Handle input
-    InputHandler::CommandList activeInputs = inputHandler.handleInput();
+    impl_->activeInputs = inputHandler.handleInput();
 
-    for (const std::string& action : activeInputs.commands) {
+    for (const std::string& action : impl_->activeInputs.commands) {
         if (action == "pause") {
             isPaused = !isPaused;
         }
@@ -56,17 +63,23 @@ void Game::update() {
 
     if (isPaused) return;
 
-    GameObject* controlledObject = getGameObject("player");
-    if (controlledObject) {
-        for (const std::string& action : activeInputs.commands) {
-            controlledObject->handleAction(action);
-        }
-    }
+    // Reset ship SOI flag
+    PlayerShip* player = (PlayerShip*)getGameObject("player");
+    if (player) player->isInGravitySOI = false;
 
     // Game Object updates
     for (const auto& [name, object] : impl_->gameObjects) {
-        object->onUpdate();
+        object->onUpdate(*this);
     }
+}
+
+bool Game::isActiveInput(std::string input) {
+    for (const std::string& action : impl_->activeInputs.commands) {
+        if (action == input) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Game::draw() {
