@@ -73,8 +73,8 @@ int main() {
                     DrawCubeWires(positions[i], 2.0f, heights[i], 2.0f, MAROON);
                 }
 
-                DrawModel(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
-                DrawModelWires(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
+                game.draw();
+
             EndMode3D();
         EndDrawing();
     }

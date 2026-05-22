@@ -13,6 +13,12 @@ struct GameImpl {
 Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
+    impl_->gameObjects["planet1"] = std::make_unique<Planet>(
+        10.0f, (Vector3){30.0f, 5.0f, 30.0f}
+    );
+    impl_->gameObjects["planet2"] = std::make_unique<Planet>(
+        20.0f, (Vector3){50.0f, 10.0f, -100.0f}
+    );
 
     // Keybinds
     inputHandler.bindKey(KEY_SPACE, DOWN, "move_up");
@@ -60,5 +66,18 @@ void Game::update() {
     // Game Object updates
     for (const auto& [name, object] : impl_->gameObjects) {
         object->onUpdate();
+    }
+}
+
+void Game::draw() {
+    GameObject* playerShip = getGameObject("player");
+    DrawModel(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
+    DrawModelWires(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
+
+    for (const auto& [name, object] : impl_->gameObjects) {
+        if (Planet* planet = dynamic_cast<Planet*>(object.get())){
+            DrawModel(object->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, GREEN);
+            DrawModelWires(object->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, DARKGREEN);
+        }
     }
 }

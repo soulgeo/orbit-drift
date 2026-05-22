@@ -21,6 +21,7 @@ public:
     bool isPaused = false;
 
     void update();
+    void draw();
 private:
     GameImpl* impl_;
 };

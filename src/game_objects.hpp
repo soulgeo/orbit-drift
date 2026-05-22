@@ -18,7 +18,7 @@ public:
 
 class Planet : public GameObject {
 public:
-    Planet();
+    Planet(float radius, Vector3 position);
     ~Planet();
 
     float radius;
