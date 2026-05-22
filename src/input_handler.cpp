@@ -31,16 +31,11 @@ InputHandler::CommandList InputHandler::handleInput() {
         auto key = pair.first;
         auto inputType = pair.second;
 
-        if (inputType == DOWN) {
-            if (IsKeyDown(key)) {
-                std::string cmd = impl_->keyBindings[key].second; 
-                list.commands[list.count++] = cmd;
-            }
-        } else if (inputType == PRESSED) {
-            if (IsKeyPressed(key)) {
-                std::string cmd = impl_->keyBindings[key].second; 
-                list.commands[list.count++] = cmd;
-            }
+        if ((inputType == DOWN && IsKeyDown(key)) || 
+            (inputType == PRESSED && IsKeyPressed(key))) {
+
+            std::string cmd = impl_->keyBindings[key].second; 
+            list.commands[list.count++] = cmd;
         }
     }
     return list;
