@@ -13,8 +13,6 @@ int main() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
 
-    Vector2 screenCenter = {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
-
     // Initialize Game
     Game game;
     PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
@@ -53,7 +51,7 @@ int main() {
     // Main Loop
     while (!WindowShouldClose())
     {
-        game.update();
+        game.update();        
         
         // Extract orientation and tracking data straight from GameObject methods
         Vector3 currentPosition = playerShip->getPosition();

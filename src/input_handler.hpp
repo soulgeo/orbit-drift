@@ -6,6 +6,11 @@
 
 struct InputHandlerImpl;
 
+enum InputType {
+    PRESSED,
+    DOWN
+};
+
 class InputHandler {
 public:
     InputHandler();
@@ -20,7 +25,7 @@ public:
 
     CommandList handleInput();
 
-    void bindKey(int key, std::string command);
+    void bindKey(int key, InputType type, std::string command);
 
 private:
     InputHandlerImpl* impl_; 

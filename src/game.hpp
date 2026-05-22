@@ -18,6 +18,8 @@ public:
 
     InputHandler inputHandler;
 
+    bool isPaused = false;
+
     void update();
 private:
     GameImpl* impl_;

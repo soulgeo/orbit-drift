@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <string>
 #include "game_objects.hpp"
+#include "raylib.h"
+
 
 struct GameImpl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> gameObjects;
@@ -12,15 +14,16 @@ Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
 
-    // Input
-    inputHandler.bindKey(KEY_SPACE, "move_up");
-    inputHandler.bindKey(KEY_LEFT_SHIFT, "move_down");
-    inputHandler.bindKey(KEY_W, "move_forward");
-    inputHandler.bindKey(KEY_S, "move_back");
-    inputHandler.bindKey(KEY_A, "move_left");
-    inputHandler.bindKey(KEY_D, "move_right");
-    inputHandler.bindKey(KEY_E, "roll_cw");
-    inputHandler.bindKey(KEY_Q, "roll_ccw");
+    // Keybinds
+    inputHandler.bindKey(KEY_SPACE, DOWN, "move_up");
+    inputHandler.bindKey(KEY_LEFT_SHIFT, DOWN, "move_down");
+    inputHandler.bindKey(KEY_W, DOWN, "move_forward");
+    inputHandler.bindKey(KEY_S, DOWN, "move_back");
+    inputHandler.bindKey(KEY_A, DOWN, "move_left");
+    inputHandler.bindKey(KEY_D, DOWN, "move_right");
+    inputHandler.bindKey(KEY_E, DOWN, "roll_cw");
+    inputHandler.bindKey(KEY_Q, DOWN, "roll_ccw");
+    inputHandler.bindKey(KEY_LEFT_ALT, PRESSED, "pause");
 }
 
 Game::~Game() {
@@ -36,15 +39,25 @@ GameObject* Game::getGameObject(std::string name){
 }
 
 void Game::update() {
+    // Handle input
     InputHandler::CommandList activeInputs = inputHandler.handleInput();
-    GameObject* controlledObject = getGameObject("player");
 
+    for (const std::string& action : activeInputs.commands) {
+        if (action == "pause") {
+            isPaused = !isPaused;
+        }
+    }
+
+    if (isPaused) return;
+
+    GameObject* controlledObject = getGameObject("player");
     if (controlledObject) {
         for (const std::string& action : activeInputs.commands) {
             controlledObject->handleAction(action);
         }
     }
 
+    // Game Object updates
     for (const auto& [name, object] : impl_->gameObjects) {
         object->onUpdate();
     }
