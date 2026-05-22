@@ -1,3 +1,6 @@
+#ifndef GAMEOBJECTS_HPP
+#define GAMEOBJECTS_HPP
+
 #include "game_object.hpp"
 
 class PlayerShip : public GameObject {
@@ -24,3 +27,5 @@ public:
 
     void update() override;
 };
+
+#endif // !GAMEOBJECTS_HPP
