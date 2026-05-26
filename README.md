@@ -1,1 +1,1 @@
-Personal project on creating a 3D space flight game from scratch in C++ using raylib. You can check out the unity version I made of what I want this game to be: https://github.com/soulgeo/orbit-drift-unity
+Personal project, creating a 3D space flight game from scratch in C++ using raylib. You can check out the unity version I made of what I want this game to be: https://github.com/soulgeo/orbit-drift-unity
