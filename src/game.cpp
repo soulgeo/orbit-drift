@@ -2,7 +2,7 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include "game_objects.hpp"
+#include "entities.hpp"
 #include "raylib.h"
 
 

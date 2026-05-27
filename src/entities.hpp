@@ -1,5 +1,5 @@
-#ifndef GAMEOBJECTS_HPP
-#define GAMEOBJECTS_HPP
+#ifndef ENTITIES_HPP
+#define ENTITIES_HPP
 
 #include "game_object.hpp"
 #include "game.hpp"
@@ -48,4 +48,4 @@ public:
     void update(Game& game) override;
 };
 
-#endif // !GAMEOBJECTS_HPP
+#endif // !ENTITIES_HPP
