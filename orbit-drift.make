@@ -123,11 +123,13 @@ GENERATED += $(OBJDIR)/game.o
 GENERATED += $(OBJDIR)/game_object.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/renderer.o
 OBJECTS += $(OBJDIR)/entities.o
 OBJECTS += $(OBJDIR)/game.o
 OBJECTS += $(OBJDIR)/game_object.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/renderer.o
 
 # Rules
 # #############################################
@@ -204,6 +206,9 @@ $(OBJDIR)/input_handler.o: src/input_handler.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/renderer.o: src/renderer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

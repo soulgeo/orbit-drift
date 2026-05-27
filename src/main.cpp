@@ -2,6 +2,7 @@
 #include "game.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "renderer.hpp"
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -11,6 +12,7 @@ int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
 
     Game game;
+    Renderer renderer(game);
     PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
 
     Camera camera = {0};
@@ -23,6 +25,7 @@ int main() {
 
     while (!WindowShouldClose()) {
         game.update();
+        renderer.update(game);
 
         Vector3 currentPosition = playerShip->getPosition();
         Vector3 forward = playerShip->getForward();
@@ -38,7 +41,7 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
         BeginMode3D(camera);
-        game.draw(camera.position);
+        renderer.draw(camera.position, game);
         EndMode3D();
 
         if (playerShip->isInGravitySOI) {

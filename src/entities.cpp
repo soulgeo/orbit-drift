@@ -5,12 +5,10 @@
 #include "raymath.h"
 
 PlayerShip::PlayerShip() {
-    model = LoadModelFromMesh(GenMeshCone(0.2f, 0.5f, 16));
-    modelBaseRotation = MatrixRotateX(-90.0f * DEG2RAD);
     hitbox = (BoundingBox){(Vector3){-0.2f, -0.2f, -0.2f}, (Vector3){0.2f, 0.2f, 0.2f}};
 }
 
-PlayerShip::~PlayerShip() { UnloadModel(model); }
+PlayerShip::~PlayerShip() {}
 
 void PlayerShip::update(Game& game) {
     Vector2 mousePosition = GetMousePosition();
@@ -48,17 +46,15 @@ void PlayerShip::addGravity(Vector3 gravityAccel) {
     externalGravityVelocity = Vector3Add(externalGravityVelocity, gravityAccel);
 }
 
-Planet::Planet(Color p_color, Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
-    : color(p_color),
-      radius(p_radius),
+Planet::Planet(Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
+    : radius(p_radius),
       gravityRadius(p_gravityRadius),
       gravityForce(p_gravityForce) 
 {
     setPosition(p_position);
-    model = LoadModelFromMesh(GenMeshSphere(p_radius, 30, 30));
 }
 
-Planet::~Planet() { UnloadModel(model); }
+Planet::~Planet() {}
 
 void Planet::update(Game& game) {
     PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");

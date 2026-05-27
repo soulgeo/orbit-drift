@@ -13,9 +13,6 @@ public:
     // Master matrix tracking position and orientation
     Matrix transform = MatrixIdentity();
 
-    Model model;
-    Matrix modelBaseRotation = MatrixIdentity();
-
     // Getters
     Vector3 getPosition() const;
     Vector3 getForward() const;

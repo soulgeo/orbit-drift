@@ -28,8 +28,8 @@ public:
 
     static constexpr size_t MAX_GAMEOBJECT_COUNT = 200;
 
-    GameObject* getGameObject(std::string name);
-    void forEachGameObject(std::function<void(GameObject&)> func);
+    GameObject* getGameObject(const std::string& name);
+    void forEachGameObject(std::function<void(const std::string&, GameObject&)> func);
 
     InputHandler inputHandler;
 
@@ -39,11 +39,7 @@ public:
 
     void update();
 
-    void draw(Vector3 cameraPos);
-
 private:
-
-    Shader fog;
     GameImpl* impl_;
 };
 
