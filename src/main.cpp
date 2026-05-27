@@ -3,12 +3,6 @@
 #include "raylib.h"
 #include "raymath.h"
 
-#if defined(PLATFORM_DESKTOP)
-#define GLSL_VERSION 330
-#else
-#define GLSL_VERSION 100
-#endif
-
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 
@@ -27,14 +21,6 @@ int main() {
 
     SetTargetFPS(60);
 
-    Shader fog =
-        LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
-                   TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
-
-    game.forEachGameObject([&](GameObject& obj) {
-        obj.model.materials[0].shader = fog;
-    });
-
     while (!WindowShouldClose()) {
         game.update();
 
@@ -49,15 +35,10 @@ int main() {
             Vector3Add(Vector3Add(currentPosition, lookOffset), heightOffset);
         camera.up = up;
 
-        int distLoc = GetShaderLocation(fog, "viewPos");
-        SetShaderValue(fog, distLoc, &camera.position, SHADER_UNIFORM_VEC3);
-        SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW],
-                       &camera.position.x, SHADER_UNIFORM_VEC3);
-
         BeginDrawing();
         ClearBackground(BLACK);
         BeginMode3D(camera);
-        game.draw();
+        game.draw(camera.position);
         EndMode3D();
 
         if (playerShip->isInGravitySOI) {

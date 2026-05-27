@@ -39,7 +39,7 @@ public:
 
     void update();
 
-    void draw();
+    void draw(Vector3 cameraPos);
 
 private:
 

@@ -1,10 +1,17 @@
 #include "game.hpp"
+
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
+
 #include "entities.hpp"
 #include "raylib.h"
 
+#if defined(PLATFORM_DESKTOP)
+#define GLSL_VERSION 330
+#else
+#define GLSL_VERSION 100
+#endif
 
 struct GameImpl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> gameObjects;
@@ -15,17 +22,13 @@ Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
     impl_->gameObjects["planet1"] = std::make_unique<Planet>(
-        PURPLE, (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f
-    );
+        PURPLE, (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f);
     impl_->gameObjects["planet2"] = std::make_unique<Planet>(
-        GREEN, (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f
-    );
+        GREEN, (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f);
     impl_->gameObjects["planet3"] = std::make_unique<Planet>(
-        YELLOW, (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f
-    );
+        YELLOW, (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f);
     impl_->gameObjects["planet4"] = std::make_unique<Planet>(
-        BLUE, (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f
-    );
+        BLUE, (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f);
 
     // Keybinds
     inputHandler.bindKey(KEY_SPACE, DOWN, MOVE_UP);
@@ -37,13 +40,23 @@ Game::Game() {
     inputHandler.bindKey(KEY_E, DOWN, ROLL_CW);
     inputHandler.bindKey(KEY_Q, DOWN, ROLL_CCW);
     inputHandler.bindKey(KEY_LEFT_ALT, PRESSED, PAUSE);
+
+    // Load Fog Shader
+    fog =
+        LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
+                   TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
+
+    // Assign shader to all game objects
+    forEachGameObject(
+        [&](GameObject& obj) { obj.model.materials[0].shader = fog; });
 }
 
 Game::~Game() {
+    UnloadShader(fog);
     delete impl_;
 }
 
-GameObject* Game::getGameObject(std::string name){
+GameObject* Game::getGameObject(std::string name) {
     auto it = impl_->gameObjects.find(name);
     if (it != impl_->gameObjects.end()) {
         return it->second.get();
@@ -88,15 +101,24 @@ bool Game::isActiveInput(int input) {
     return false;
 }
 
-void Game::draw() {
+void Game::draw(Vector3 cameraPos) {
+    int distLoc = GetShaderLocation(fog, "viewPos");
+    SetShaderValue(fog, distLoc, &cameraPos, SHADER_UNIFORM_VEC3);
+    SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW], &cameraPos.x,
+                   SHADER_UNIFORM_VEC3);
+
     GameObject* playerShip = getGameObject("player");
-    DrawModel(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, PURPLE);
-    DrawModelWires(playerShip->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, MAROON);
+    DrawModel(playerShip->model, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, PURPLE);
+    DrawModelWires(playerShip->model, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f,
+                   MAROON);
 
     for (const auto& [name, object] : impl_->gameObjects) {
-        if (Planet* planet = dynamic_cast<Planet*>(object.get())){
-            DrawModel(planet->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, planet->color);
-            DrawModelWires(planet->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, ColorTint(planet->color, (Color){ 200, 200, 200, 255 }));
+        if (Planet* planet = dynamic_cast<Planet*>(object.get())) {
+            DrawModel(planet->model, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f,
+                      planet->color);
+            DrawModelWires(
+                planet->model, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f,
+                ColorTint(planet->color, (Color){200, 200, 200, 255}));
         }
     }
 }
