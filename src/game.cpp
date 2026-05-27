@@ -28,15 +28,15 @@ Game::Game() {
     );
 
     // Keybinds
-    inputHandler.bindKey(KEY_SPACE, DOWN, "move_up");
-    inputHandler.bindKey(KEY_LEFT_SHIFT, DOWN, "move_down");
-    inputHandler.bindKey(KEY_W, DOWN, "move_forward");
-    inputHandler.bindKey(KEY_S, DOWN, "move_back");
-    inputHandler.bindKey(KEY_A, DOWN, "move_left");
-    inputHandler.bindKey(KEY_D, DOWN, "move_right");
-    inputHandler.bindKey(KEY_E, DOWN, "roll_cw");
-    inputHandler.bindKey(KEY_Q, DOWN, "roll_ccw");
-    inputHandler.bindKey(KEY_LEFT_ALT, PRESSED, "pause");
+    inputHandler.bindKey(KEY_SPACE, DOWN, MOVE_UP);
+    inputHandler.bindKey(KEY_LEFT_SHIFT, DOWN, MOVE_DOWN);
+    inputHandler.bindKey(KEY_W, DOWN, MOVE_FORWARD);
+    inputHandler.bindKey(KEY_S, DOWN, MOVE_BACK);
+    inputHandler.bindKey(KEY_A, DOWN, MOVE_LEFT);
+    inputHandler.bindKey(KEY_D, DOWN, MOVE_RIGHT);
+    inputHandler.bindKey(KEY_E, DOWN, ROLL_CW);
+    inputHandler.bindKey(KEY_Q, DOWN, ROLL_CCW);
+    inputHandler.bindKey(KEY_LEFT_ALT, PRESSED, PAUSE);
 }
 
 Game::~Game() {
@@ -61,8 +61,8 @@ void Game::update() {
     // Handle input
     impl_->activeInputs = inputHandler.handleInput();
 
-    for (const std::string& action : impl_->activeInputs.commands) {
-        if (action == "pause") {
+    for (size_t i = 0; i < impl_->activeInputs.count; ++i) {
+        if (impl_->activeInputs.commands[i] == PAUSE) {
             isPaused = !isPaused;
         }
     }
@@ -79,9 +79,9 @@ void Game::update() {
     }
 }
 
-bool Game::isActiveInput(std::string input) {
-    for (const std::string& action : impl_->activeInputs.commands) {
-        if (action == input) {
+bool Game::isActiveInput(int input) {
+    for (size_t i = 0; i < impl_->activeInputs.count; ++i) {
+        if (impl_->activeInputs.commands[i] == input) {
             return true;
         }
     }

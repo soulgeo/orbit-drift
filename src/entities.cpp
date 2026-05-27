@@ -1,5 +1,6 @@
 #include "entities.hpp"
 
+#include "game.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -21,10 +22,10 @@ void PlayerShip::update(Game& game) {
     rotateYaw(localYaw);
 
     int moveX =
-        game.isActiveInput("move_right") - game.isActiveInput("move_left");
-    int moveY = game.isActiveInput("move_up") - game.isActiveInput("move_down");
+        game.isActiveInput(MOVE_RIGHT) - game.isActiveInput(MOVE_LEFT);
+    int moveY = game.isActiveInput(MOVE_UP) - game.isActiveInput(MOVE_DOWN);
     int moveZ =
-        game.isActiveInput("move_forward") - game.isActiveInput("move_back");
+        game.isActiveInput(MOVE_FORWARD) - game.isActiveInput(MOVE_BACK);
 
     Vector3 localTargetVelocity = {moveX * rightSpeed, moveY * upSpeed, -moveZ * forwardSpeed};
     currentVelocity = Vector3Lerp(currentVelocity, localTargetVelocity, forwardAccel * GetFrameTime());
