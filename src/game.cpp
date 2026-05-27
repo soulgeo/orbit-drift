@@ -15,16 +15,16 @@ Game::Game() {
     impl_ = new GameImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
     impl_->gameObjects["planet1"] = std::make_unique<Planet>(
-        (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f
+        PURPLE, (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f
     );
     impl_->gameObjects["planet2"] = std::make_unique<Planet>(
-        (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f
+        GREEN, (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f
     );
     impl_->gameObjects["planet3"] = std::make_unique<Planet>(
-        (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f
+        YELLOW, (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f
     );
     impl_->gameObjects["planet4"] = std::make_unique<Planet>(
-        (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f
+        BLUE, (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f
     );
 
     // Keybinds
@@ -49,6 +49,12 @@ GameObject* Game::getGameObject(std::string name){
         return it->second.get();
     }
     return nullptr;
+}
+
+void Game::forEachGameObject(std::function<void(GameObject&)> func) {
+    for (auto& [name, object] : impl_->gameObjects) {
+        func(*object);
+    }
 }
 
 void Game::update() {
@@ -89,8 +95,8 @@ void Game::draw() {
 
     for (const auto& [name, object] : impl_->gameObjects) {
         if (Planet* planet = dynamic_cast<Planet*>(object.get())){
-            DrawModel(object->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, GREEN);
-            DrawModelWires(object->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, DARKGREEN);
+            DrawModel(planet->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, planet->color);
+            DrawModelWires(planet->model, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, ColorTint(planet->color, (Color){ 200, 200, 200, 255 }));
         }
     }
 }

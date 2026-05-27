@@ -4,6 +4,7 @@
 #include "game_object.hpp"
 #include "input_handler.hpp"
 #include <string>
+#include <functional>
 
 struct GameImpl;
 
@@ -15,6 +16,7 @@ public:
     static constexpr size_t MAX_GAMEOBJECT_COUNT = 200;
 
     GameObject* getGameObject(std::string name);
+    void forEachGameObject(std::function<void(GameObject&)> func);
 
     InputHandler inputHandler;
 
@@ -27,6 +29,8 @@ public:
     void draw();
 
 private:
+
+    Shader fog;
     GameImpl* impl_;
 };
 

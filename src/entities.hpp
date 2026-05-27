@@ -37,8 +37,10 @@ private:
 
 class Planet : public GameObject {
 public:
-    Planet(Vector3 position, float radius, float gravityRadius, float GravityForce);
+    Planet(Color color, Vector3 position, float radius, float gravityRadius, float GravityForce);
     ~Planet();
+
+    Color color;
 
     float radius;
     float gravityRadius;

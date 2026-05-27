@@ -47,8 +47,9 @@ void PlayerShip::addGravity(Vector3 gravityAccel) {
     externalGravityVelocity = Vector3Add(externalGravityVelocity, gravityAccel);
 }
 
-Planet::Planet(Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
-    : radius(p_radius),
+Planet::Planet(Color p_color, Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
+    : color(p_color),
+      radius(p_radius),
       gravityRadius(p_gravityRadius),
       gravityForce(p_gravityForce) 
 {
