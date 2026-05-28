@@ -2,7 +2,7 @@
 #define ENTITIES_HPP
 
 #include "game_object.hpp"
-#include "game.hpp"
+#include "scene.hpp"
 #include "raylib.h"
 
 class PlayerShip : public GameObject {
@@ -28,7 +28,7 @@ public:
 
     void addGravity(Vector3 gravityAccel);
 
-    void update(Game& game) override;
+    void update(Scene& scene) override;
 
 private:
     Vector3 currentVelocity = Vector3Zero();
@@ -45,7 +45,7 @@ public:
     float gravityForce;
     float rotationSpeed;
 
-    void update(Game& game) override;
+    void update(Scene& scene) override;
 };
 
 #endif // !ENTITIES_HPP

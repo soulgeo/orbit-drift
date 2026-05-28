@@ -94,7 +94,7 @@ void GameObject::rotate(float deltaPitch, float deltaYaw, float deltaRoll) {
 
 //================================================================================== 
 // Frame by frame behavior
-void GameObject::onUpdate(Game& game){
-    update(game);
+void GameObject::onUpdate(Scene& scene){
+    update(scene);
 }
 

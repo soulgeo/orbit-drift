@@ -1,4 +1,4 @@
-#include "game.hpp"
+#include "scene.hpp"
 
 #include <memory>
 #include <string>
@@ -7,13 +7,13 @@
 #include "entities.hpp"
 #include "raylib.h"
 
-struct GameImpl {
+struct SceneImpl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> gameObjects;
     InputHandler::CommandList activeInputs;
 };
 
-Game::Game() {
-    impl_ = new GameImpl();
+Scene::Scene() {
+    impl_ = new SceneImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
     impl_->gameObjects["planet1"] = std::make_unique<Planet>(
         (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f);
@@ -33,14 +33,13 @@ Game::Game() {
     inputHandler.bindKey(KEY_E, DOWN, ROLL_CW);
     inputHandler.bindKey(KEY_Q, DOWN, ROLL_CCW);
     inputHandler.bindKey(KEY_LEFT_ALT, PRESSED, PAUSE);
-
 }
 
-Game::~Game() {
+Scene::~Scene() {
     delete impl_;
 }
 
-GameObject* Game::getGameObject(const std::string& name) {
+GameObject* Scene::getGameObject(const std::string& name) {
     auto it = impl_->gameObjects.find(name);
     if (it != impl_->gameObjects.end()) {
         return it->second.get();
@@ -48,13 +47,13 @@ GameObject* Game::getGameObject(const std::string& name) {
     return nullptr;
 }
 
-void Game::forEachGameObject(std::function<void(const std::string&, GameObject&)> func) {
+void Scene::forEachGameObject(std::function<void(const std::string&, GameObject&)> func) {
     for (auto& [name, object] : impl_->gameObjects) {
         func(name, *object);
     }
 }
 
-void Game::update() {
+void Scene::update() {
     // Handle input
     impl_->activeInputs = inputHandler.handleInput();
 
@@ -75,7 +74,7 @@ void Game::update() {
     }
 }
 
-bool Game::isActiveInput(int input) {
+bool Scene::isActiveInput(int input) {
     for (size_t i = 0; i < impl_->activeInputs.count; ++i) {
         if (impl_->activeInputs.commands[i] == input) {
             return true;

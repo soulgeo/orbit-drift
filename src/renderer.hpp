@@ -1,19 +1,19 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "game.hpp"
+#include "scene.hpp"
 #include "game_object.hpp"
 struct RendererImpl;
 
 class Renderer {
 public:
-    Renderer(Game& game);
+    Renderer(Scene& game);
     ~Renderer();
 
     Camera camera = {0};
-    void update(Game& game);
-    void draw3D(const Game& game);
-    void drawUI(const Game& game);
+    void update(Scene& scene);
+    void draw3D(const Scene& scene);
+    void drawUI(const Scene& scene);
 private:
     GameObject* cameraTarget;
     Shader fog;

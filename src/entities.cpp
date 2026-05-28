@@ -1,6 +1,6 @@
 #include "entities.hpp"
 
-#include "game.hpp"
+#include "scene.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -10,7 +10,7 @@ PlayerShip::PlayerShip() {
 
 PlayerShip::~PlayerShip() {}
 
-void PlayerShip::update(Game& game) {
+void PlayerShip::update(Scene& scene) {
     Vector2 mousePosition = GetMousePosition();
     Vector2 mouseDistance = {mousePosition.x - 960, mousePosition.y - 540};
     float localYaw = mouseDistance.x * -panSpeed * GetFrameTime();
@@ -20,10 +20,10 @@ void PlayerShip::update(Game& game) {
     rotateYaw(localYaw);
 
     int moveX =
-        game.isActiveInput(MOVE_RIGHT) - game.isActiveInput(MOVE_LEFT);
-    int moveY = game.isActiveInput(MOVE_UP) - game.isActiveInput(MOVE_DOWN);
+        scene.isActiveInput(MOVE_RIGHT) - scene.isActiveInput(MOVE_LEFT);
+    int moveY = scene.isActiveInput(MOVE_UP) - scene.isActiveInput(MOVE_DOWN);
     int moveZ =
-        game.isActiveInput(MOVE_FORWARD) - game.isActiveInput(MOVE_BACK);
+        scene.isActiveInput(MOVE_FORWARD) - scene.isActiveInput(MOVE_BACK);
 
     Vector3 localTargetVelocity = {moveX * rightSpeed, moveY * upSpeed, -moveZ * forwardSpeed};
     currentVelocity = Vector3Lerp(currentVelocity, localTargetVelocity, forwardAccel * GetFrameTime());
@@ -56,8 +56,8 @@ Planet::Planet(Vector3 p_position, float p_radius, float p_gravityRadius, float 
 
 Planet::~Planet() {}
 
-void Planet::update(Game& game) {
-    PlayerShip* playerShip = (PlayerShip*)game.getGameObject("player");
+void Planet::update(Scene& scene) {
+    PlayerShip* playerShip = (PlayerShip*)scene.getGameObject("player");
     bool colliding = CheckCollisionBoxSphere(playerShip->hitbox, getPosition(), gravityRadius);
     if (colliding) {
         playerShip->isInGravitySOI = true;

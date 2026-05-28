@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "raymath.h"
 
-class Game;
+class Scene;
 
 class GameObject {
 public:
@@ -46,10 +46,10 @@ public:
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
     // Frame by frame behavior
-    virtual void onUpdate(Game& game);
+    virtual void onUpdate(Scene& scene);
 
 protected:
-    virtual void update(Game& game) {};
+    virtual void update(Scene& scene) {};
 };
 
 #endif // GAMEOBJECT_HPP
