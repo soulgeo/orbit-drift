@@ -7,14 +7,15 @@ struct RendererImpl;
 
 class Renderer {
 public:
-    Renderer(Scene& game);
+    Renderer(Scene* scene);
     ~Renderer();
 
     Camera camera = {0};
-    void update(Scene& scene);
-    void draw3D(const Scene& scene);
-    void drawUI(const Scene& scene);
+    void update();
+    void draw3D();
+    void drawUI();
 private:
+    Scene* scene;
     GameObject* cameraTarget;
     Shader fog;
     RendererImpl* impl_;

@@ -20,14 +20,14 @@ struct RendererImpl {
     std::unordered_map<std::string, std::tuple<Model, Matrix, Color>> objModelRefs;
 };
 
-Renderer::Renderer(Scene& scene) {
+Renderer::Renderer(Scene* r_scene) : scene(r_scene){
     impl_ = new RendererImpl;
 
     // Init camera
     camera.up = (Vector3){0.0f, 1.0f, 0.0f};
     camera.fovy = 60.0f;
     camera.projection = CAMERA_PERSPECTIVE;
-    cameraTarget = scene.getGameObject("player");
+    cameraTarget = r_scene->getGameObject("player");
 
     // Init models
     impl_->models["player_model"] = LoadModelFromMesh(GenMeshCone(0.2f, 0.5f, 16.0f));
@@ -41,28 +41,28 @@ Renderer::Renderer(Scene& scene) {
 
     float scalar;
 
-    scalar = ((Planet*)scene.getGameObject("planet1"))->radius;
+    scalar = ((Planet*)r_scene->getGameObject("planet1"))->radius;
     impl_->objModelRefs["planet1"] = {
         impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
         PURPLE
     };
 
-    scalar = ((Planet*)scene.getGameObject("planet2"))->radius;
+    scalar = ((Planet*)r_scene->getGameObject("planet2"))->radius;
     impl_->objModelRefs["planet2"] = {
         impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
         GREEN
     };
 
-    scalar = ((Planet*)scene.getGameObject("planet3"))->radius;
+    scalar = ((Planet*)r_scene->getGameObject("planet3"))->radius;
     impl_->objModelRefs["planet3"] = {
         impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
         YELLOW
     };
 
-    scalar = ((Planet*)scene.getGameObject("planet4"))->radius;
+    scalar = ((Planet*)r_scene->getGameObject("planet4"))->radius;
     impl_->objModelRefs["planet4"] = {
         impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
@@ -87,7 +87,7 @@ Renderer::~Renderer() {
     delete impl_;
 }
 
-void Renderer::update(Scene& scene) {
+void Renderer::update() {
     // Update camera
     Vector3 position = cameraTarget->getPosition();
     Vector3 forward = cameraTarget->getForward();
@@ -102,14 +102,14 @@ void Renderer::update(Scene& scene) {
 
     // Update model transforms
     for (auto& [name, tuple] : impl_->objModelRefs) {
-        GameObject *object = scene.getGameObject(name);
+        GameObject *object = scene->getGameObject(name);
         if (object) {
             std::get<0>(tuple).transform = MatrixMultiply(std::get<1>(tuple), object->transform);
         }
     }
 }
 
-void Renderer::draw3D(const Scene& scene) {
+void Renderer::draw3D() {
     int distLoc = GetShaderLocation(fog, "viewPos");
     SetShaderValue(fog, distLoc, &camera.position, SHADER_UNIFORM_VEC3);
     SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW], &camera.position, SHADER_UNIFORM_VEC3);
@@ -122,8 +122,8 @@ void Renderer::draw3D(const Scene& scene) {
     }
 }
 
-void Renderer::drawUI(const Scene& scene) {
+void Renderer::drawUI() {
     if (((PlayerShip*)cameraTarget)->isInGravitySOI) {
-        DrawText("IN GRAVITY", 20, 40, 40, YELLOW);
+        DrawText("IN GRAVITY", 20, 40, 32, YELLOW);
     }
 }

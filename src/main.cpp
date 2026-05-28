@@ -10,20 +10,20 @@ int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
 
     Scene scene;
-    Renderer renderer(scene);
+    Renderer renderer(&scene);
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
         scene.update();
-        renderer.update(scene);
+        renderer.update();
 
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode3D(renderer.camera);
-                renderer.draw3D(scene);
+                renderer.draw3D();
             EndMode3D();
-            renderer.drawUI(scene);
+            renderer.drawUI();
         EndDrawing();
     }
 
