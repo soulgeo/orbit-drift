@@ -63,7 +63,6 @@ void Game::update() {
             isPaused = !isPaused;
         }
     }
-
     if (isPaused) return;
 
     // Reset ship SOI flag

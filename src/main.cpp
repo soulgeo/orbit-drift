@@ -19,14 +19,11 @@ int main() {
         renderer.update(game);
 
         BeginDrawing();
-        ClearBackground(BLACK);
-
-        BeginMode3D(renderer.camera);
-        renderer.draw3D(game);
-        EndMode3D();
-
-        renderer.drawUI(game);
-
+            ClearBackground(BLACK);
+            BeginMode3D(renderer.camera);
+                renderer.draw3D(game);
+            EndMode3D();
+            renderer.drawUI(game);
         EndDrawing();
     }
 
