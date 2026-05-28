@@ -20,8 +20,16 @@ struct RendererImpl {
     std::unordered_map<std::string, Model> models;
     std::unordered_map<std::string, std::tuple<Model, Matrix, Color>> objModelRefs;
 };
+
 Renderer::Renderer(Game& game) {
     impl_ = new RendererImpl;
+
+    camera.up = (Vector3){0.0f, 1.0f, 0.0f};
+    camera.fovy = 60.0f;
+    camera.projection = CAMERA_PERSPECTIVE;
+
+    cameraTarget = game.getGameObject("player");
+
     impl_->models["player_model"] = LoadModelFromMesh(GenMeshCone(0.2f, 0.5f, 16.0f));
     impl_->models["planet_model"] = LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
 
@@ -79,6 +87,16 @@ Renderer::~Renderer() {
 }
 
 void Renderer::update(Game& game) {
+    Vector3 currentPosition = cameraTarget->getPosition();
+    Vector3 forward = cameraTarget->getForward();
+    Vector3 up = cameraTarget->getUp();
+
+    camera.target = currentPosition;
+    Vector3 lookOffset = Vector3Scale(forward, -3.0f);
+    Vector3 heightOffset = Vector3Scale(up, 2.5f);
+    camera.position =
+        Vector3Add(Vector3Add(currentPosition, lookOffset), heightOffset);
+    camera.up = up;
     for (auto& [name, tuple] : impl_->objModelRefs) {
         GameObject *object = game.getGameObject(name);
         if (object) {
@@ -87,15 +105,21 @@ void Renderer::update(Game& game) {
     }
 }
 
-void Renderer::draw(Vector3 cameraPos, const Game& game) {
+void Renderer::draw3D(const Game& game) {
     int distLoc = GetShaderLocation(fog, "viewPos");
-    SetShaderValue(fog, distLoc, &cameraPos, SHADER_UNIFORM_VEC3);
-    SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW], &cameraPos, SHADER_UNIFORM_VEC3);
+    SetShaderValue(fog, distLoc, &camera.position, SHADER_UNIFORM_VEC3);
+    SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW], &camera.position, SHADER_UNIFORM_VEC3);
 
     for (auto& [name, tuple] : impl_->objModelRefs) {
         Model& model = std::get<0>(tuple);
         DrawModel(model, Vector3Zero(), 1.0, std::get<2>(tuple));
         DrawModelWires(model, Vector3Zero(), 1.0f,
                        ColorTint(std::get<2>(tuple), (Color){200, 200, 200, 255}));
+    }
+}
+
+void Renderer::drawUI(const Game& game) {
+    if (((PlayerShip*)cameraTarget)->isInGravitySOI) {
+        DrawText("IN GRAVITY", 20, 40, 40, YELLOW);
     }
 }
