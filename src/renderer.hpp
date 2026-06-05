@@ -19,6 +19,7 @@ private:
     GameObject* cameraTarget;
     Shader fog;
     RendererImpl* impl_;
+    float dt;
 };
 
 #endif // !RENDERER_HPP
