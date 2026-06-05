@@ -14,6 +14,7 @@ public:
     Matrix transform = MatrixIdentity();
 
     // Getters
+    // TODO: Add Quaternion Getter
     Vector3 getPosition() const;
     Vector3 getForward() const;
     Vector3 getUp() const;
@@ -40,6 +41,7 @@ public:
     virtual void moveLocalForward(float distance);
 
     // Rotations
+    // TODO: Add Quaternion Rotation
     virtual void rotatePitch(float angleRad); // Rotation around Right axis
     virtual void rotateYaw(float angleRad); // Rotation around Up axis
     virtual void rotateRoll(float angleRad); // Rotation around Forward axis

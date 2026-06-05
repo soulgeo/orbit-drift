@@ -21,7 +21,7 @@ public:
 
     float panSpeed = 0.004f;
 
-    float rollSpeed = 1.0f;
+    float rollSpeed = 3.0f;
     float rollAccel = 4.0f;
 
     BoundingBox hitbox;

@@ -59,27 +59,27 @@ Vector3 GameObject::getForward() const {
 
 void GameObject::moveLocalRight(float distance) {
     Matrix moveMat = MatrixTranslate(distance, 0.0f, 0.0f);
-    this->transform = MatrixMultiply(moveMat, this->transform);
+    this->transform = moveMat * this->transform;
 }
 void GameObject::moveLocalUp(float distance) {
     Matrix moveMat = MatrixTranslate(0.0f, distance, 0.0f);
-    this->transform = MatrixMultiply(moveMat, this->transform);
+    this->transform = moveMat * this->transform;
 }
 void GameObject::moveLocalForward(float distance) {
     Matrix moveMat = MatrixTranslate(0.0f, 0.0f, -distance);
-    this->transform = MatrixMultiply(moveMat, this->transform);
+    this->transform = moveMat * this->transform;
 }
 
 //================================================================================== 
 // Rotation
 void GameObject::rotatePitch(float angleRad) {
-    this->transform = MatrixMultiply(MatrixRotateX(angleRad), this->transform);
+    this->transform = MatrixRotateX(angleRad) * this->transform;
 }
 void GameObject::rotateYaw(float angleRad) {
-    this->transform = MatrixMultiply(MatrixRotateY(angleRad), this->transform);
+    this->transform = MatrixRotateY(angleRad) * this->transform;
 }
 void GameObject::rotateRoll(float angleRad) {
-    this->transform = MatrixMultiply(MatrixRotateZ(angleRad), this->transform);
+    this->transform = MatrixRotateZ(angleRad) * this->transform;
 }
 
 void GameObject::rotate(float deltaPitch, float deltaYaw, float deltaRoll) {
@@ -87,9 +87,9 @@ void GameObject::rotate(float deltaPitch, float deltaYaw, float deltaRoll) {
     Matrix yMat = MatrixRotateY(deltaYaw);
     Matrix rMat = MatrixRotateZ(deltaRoll);
 
-    Matrix frameRotation = MatrixMultiply(MatrixMultiply(pMat, yMat), rMat);
+    Matrix frameRotation = pMat * yMat * rMat;
 
-    this->transform = MatrixMultiply(frameRotation, this->transform);
+    this->transform = frameRotation * this->transform;
 }
 
 //================================================================================== 

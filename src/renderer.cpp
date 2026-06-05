@@ -46,9 +46,9 @@ Renderer::Renderer(Scene *r_scene) : scene(r_scene) {
 
     impl_->objModelRefs["player"] = {
         impl_->models["player_model"],
-        MatrixMultiply(MatrixMultiply(MatrixRotateX(180.0f * DEG2RAD),
-                                      MatrixRotateZ(180.0f * DEG2RAD)),
-                       MatrixScale(0.2f, 0.2f, 0.2f)),
+        MatrixRotateX(180.0f * DEG2RAD) * 
+            MatrixRotateZ(180.0f * DEG2RAD) * 
+            MatrixScale(0.2f, 0.2f, 0.2f),
         MAGENTA};
 
     float scalar;
@@ -96,12 +96,13 @@ void Renderer::update() {
     Vector3 forward = cameraTarget->getForward();
     Vector3 up = cameraTarget->getUp();
 
-    float followSpeed = 20.0f;
-    camera.target = Vector3Lerp(camera.target, position, followSpeed*dt);
-    Vector3 lookOffset = Vector3Scale(forward, -3.0f);
-    Vector3 heightOffset = Vector3Scale(up, 1.0f);
+    float followSpeed = 30.0f;
+    Vector3 endTarget = position + 3.0f * forward;
+    camera.target = Vector3Lerp(camera.target, endTarget, followSpeed*dt);
+    Vector3 lookOffset = -2.5f * forward;
+    Vector3 heightOffset = 1.0f * up;
 
-    Vector3 endPosition = Vector3Add(Vector3Add(position, lookOffset), heightOffset);
+    Vector3 endPosition = position + lookOffset + heightOffset;
     camera.position = Vector3Lerp(camera.position, endPosition, followSpeed*dt);
     camera.up = up;
 
@@ -110,7 +111,7 @@ void Renderer::update() {
         GameObject *object = scene->getGameObject(name);
         if (object) {
             std::get<0>(tuple).transform =
-                MatrixMultiply(std::get<1>(tuple), object->transform);
+                std::get<1>(tuple) * object->transform;
         }
     }
 }

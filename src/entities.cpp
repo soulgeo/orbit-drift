@@ -47,7 +47,7 @@ void PlayerShip::update(Scene& scene) {
     Quaternion rot = QuaternionFromMatrix(transform);
 
     Vector3 worldMovement = Vector3RotateByQuaternion(currentVelocity, rot);
-    worldMovement = Vector3Add(worldMovement, Vector3Scale(externalGravityVelocity, GetFrameTime()));
+    worldMovement = worldMovement + externalGravityVelocity*GetFrameTime();
 
     moveGlobal(worldMovement);
 
@@ -64,7 +64,7 @@ void PlayerShip::update(Scene& scene) {
 }
 
 void PlayerShip::addGravity(Vector3 gravityAccel) {
-    externalGravityVelocity = Vector3Add(externalGravityVelocity, gravityAccel);
+    externalGravityVelocity += gravityAccel;
 }
 
 Planet::Planet(Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
@@ -85,7 +85,7 @@ void Planet::update(Scene& scene) {
         Vector3 direction = Vector3Normalize(Vector3Subtract(getPosition(), playerShip->getPosition()));
         float distance = Vector3Distance(playerShip->getPosition(), getPosition());
         float distanceFactor = 1.0f - Clamp(distance / gravityRadius, 0, 1);
-        Vector3 gravityAccel = Vector3Scale(direction, gravityForce * distanceFactor);
+        Vector3 gravityAccel = gravityForce * distanceFactor * direction;
 
         playerShip->addGravity(gravityAccel);
     }
