@@ -20,7 +20,9 @@ public:
     float upAccel = 3.0f;
 
     float panSpeed = 0.004f;
+
     float rollSpeed = 1.0f;
+    float rollAccel = 4.0f;
 
     BoundingBox hitbox;
 
@@ -32,6 +34,7 @@ public:
 
 private:
     Vector3 currentVelocity = Vector3Zero();
+    float currentRollSpeed = 0.0f;
     Vector3 externalGravityVelocity = Vector3Zero();
 };
 

@@ -4,6 +4,20 @@
 #include "raylib.h"
 #include "raymath.h"
 
+float _smoothTowards(float start, float target, float speed, float threshold = 0.001f) {
+    float value = Lerp(start, target, speed*GetFrameTime());
+    if (std::abs(value - start) < threshold) return start;
+    if (std::abs(value - target) < threshold) return target;
+    return value;
+}
+
+Vector3 _vector3SmoothTowards(Vector3 start, Vector3 target, float speed, float threshold = 0.001f) {
+    Vector3 value = Vector3Lerp(start, target, speed*GetFrameTime());
+    if (Vector3Distance(value, start) < threshold) return start;
+    if (Vector3Distance(value, target) < threshold) return target;
+    return value;
+}
+
 PlayerShip::PlayerShip() {
     hitbox = (BoundingBox){(Vector3){-0.2f, -0.2f, -0.2f}, (Vector3){0.2f, 0.2f, 0.2f}};
 }
@@ -24,15 +38,22 @@ void PlayerShip::update(Scene& scene) {
     int moveY = scene.isActiveInput(MOVE_UP) - scene.isActiveInput(MOVE_DOWN);
     int moveZ =
         scene.isActiveInput(MOVE_FORWARD) - scene.isActiveInput(MOVE_BACK);
+    int roll = 
+        scene.isActiveInput(ROLL_CCW) - scene.isActiveInput(ROLL_CW);
 
+    // Position Movement
     Vector3 localTargetVelocity = {moveX * rightSpeed, moveY * upSpeed, -moveZ * forwardSpeed};
-    currentVelocity = Vector3Lerp(currentVelocity, localTargetVelocity, forwardAccel * GetFrameTime());
+    currentVelocity = _vector3SmoothTowards(currentVelocity, localTargetVelocity, forwardAccel);
     Quaternion rot = QuaternionFromMatrix(transform);
 
     Vector3 worldMovement = Vector3RotateByQuaternion(currentVelocity, rot);
     worldMovement = Vector3Add(worldMovement, Vector3Scale(externalGravityVelocity, GetFrameTime()));
 
     moveGlobal(worldMovement);
+
+    // Rotation
+    currentRollSpeed = _smoothTowards(currentRollSpeed, roll*rollSpeed, rollAccel);
+    rotateRoll(currentRollSpeed*GetFrameTime());
 
     externalGravityVelocity = Vector3Zero();
 
