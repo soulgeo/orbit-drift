@@ -16,11 +16,11 @@ Scene::Scene() {
     impl_ = new SceneImpl();
     impl_->gameObjects["player"] = std::make_unique<PlayerShip>();
     impl_->gameObjects["planet1"] = std::make_unique<Planet>(
-        (Vector3){30.0f, 5.0f, 30.0f}, 10.0f, 40.0f, 40.0f);
+        (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f);
     impl_->gameObjects["planet2"] = std::make_unique<Planet>(
-        (Vector3){50.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f);
+        (Vector3){100.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f);
     impl_->gameObjects["planet3"] = std::make_unique<Planet>(
-        (Vector3){-60.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f);
+        (Vector3){-200.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f);
     impl_->gameObjects["planet4"] = std::make_unique<Planet>(
         (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f);
 
