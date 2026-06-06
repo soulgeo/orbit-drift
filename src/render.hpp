@@ -1,5 +1,5 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef RENDER_HPP
+#define RENDER_HPP
 
 #include "scene.hpp"
 #include "game_object.hpp"
@@ -87,4 +87,4 @@ private:
     float dt_;
 };
 
-#endif // !RENDERER_HPP
+#endif // !RENDER_HPP

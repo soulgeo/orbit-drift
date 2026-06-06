@@ -1,6 +1,6 @@
 #include "scene.hpp"
 #include "raylib.h"
-#include "renderer.hpp"
+#include "render.hpp"
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
