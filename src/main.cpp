@@ -20,10 +20,10 @@ int main() {
 
         BeginDrawing();
             ClearBackground(BLACK);
-            BeginMode3D(renderer.camManager.camera);
-                renderer.draw3D();
+            BeginMode3D(renderer.cam_manager.camera);
+                renderer.draw_3d();
             EndMode3D();
-            renderer.drawUI();
+            renderer.draw_ui();
         EndDrawing();
     }
 

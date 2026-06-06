@@ -4,8 +4,8 @@
 #include <vector>
 
 struct InputHandlerImpl {
-    std::vector<std::pair<int, InputType>> activeKeyCodes;
-    std::array<std::pair<InputType, int>, 350> keyBindings;
+    std::vector<std::pair<int, InputType>> active_key_codes;
+    std::array<std::pair<InputType, int>, 350> bindings;
 };
 
 InputHandler::InputHandler() {
@@ -16,16 +16,16 @@ InputHandler::~InputHandler() {
     delete impl_;
 }
 
-void InputHandler::bindKey(int key, InputType type, int command) {
-    impl_->keyBindings[key].first = type;
-    impl_->keyBindings[key].second = command;
-    impl_->activeKeyCodes.push_back({key, type});
+void InputHandler::bind_key(int key, InputType type, int command) {
+    impl_->bindings[key].first = type;
+    impl_->bindings[key].second = command;
+    impl_->active_key_codes.push_back({key, type});
 }
 
-InputHandler::CommandList InputHandler::handleInput() {
+InputHandler::CommandList InputHandler::handle_input() {
     CommandList list;
 
-    for (auto pair : impl_->activeKeyCodes) {
+    for (auto pair : impl_->active_key_codes) {
         if (list.count >= MAX_SIMULTANEOUS_INPUTS) break;
         auto key = pair.first;
         auto inputType = pair.second;
@@ -33,7 +33,7 @@ InputHandler::CommandList InputHandler::handleInput() {
         if ((inputType == DOWN && IsKeyDown(key)) || 
             (inputType == PRESSED && IsKeyPressed(key))) {
 
-            int cmd = impl_->keyBindings[key].second; 
+            int cmd = impl_->bindings[key].second; 
             list.commands[list.count++] = cmd;
         }
     }

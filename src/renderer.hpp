@@ -6,18 +6,18 @@
 
 struct CameraProfile {
     GameObject* target;
-    Vector3 posOffset = (Vector3) {0.0f, 0.0f, 0.0f};
-    Vector3 targOffset = (Vector3) {0.0f, 0.0f, 0.0f};
-    Vector3 posLocalOffset = (Vector3) {0.0f, 0.0f, 0.0f};
-    Vector3 targLocalOffset = (Vector3) {0.0f, 0.0f, 0.0f};
+    Vector3 pos_offset = (Vector3) {0.0f, 0.0f, 0.0f};
+    Vector3 targ_offset = (Vector3) {0.0f, 0.0f, 0.0f};
+    Vector3 pos_local_offset = (Vector3) {0.0f, 0.0f, 0.0f};
+    Vector3 targ_local_offset = (Vector3) {0.0f, 0.0f, 0.0f};
     float fovy;
 };
 
 struct CameraState {
-    Vector3 posOffset;
-    Vector3 targOffset;
-    Vector3 posLocalOffset;
-    Vector3 targLocalOffset;
+    Vector3 pos_offset;
+    Vector3 targ_offset;
+    Vector3 pos_local_offset;
+    Vector3 targ_local_offset;
     float fovy;
 };
 
@@ -35,35 +35,35 @@ public:
 
     Camera camera = {0};
 
-    int getProfile() {
-        return activeProfile;
+    int get_profile_id() {
+        return active_profile_id_;
     }
     
-    int getTransitionProfile() {
-        return newProfile;
+    int get_new_profile_id() {
+        return new_profile_id_;
     }
 
-    int getTransIter() {
-        return transIter;
+    int get_trans_iter() {
+        return trans_iter_;
     }
 
-    void switchProfile(int targetProfile){
-        newProfile = targetProfile;
-        transIter = 0;
+    void switch_profile(int target_profile){
+        new_profile_id_ = target_profile;
+        trans_iter_ = 0;
     };
 
     void update();
 
-    CameraState currentState;
-    CameraState savedState;
 
 private:
+    CameraState curr_state_;
+    CameraState saved_state_;
     CameraManagerImpl* impl_;
-    Scene* scene;
-    int activeProfile = CP_DEFAULT;
-    int newProfile = -1;
-    int transIter = 0;
-    int maxTransIter = 16;
+    Scene* scene_;
+    int active_profile_id_ = CP_DEFAULT;
+    int new_profile_id_ = -1;
+    int trans_iter_ = 0;
+    int max_trans_iter_ = 16;
 };
 
 struct RendererImpl;
@@ -73,20 +73,18 @@ public:
     Renderer(Scene* scene);
     ~Renderer();
 
-    CameraManager camManager;
+    CameraManager cam_manager;
 
     void update();
-    void draw3D();
-    void drawUI();
+    void draw_3d();
+    void draw_ui();
 
 private:
-    Scene* scene;
-    Shader fog;
+    Scene* scene_;
+    Shader fog_;
     RendererImpl* impl_;
 
-    float dt;
-
-    void _switchProfile(int profileId);
+    float dt_;
 };
 
 #endif // !RENDERER_HPP

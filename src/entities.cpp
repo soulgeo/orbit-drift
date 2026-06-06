@@ -4,14 +4,14 @@
 #include "raylib.h"
 #include "raymath.h"
 
-float _smoothTowards(float start, float target, float speed, float threshold = 0.001f) {
+float _smooth_towards(float start, float target, float speed, float threshold = 0.001f) {
     float value = Lerp(start, target, speed*GetFrameTime());
     if (std::abs(value - start) < threshold) return start;
     if (std::abs(value - target) < threshold) return target;
     return value;
 }
 
-Vector3 _vector3SmoothTowards(Vector3 start, Vector3 target, float speed, float threshold = 0.001f) {
+Vector3 _vector_3_smooth_towards(Vector3 start, Vector3 target, float speed, float threshold = 0.001f) {
     Vector3 value = Vector3Lerp(start, target, speed*GetFrameTime());
     if (Vector3Distance(value, start) < threshold) return start;
     if (Vector3Distance(value, target) < threshold) return target;
@@ -24,86 +24,86 @@ PlayerShip::PlayerShip() {
 
 PlayerShip::~PlayerShip() {}
 
-void PlayerShip::beforeUpdate(Scene& scene) {
-    gFlag = false;
-    enteredGravitySOI = false;
+void PlayerShip::before_update(Scene& scene) {
+    g_flag = false;
+    entered_gravity = false;
 }
 
 void PlayerShip::update(Scene& scene) {
-    Vector2 mousePosition = GetMousePosition();
-    Vector2 mouseDistance = {mousePosition.x - 960, mousePosition.y - 540};
-    float localYaw = mouseDistance.x * -panSpeed * GetFrameTime();
-    float localPitch = mouseDistance.y * -panSpeed * GetFrameTime();
+    Vector2 mouse_position = GetMousePosition();
+    Vector2 mouse_distance = {mouse_position.x - 960, mouse_position.y - 540};
+    float local_yaw = mouse_distance.x * -pan_speed * GetFrameTime();
+    float local_pitch = mouse_distance.y * -pan_speed * GetFrameTime();
 
-    rotatePitch(localPitch);
-    rotateYaw(localYaw);
+    this->rotate_pitch(local_pitch);
+    this->rotate_yaw(local_yaw);
 
     int moveX =
-        scene.isActiveInput(MOVE_RIGHT) - scene.isActiveInput(MOVE_LEFT);
-    int moveY = scene.isActiveInput(MOVE_UP) - scene.isActiveInput(MOVE_DOWN);
+        scene.is_active_input(MOVE_RIGHT) - scene.is_active_input(MOVE_LEFT);
+    int moveY = scene.is_active_input(MOVE_UP) - scene.is_active_input(MOVE_DOWN);
     int moveZ =
-        scene.isActiveInput(MOVE_FORWARD) - scene.isActiveInput(MOVE_BACK);
+        scene.is_active_input(MOVE_FORWARD) - scene.is_active_input(MOVE_BACK);
     int roll = 
-        scene.isActiveInput(ROLL_CCW) - scene.isActiveInput(ROLL_CW);
+        scene.is_active_input(ROLL_CCW) - scene.is_active_input(ROLL_CW);
 
     // Position Movement
-    Vector3 localTargetVelocity = {moveX * rightSpeed, moveY * upSpeed, -moveZ * forwardSpeed};
-    currentVelocity = _vector3SmoothTowards(currentVelocity, localTargetVelocity, forwardAccel);
+    Vector3 localTargetVelocity = {moveX * right_speed, moveY * up_speed, -moveZ * forward_speed};
+    curr_velocity_ = _vector_3_smooth_towards(curr_velocity_, localTargetVelocity, forward_accel);
     Quaternion rot = QuaternionFromMatrix(transform);
 
-    Vector3 worldMovement = Vector3RotateByQuaternion(currentVelocity, rot);
-    worldMovement = worldMovement + externalGravityVelocity*GetFrameTime();
+    Vector3 worldMovement = Vector3RotateByQuaternion(curr_velocity_, rot);
+    worldMovement = worldMovement + ext_gravity_velocity_*GetFrameTime();
 
-    moveGlobal(worldMovement);
+    move_global(worldMovement);
 
     // Rotation
-    currentRollSpeed = _smoothTowards(currentRollSpeed, roll*rollSpeed, rollAccel);
-    rotateRoll(currentRollSpeed*GetFrameTime());
+    curr_roll_speed_ = _smooth_towards(curr_roll_speed_, roll*roll_speed, roll_accel);
+    rotate_roll(curr_roll_speed_*GetFrameTime());
 
-    externalGravityVelocity = Vector3Zero();
+    ext_gravity_velocity_ = Vector3Zero();
 
     // Update hitbox position
-    Vector3 pos = getPosition();
+    Vector3 pos = get_position();
     hitbox.min = (Vector3){pos.x - 0.2f, pos.y - 0.2f, pos.z - 0.2f};
     hitbox.max = (Vector3){pos.x + 0.2f, pos.y + 0.2f, pos.z + 0.2f};
 }
 
-void PlayerShip::afterUpdate(Scene& scene){
-    exitedGravitySOI = false;
-    if (isInGravitySOI && !gFlag) {
-        isInGravitySOI = false;
-        exitedGravitySOI = true;
+void PlayerShip::after_update(Scene& scene){
+    exited_gravity = false;
+    if (in_gravity && !g_flag) {
+        in_gravity = false;
+        exited_gravity = true;
     }
 }
 
-void PlayerShip::addGravity(Vector3 gravityAccel) {
-    externalGravityVelocity += gravityAccel;
+void PlayerShip::add_gravity(Vector3 gravityAccel) {
+    ext_gravity_velocity_ += gravityAccel;
 }
 
 Planet::Planet(Vector3 p_position, float p_radius, float p_gravityRadius, float p_gravityForce)
     : radius(p_radius),
-      gravityRadius(p_gravityRadius),
-      gravityForce(p_gravityForce) 
+      gravity_radius(p_gravityRadius),
+      gravity_force(p_gravityForce) 
 {
-    setPosition(p_position);
+    set_position(p_position);
 }
 
 Planet::~Planet() {}
 
 void Planet::update(Scene& scene) {
-    PlayerShip* playerShip = (PlayerShip*)scene.getGameObject("player");
-    bool colliding = CheckCollisionBoxSphere(playerShip->hitbox, getPosition(), gravityRadius);
+    PlayerShip* playerShip = (PlayerShip*)scene.get_game_object("player");
+    bool colliding = CheckCollisionBoxSphere(playerShip->hitbox, get_position(), gravity_radius);
     if (colliding) {
-        if (!playerShip->isInGravitySOI){
-            playerShip->enteredGravitySOI = true;
+        if (!playerShip->in_gravity){
+            playerShip->entered_gravity = true;
         }
-        playerShip->gFlag = true;
-        playerShip->isInGravitySOI = true;
-        Vector3 direction = Vector3Normalize(Vector3Subtract(getPosition(), playerShip->getPosition()));
-        float distance = Vector3Distance(playerShip->getPosition(), getPosition());
-        float distanceFactor = 1.0f - Clamp(distance / gravityRadius, 0, 1);
-        Vector3 gravityAccel = gravityForce * distanceFactor * direction;
+        playerShip->g_flag = true;
+        playerShip->in_gravity = true;
+        Vector3 direction = Vector3Normalize(Vector3Subtract(get_position(), playerShip->get_position()));
+        float distance = Vector3Distance(playerShip->get_position(), get_position());
+        float distanceFactor = 1.0f - Clamp(distance / gravity_radius, 0, 1);
+        Vector3 gravityAccel = gravity_force * distanceFactor * direction;
 
-        playerShip->addGravity(gravityAccel);
+        playerShip->add_gravity(gravityAccel);
     }
 }

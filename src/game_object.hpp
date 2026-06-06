@@ -15,48 +15,48 @@ public:
 
     // Getters
     // TODO: Add Quaternion Getter
-    Vector3 getPosition() const;
-    Vector3 getForward() const;
-    Vector3 getUp() const;
-    Vector3 getRight() const;
+    Vector3 get_position() const;
+    Vector3 get_forward() const;
+    Vector3 get_up() const;
+    Vector3 get_right() const;
 
     // Setters
     // TODO: Add Quaternion Setter
-    void setPositionX(float x);
-    void setPositionY(float y);
-    void setPositionZ(float z);
-    void setPosition(float x, float y, float z);
-    void setPosition(Vector3 position);
+    void set_position_x(float x);
+    void set_position_y(float y);
+    void set_position_z(float z);
+    void set_position(float x, float y, float z);
+    void set_position(Vector3 position);
 
     // Global Movement
-    virtual void moveGlobalX(float deltaX);
-    virtual void moveGlobalY(float deltaY);
-    virtual void moveGlobalZ(float deltaZ);
-    virtual void moveGlobal(float deltaX, float deltaY, float deltaZ);
-    virtual void moveGlobal(Vector3 delta);
-    virtual void moveGlobalVel(Vector3 velocity);
+    virtual void move_global_x(float deltaX);
+    virtual void move_global_y(float deltaY);
+    virtual void move_global_z(float deltaZ);
+    virtual void move_global(float deltaX, float deltaY, float deltaZ);
+    virtual void move_global(Vector3 delta);
+    virtual void move_global_vel(Vector3 velocity);
 
     // Local Movement
-    virtual void moveLocalRight(float distance);
-    virtual void moveLocalUp(float distance);
-    virtual void moveLocalForward(float distance);
+    virtual void move_local_right(float distance);
+    virtual void move_local_up(float distance);
+    virtual void move_local_forward(float distance);
 
     // Rotations
     // TODO: Add Quaternion Rotation
-    virtual void rotatePitch(float angleRad); // Rotation around Right axis
-    virtual void rotateYaw(float angleRad); // Rotation around Up axis
-    virtual void rotateRoll(float angleRad); // Rotation around Forward axis
+    virtual void rotate_pitch(float angleRad); // Rotation around Right axis
+    virtual void rotate_yaw(float angleRad); // Rotation around Up axis
+    virtual void rotate_roll(float angleRad); // Rotation around Forward axis
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
     // Frame by frame behavior
-    virtual void onUpdate(Scene& scene);
-    virtual void onBeforeUpdate(Scene& scene);
-    virtual void onAfterUpdate(Scene& scene);
+    virtual void on_update(Scene& scene);
+    virtual void on_before_update(Scene& scene);
+    virtual void on_after_update(Scene& scene);
 
 protected:
     virtual void update(Scene& scene) {};
-    virtual void beforeUpdate(Scene& scene) {};
-    virtual void afterUpdate(Scene& scene) {};
+    virtual void before_update(Scene& scene) {};
+    virtual void after_update(Scene& scene) {};
 };
 
 #endif // GAMEOBJECT_HPP

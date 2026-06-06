@@ -23,9 +23,9 @@ public:
         size_t count = 0;
     };
 
-    CommandList handleInput();
+    CommandList handle_input();
 
-    void bindKey(int key, InputType type, int command);
+    void bind_key(int key, InputType type, int command);
 
 private:
     InputHandlerImpl* impl_; 

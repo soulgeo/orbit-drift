@@ -10,49 +10,48 @@ public:
     PlayerShip();
     ~PlayerShip();
 
-    float forwardSpeed = 0.8f;
-    float forwardAccel = 1.5f;
+    float forward_speed = 0.8f;
+    float forward_accel = 1.5f;
 
-    float rightSpeed = 0.4f;
-    float rightAccel = 3.0f;
+    float right_speed = 0.4f;
+    float right_accel = 3.0f;
 
-    float upSpeed = 0.4f;
-    float upAccel = 3.0f;
+    float up_speed = 0.4f;
+    float up_accel = 3.0f;
 
-    float panSpeed = 0.004f;
+    float pan_speed = 0.004f;
 
-    float rollSpeed = 3.0f;
-    float rollAccel = 4.0f;
+    float roll_speed = 3.0f;
+    float roll_accel = 4.0f;
 
     BoundingBox hitbox;
 
-    bool gFlag = false;
-    bool isInGravitySOI = false;
-    bool enteredGravitySOI = false;
-    bool exitedGravitySOI = false;
+    bool g_flag = false;
+    bool in_gravity = false;
+    bool entered_gravity = false;
+    bool exited_gravity = false;
 
-    void addGravity(Vector3 gravityAccel);
+    void add_gravity(Vector3 gravityAccel);
 
     void update(Scene& scene) override;
-    void beforeUpdate(Scene& scene) override;
-    void afterUpdate(Scene& scene) override;
-
+    void before_update(Scene& scene) override;
+    void after_update(Scene& scene) override;
 
 private:
-    Vector3 currentVelocity = Vector3Zero();
-    float currentRollSpeed = 0.0f;
-    Vector3 externalGravityVelocity = Vector3Zero();
+    float curr_roll_speed_ = 0.0f;
+    Vector3 curr_velocity_ = Vector3Zero();
+    Vector3 ext_gravity_velocity_ = Vector3Zero();
 };
 
 class Planet : public GameObject {
 public:
-    Planet(Vector3 position, float radius, float gravityRadius, float GravityForce);
+    Planet(Vector3 position, float radius, float gravity_radius, float gravity_force);
     ~Planet();
 
     float radius;
-    float gravityRadius;
-    float gravityForce;
-    float rotationSpeed;
+    float gravity_radius;
+    float gravity_force;
+    float rotation_speed;
 
     void update(Scene& scene) override;
 };

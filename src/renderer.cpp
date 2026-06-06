@@ -1,7 +1,5 @@
 #include "renderer.hpp"
 
-#include <iostream>
-#include <ostream>
 #include <random>
 #include <string>
 #include <tuple>
@@ -19,35 +17,35 @@
 #endif
 
 struct CameraManagerImpl {
-    std::vector<CameraProfile> cameraProfiles;
+    std::vector<CameraProfile> camera_profiles;
 };
 
 struct RendererImpl {
     std::unordered_map<std::string, Model> models;
     std::unordered_map<std::string, std::tuple<Model, Matrix, Color>>
-    objModelRefs;
+    obj_model_refs;
 };
 
-CameraManager::CameraManager(Scene* c_scene) : scene(c_scene) {
+CameraManager::CameraManager(Scene* c_scene) : scene_(c_scene) {
     impl_ = new CameraManagerImpl;
 
     // Define Camera Profiles
     CameraProfile defaultCamera;
-    defaultCamera.target = c_scene->getGameObject("player");
-    defaultCamera.posLocalOffset = (Vector3) {0.0f, 1.0f, -2.5f};
-    defaultCamera.targLocalOffset = (Vector3) {0.0f, 0.0f, 3.0f};
+    defaultCamera.target = c_scene->get_game_object("player");
+    defaultCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
+    defaultCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
     defaultCamera.fovy = 60.0f;
-    impl_->cameraProfiles.push_back(defaultCamera);
+    impl_->camera_profiles.push_back(defaultCamera);
 
     CameraProfile inGravityCamera;
-    inGravityCamera.target = c_scene->getGameObject("player");
-    inGravityCamera.posLocalOffset = (Vector3) {0.0f, 1.0f, -3.8f};
-    inGravityCamera.targLocalOffset = (Vector3) {0.0f, 0.0f, 3.0f};
+    inGravityCamera.target = c_scene->get_game_object("player");
+    inGravityCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -3.8f};
+    inGravityCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
     inGravityCamera.fovy = 80.0f;
-    impl_->cameraProfiles.push_back(inGravityCamera);
+    impl_->camera_profiles.push_back(inGravityCamera);
 
     // Init camera
-    activeProfile = CP_DEFAULT;
+    active_profile_id_ = CP_DEFAULT;
     camera.up = (Vector3){0.0f, 1.0f, 0.0f};
     camera.fovy = 60.0f;
     camera.projection = CAMERA_PERSPECTIVE;
@@ -55,104 +53,104 @@ CameraManager::CameraManager(Scene* c_scene) : scene(c_scene) {
 }
 
 void CameraManager::update() {
-    CameraProfile& active = impl_->cameraProfiles[activeProfile];
+    CameraProfile& active = impl_->camera_profiles[active_profile_id_];
 
     // If new transition is starting, save the current camera state
-    if (newProfile >= 0 && transIter == 0) {
-        savedState.posOffset = currentState.posOffset;
-        savedState.targOffset = currentState.targOffset;
-        savedState.posLocalOffset = currentState.posLocalOffset;
-        savedState.targLocalOffset = currentState.targLocalOffset;
-        savedState.fovy = currentState.fovy;
+    if (new_profile_id_ >= 0 && trans_iter_ == 0) {
+        saved_state_.pos_offset = curr_state_.pos_offset;
+        saved_state_.targ_offset = curr_state_.targ_offset;
+        saved_state_.pos_local_offset = curr_state_.pos_local_offset;
+        saved_state_.targ_local_offset = curr_state_.targ_local_offset;
+        saved_state_.fovy = curr_state_.fovy;
     }
 
-    if (newProfile < 0) {
+    if (new_profile_id_ < 0) {
         // Just set calced offsets to the active profile ones
-        currentState.posOffset = active.posOffset;
-        currentState.targOffset = active.targOffset;
-        currentState.posLocalOffset = active.posLocalOffset;
-        currentState.targLocalOffset = active.targLocalOffset;
-        currentState.fovy = active.fovy;
+        curr_state_.pos_offset = active.pos_offset;
+        curr_state_.targ_offset = active.targ_offset;
+        curr_state_.pos_local_offset = active.pos_local_offset;
+        curr_state_.targ_local_offset = active.targ_local_offset;
+        curr_state_.fovy = active.fovy;
     } else {
         // Get calced offsets for transition from saved state to new profile
-        CameraProfile& next = impl_->cameraProfiles[newProfile];
-        currentState.targOffset = Vector3Lerp(
-            savedState.targOffset, 
-            next.targOffset, 
-            (float)transIter/maxTransIter
+        CameraProfile& next = impl_->camera_profiles[new_profile_id_];
+        curr_state_.targ_offset = Vector3Lerp(
+            saved_state_.targ_offset, 
+            next.targ_offset, 
+            (float)trans_iter_/max_trans_iter_
         );
-        currentState.posOffset = Vector3Lerp(
-            savedState.posOffset, 
-            next.posOffset, 
-            (float)transIter/maxTransIter
+        curr_state_.pos_offset = Vector3Lerp(
+            saved_state_.pos_offset, 
+            next.pos_offset, 
+            (float)trans_iter_/max_trans_iter_
         );
-        currentState.targLocalOffset = Vector3Lerp(
-            savedState.targLocalOffset, 
-            next.targLocalOffset, 
-            (float)transIter/maxTransIter
+        curr_state_.targ_local_offset = Vector3Lerp(
+            saved_state_.targ_local_offset, 
+            next.targ_local_offset, 
+            (float)trans_iter_/max_trans_iter_
         );
-        currentState.posLocalOffset  = Vector3Lerp(
-            savedState.posLocalOffset, 
-            next.posLocalOffset, 
-            (float)transIter/maxTransIter
+        curr_state_.pos_local_offset  = Vector3Lerp(
+            saved_state_.pos_local_offset, 
+            next.pos_local_offset, 
+            (float)trans_iter_/max_trans_iter_
         );
-        currentState.fovy = Lerp(
-            savedState.fovy, 
+        curr_state_.fovy = Lerp(
+            saved_state_.fovy, 
             next.fovy, 
-            (float)transIter/maxTransIter
+            (float)trans_iter_/max_trans_iter_
         );
     }
 
     // Update Camera Target
-    GameObject& cameraTarget = *active.target;
+    GameObject& camera_target = *active.target;
 
-    Vector3 targetPosition = cameraTarget.getPosition();
-    Vector3 targetForward = cameraTarget.getForward();
-    Vector3 targetUp = cameraTarget.getUp();
-    Vector3 targetRight = cameraTarget.getRight();
+    Vector3 target_position = camera_target.get_position();
+    Vector3 target_forward = camera_target.get_forward();
+    Vector3 target_up = camera_target.get_up();
+    Vector3 target_right = camera_target.get_right();
 
-    float followSpeed = 30.0f;
+    float follow_speed = 30.0f;
 
-    Vector3 targConvertedOffset;
+    Vector3 targ_translated_offset;
     // Translate local offset from local to upright space
-    Vector3 rightOffset = currentState.targLocalOffset.x * targetRight;
-    Vector3 upOffset = currentState.targLocalOffset.y * targetUp;
-    Vector3 forwardOffset = currentState.targLocalOffset.z * targetForward;
-    targConvertedOffset = rightOffset + upOffset + forwardOffset;
+    Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
+    Vector3 up_offset = curr_state_.targ_local_offset.y * target_up;
+    Vector3 forward_offset = curr_state_.targ_local_offset.z * target_forward;
+    targ_translated_offset = right_offset + up_offset + forward_offset;
 
     // Finally translate to world space
-    Vector3 worldTarget = targetPosition + currentState.targOffset + targConvertedOffset;
+    Vector3 world_target = target_position + curr_state_.targ_offset + targ_translated_offset;
 
-    camera.target = Vector3Lerp(camera.target, worldTarget, followSpeed*GetFrameTime());
+    camera.target = Vector3Lerp(camera.target, world_target, follow_speed*GetFrameTime());
 
-    Vector3 posConvertedOffset;
+    Vector3 pos_translated_offset;
     // Translate local offset from local to upright space
-    rightOffset = currentState.posLocalOffset.x * targetRight;
-    upOffset = currentState.posLocalOffset.y * targetUp;
-    forwardOffset = currentState.posLocalOffset.z * targetForward;
-    posConvertedOffset = rightOffset + upOffset + forwardOffset;
+    right_offset = curr_state_.pos_local_offset.x * target_right;
+    up_offset = curr_state_.pos_local_offset.y * target_up;
+    forward_offset = curr_state_.pos_local_offset.z * target_forward;
+    pos_translated_offset = right_offset + up_offset + forward_offset;
 
     // Finally translate to world space
-    Vector3 worldPosition = targetPosition + currentState.posOffset + posConvertedOffset;
+    Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
 
-    camera.position = Vector3Lerp(camera.position, worldPosition, followSpeed*GetFrameTime());
+    camera.position = Vector3Lerp(camera.position, world_position, follow_speed*GetFrameTime());
 
     // Update Camera Up
-    camera.up = targetUp;
+    camera.up = target_up;
 
     // Manage transition loop
-    if (newProfile >= 0) {
-        if (transIter >= maxTransIter) {
-            activeProfile = newProfile;
-            newProfile = -1;
-            transIter = 0;
+    if (new_profile_id_ >= 0) {
+        if (trans_iter_ >= max_trans_iter_) {
+            active_profile_id_ = new_profile_id_;
+            new_profile_id_ = -1;
+            trans_iter_ = 0;
         } else {
-            transIter++;
+            trans_iter_++;
         }
     }
 }
 
-Renderer::Renderer(Scene *r_scene) : scene(r_scene), camManager(r_scene) {
+Renderer::Renderer(Scene *r_scene) : scene_(r_scene), cam_manager(r_scene) {
     impl_ = new RendererImpl;
 
     // Init models
@@ -169,7 +167,7 @@ Renderer::Renderer(Scene *r_scene) : scene(r_scene), camManager(r_scene) {
     impl_->models["planet_model"] =
         LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
 
-    impl_->objModelRefs["player"] = {
+    impl_->obj_model_refs["player"] = {
         impl_->models["player_model"],
         MatrixRotateX(180.0f * DEG2RAD) * 
             MatrixRotateZ(180.0f * DEG2RAD) * 
@@ -178,30 +176,30 @@ Renderer::Renderer(Scene *r_scene) : scene(r_scene), camManager(r_scene) {
 
     float scalar;
 
-    scalar = ((Planet *)r_scene->getGameObject("planet1"))->radius;
-    impl_->objModelRefs["planet1"] = {impl_->models["planet_model"],
+    scalar = ((Planet *)r_scene->get_game_object("planet1"))->radius;
+    impl_->obj_model_refs["planet1"] = {impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
         PURPLE};
 
-    scalar = ((Planet *)r_scene->getGameObject("planet2"))->radius;
-    impl_->objModelRefs["planet2"] = {impl_->models["planet_model"],
+    scalar = ((Planet *)r_scene->get_game_object("planet2"))->radius;
+    impl_->obj_model_refs["planet2"] = {impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar), GREEN};
 
-    scalar = ((Planet *)r_scene->getGameObject("planet3"))->radius;
-    impl_->objModelRefs["planet3"] = {impl_->models["planet_model"],
+    scalar = ((Planet *)r_scene->get_game_object("planet3"))->radius;
+    impl_->obj_model_refs["planet3"] = {impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar),
         YELLOW};
 
-    scalar = ((Planet *)r_scene->getGameObject("planet4"))->radius;
-    impl_->objModelRefs["planet4"] = {impl_->models["planet_model"],
+    scalar = ((Planet *)r_scene->get_game_object("planet4"))->radius;
+    impl_->obj_model_refs["planet4"] = {impl_->models["planet_model"],
         MatrixScale(scalar, scalar, scalar), BLUE};
 
     // Init shaders
-    fog = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
+    fog_ = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
                      TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
 
-    for (auto &[name, tuple] : impl_->objModelRefs) {
-        std::get<0>(tuple).materials[0].shader = fog;
+    for (auto &[name, tuple] : impl_->obj_model_refs) {
+        std::get<0>(tuple).materials[0].shader = fog_;
     }
 }
 
@@ -209,28 +207,28 @@ Renderer::~Renderer() {
     for (auto &[name, model] : impl_->models) {
         UnloadModel(model);
     }
-    UnloadShader(fog);
+    UnloadShader(fog_);
     delete impl_;
 }
 
 
 void Renderer::update() {
-    dt = GetFrameTime();
+    dt_ = GetFrameTime();
 
-    int camProfile = camManager.getProfile(); 
-    auto player = (PlayerShip *)scene->getGameObject("player");
-    if (player->enteredGravitySOI && camProfile == CP_DEFAULT) {
-        camManager.switchProfile(CP_IN_GRAVITY);
+    int camProfile = cam_manager.get_profile_id(); 
+    auto player = (PlayerShip *)scene_->get_game_object("player");
+    if (player->entered_gravity && camProfile == CP_DEFAULT) {
+        cam_manager.switch_profile(CP_IN_GRAVITY);
     }
-    if (player->exitedGravitySOI && camProfile == CP_IN_GRAVITY) {
-        camManager.switchProfile(CP_DEFAULT);
+    if (player->exited_gravity && camProfile == CP_IN_GRAVITY) {
+        cam_manager.switch_profile(CP_DEFAULT);
     }
 
-    camManager.update();
+    cam_manager.update();
 
     // Update model transforms
-    for (auto &[name, tuple] : impl_->objModelRefs) {
-        GameObject *object = scene->getGameObject(name);
+    for (auto &[name, tuple] : impl_->obj_model_refs) {
+        GameObject *object = scene_->get_game_object(name);
         if (object) {
             std::get<0>(tuple).transform =
                 std::get<1>(tuple) * object->transform;
@@ -238,13 +236,13 @@ void Renderer::update() {
     }
 }
 
-void Renderer::draw3D() {
-    int distLoc = GetShaderLocation(fog, "viewPos");
-    SetShaderValue(fog, distLoc, &camManager.camera.position, SHADER_UNIFORM_VEC3);
-    SetShaderValue(fog, fog.locs[SHADER_LOC_VECTOR_VIEW], &camManager.camera.position,
+void Renderer::draw_3d() {
+    int distLoc = GetShaderLocation(fog_, "viewPos");
+    SetShaderValue(fog_, distLoc, &cam_manager.camera.position, SHADER_UNIFORM_VEC3);
+    SetShaderValue(fog_, fog_.locs[SHADER_LOC_VECTOR_VIEW], &cam_manager.camera.position,
                    SHADER_UNIFORM_VEC3);
 
-    for (auto &[name, tuple] : impl_->objModelRefs) {
+    for (auto &[name, tuple] : impl_->obj_model_refs) {
         Model &model = std::get<0>(tuple);
         DrawModel(model, Vector3Zero(), 1.0, std::get<2>(tuple));
         // DrawModelWires(model, Vector3Zero(), 1.0f,
@@ -253,41 +251,13 @@ void Renderer::draw3D() {
     }
 }
 
-void Renderer::drawUI() {
-    // auto text = "CAM PROFILE: " + std::to_string(camManager.getProfile());
+void Renderer::draw_ui() {
+    // auto text = "CAM PROFILE: " + std::to_string(cam_manager.get_profile_id());
     // DrawText(text.c_str(), 30, 50, 20, YELLOW);
-    // text = "CAM TRANSITION PROFILE: " + std::to_string(camManager.getTransitionProfile());
+    // text = "CAM TRANSITION PROFILE: " + std::to_string(cam_manager.get_new_profile_id());
     // DrawText(text.c_str(), 30, 75, 20, YELLOW);
-    // text = "CAM TRANSITION ITERATOR: " + std::to_string(camManager.getTransIter());
+    // text = "CAM TRANSITION ITERATOR: " + std::to_string(cam_manager.get_trans_iter());
     // DrawText(text.c_str(), 30, 100, 20, YELLOW);
-    //
-    // text = "CAM CURRENT TARG OFFSET X: " + std::to_string(camManager.currentState.targOffset.x);
-    // DrawText(text.c_str(), 30, 150, 20, YELLOW);
-    // text = "CAM CURRENT TARG OFFSET Y: " + std::to_string(camManager.currentState.targOffset.y);
-    // DrawText(text.c_str(), 30, 175, 20, YELLOW);
-    // text = "CAM CURRENT TARG OFFSET Z: " + std::to_string(camManager.currentState.targOffset.z);
-    // DrawText(text.c_str(), 30, 200, 20, YELLOW);
-    //
-    // text = "CAM CURRENT POS OFFSET X: " + std::to_string(camManager.currentState.posOffset.x);
-    // DrawText(text.c_str(), 30, 250, 20, YELLOW);
-    // text = "CAM CURRENT POS OFFSET Y: " + std::to_string(camManager.currentState.posOffset.y);
-    // DrawText(text.c_str(), 30, 275, 20, YELLOW);
-    // text = "CAM CURRENT POS OFFSET Z: " + std::to_string(camManager.currentState.posOffset.z);
-    // DrawText(text.c_str(), 30, 300, 20, YELLOW);
-    //
-    // text = "CAM CURRENT TARG LOCAL OFFSET X: " + std::to_string(camManager.currentState.targLocalOffset.x);
-    // DrawText(text.c_str(), 30, 350, 20, YELLOW);
-    // text = "CAM CURRENT TARG LOCAL OFFSET Y: " + std::to_string(camManager.currentState.targLocalOffset.y);
-    // DrawText(text.c_str(), 30, 375, 20, YELLOW);
-    // text = "CAM CURRENT TARG LOCAL OFFSET Z: " + std::to_string(camManager.currentState.targLocalOffset.z);
-    // DrawText(text.c_str(), 30, 400, 20, YELLOW);
-    //
-    // text = "CAM CURRENT POS LOCAL OFFSET X: " + std::to_string(camManager.currentState.posLocalOffset.x);
-    // DrawText(text.c_str(), 30, 450, 20, YELLOW);
-    // text = "CAM CURRENT POS LOCAL OFFSET Y: " + std::to_string(camManager.currentState.posLocalOffset.y);
-    // DrawText(text.c_str(), 30, 475, 20, YELLOW);
-    // text = "CAM CURRENT POS LOCAL OFFSET Z: " + std::to_string(camManager.currentState.posLocalOffset.z);
-    // DrawText(text.c_str(), 30, 500, 20, YELLOW);
 }
 
 struct ShakeSetting {
@@ -329,8 +299,4 @@ void _shake(ShakeState* stateRef, ShakeSetting s) {
         }
     }
     stateRef->value = targetValue;
-}
-
-void Renderer::_switchProfile(int profileId) {
-
 }
