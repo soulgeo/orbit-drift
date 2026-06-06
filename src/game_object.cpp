@@ -98,3 +98,10 @@ void GameObject::onUpdate(Scene& scene){
     update(scene);
 }
 
+void GameObject::onBeforeUpdate(Scene& scene){
+    beforeUpdate(scene);
+}
+
+void GameObject::onAfterUpdate(Scene& scene){
+    afterUpdate(scene);
+}

@@ -26,11 +26,17 @@ public:
 
     BoundingBox hitbox;
 
+    bool gFlag = false;
     bool isInGravitySOI = false;
+    bool enteredGravitySOI = false;
+    bool exitedGravitySOI = false;
 
     void addGravity(Vector3 gravityAccel);
 
     void update(Scene& scene) override;
+    void beforeUpdate(Scene& scene) override;
+    void afterUpdate(Scene& scene) override;
+
 
 private:
     Vector3 currentVelocity = Vector3Zero();

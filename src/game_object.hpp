@@ -21,6 +21,7 @@ public:
     Vector3 getRight() const;
 
     // Setters
+    // TODO: Add Quaternion Setter
     void setPositionX(float x);
     void setPositionY(float y);
     void setPositionZ(float z);
@@ -49,9 +50,13 @@ public:
 
     // Frame by frame behavior
     virtual void onUpdate(Scene& scene);
+    virtual void onBeforeUpdate(Scene& scene);
+    virtual void onAfterUpdate(Scene& scene);
 
 protected:
     virtual void update(Scene& scene) {};
+    virtual void beforeUpdate(Scene& scene) {};
+    virtual void afterUpdate(Scene& scene) {};
 };
 
 #endif // GAMEOBJECT_HPP

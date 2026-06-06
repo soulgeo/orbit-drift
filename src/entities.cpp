@@ -24,6 +24,11 @@ PlayerShip::PlayerShip() {
 
 PlayerShip::~PlayerShip() {}
 
+void PlayerShip::beforeUpdate(Scene& scene) {
+    gFlag = false;
+    enteredGravitySOI = false;
+}
+
 void PlayerShip::update(Scene& scene) {
     Vector2 mousePosition = GetMousePosition();
     Vector2 mouseDistance = {mousePosition.x - 960, mousePosition.y - 540};
@@ -63,6 +68,14 @@ void PlayerShip::update(Scene& scene) {
     hitbox.max = (Vector3){pos.x + 0.2f, pos.y + 0.2f, pos.z + 0.2f};
 }
 
+void PlayerShip::afterUpdate(Scene& scene){
+    exitedGravitySOI = false;
+    if (isInGravitySOI && !gFlag) {
+        isInGravitySOI = false;
+        exitedGravitySOI = true;
+    }
+}
+
 void PlayerShip::addGravity(Vector3 gravityAccel) {
     externalGravityVelocity += gravityAccel;
 }
@@ -81,6 +94,10 @@ void Planet::update(Scene& scene) {
     PlayerShip* playerShip = (PlayerShip*)scene.getGameObject("player");
     bool colliding = CheckCollisionBoxSphere(playerShip->hitbox, getPosition(), gravityRadius);
     if (colliding) {
+        if (!playerShip->isInGravitySOI){
+            playerShip->enteredGravitySOI = true;
+        }
+        playerShip->gFlag = true;
         playerShip->isInGravitySOI = true;
         Vector3 direction = Vector3Normalize(Vector3Subtract(getPosition(), playerShip->getPosition()));
         float distance = Vector3Distance(playerShip->getPosition(), getPosition());

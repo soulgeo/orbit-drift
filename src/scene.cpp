@@ -64,13 +64,15 @@ void Scene::update() {
     }
     if (isPaused) return;
 
-    // Reset ship SOI flag
-    PlayerShip* player = (PlayerShip*)getGameObject("player");
-    if (player) player->isInGravitySOI = false;
-
     // Game Object updates
     for (const auto& [name, object] : impl_->gameObjects) {
+        object->onBeforeUpdate(*this);
+    }
+    for (const auto& [name, object] : impl_->gameObjects) {
         object->onUpdate(*this);
+    }
+    for (const auto& [name, object] : impl_->gameObjects) {
+        object->onAfterUpdate(*this);
     }
 }
 
