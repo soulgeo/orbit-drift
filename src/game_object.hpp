@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "raymath.h"
 
-class Scene;
+class Engine;
 
 class GameObject {
 public:
@@ -49,14 +49,18 @@ public:
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
     // Frame by frame behavior
-    virtual void on_update(Scene& scene);
-    virtual void on_before_update(Scene& scene);
-    virtual void on_after_update(Scene& scene);
+    virtual void on_update(Engine& engine);
+    virtual void on_before_update(Engine& engine);
+    virtual void on_after_update(Engine& engine);
+
+    virtual void on_fixed_update(Engine& engine);
 
 protected:
-    virtual void update(Scene& scene) {};
-    virtual void before_update(Scene& scene) {};
-    virtual void after_update(Scene& scene) {};
+    virtual void update(Engine& engine) {};
+    virtual void before_update(Engine& engine) {};
+    virtual void after_update(Engine& engine) {};
+
+    virtual void fixed_update(Engine& engine) {};
 };
 
 #endif // GAMEOBJECT_HPP

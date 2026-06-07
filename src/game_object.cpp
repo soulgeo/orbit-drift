@@ -94,14 +94,18 @@ void GameObject::rotate(float delta_pitch, float delta_yaw, float delta_roll) {
 
 //================================================================================== 
 // Frame by frame behavior
-void GameObject::on_update(Scene& scene){
-    update(scene);
+void GameObject::on_update(Engine& engine){
+    update(engine);
 }
 
-void GameObject::on_before_update(Scene& scene){
-    before_update(scene);
+void GameObject::on_before_update(Engine& engine){
+    before_update(engine);
 }
 
-void GameObject::on_after_update(Scene& scene){
-    after_update(scene);
+void GameObject::on_after_update(Engine& engine){
+    after_update(engine);
+}
+
+void GameObject::on_fixed_update(Engine& engine) {
+    fixed_update(engine);
 }

@@ -53,6 +53,7 @@ public:
     };
 
     void update();
+    void fixed_update();
 
 
 private:
@@ -76,11 +77,12 @@ public:
     CameraManager cam_manager;
 
     void update();
+    void fixed_update();
     void draw_3d();
     void draw_ui();
 
 private:
-    Scene* scene_;
+    Scene* scene_ = nullptr;
     Shader fog_;
     RendererImpl* impl_;
 

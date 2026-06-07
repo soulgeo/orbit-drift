@@ -52,7 +52,9 @@ CameraManager::CameraManager(Scene* c_scene) : scene_(c_scene) {
 
 }
 
-void CameraManager::update() {
+void CameraManager::update() {}
+
+void CameraManager::fixed_update() {
     CameraProfile& active = impl_->camera_profiles[active_profile_id_];
 
     // If new transition is starting, save the current camera state
@@ -211,6 +213,9 @@ Renderer::~Renderer() {
     delete impl_;
 }
 
+void Renderer::fixed_update() {
+    cam_manager.fixed_update();
+}
 
 void Renderer::update() {
     dt_ = GetFrameTime();
