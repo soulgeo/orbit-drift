@@ -1,10 +1,12 @@
 #include "engine.hpp"
 #include "game_object.hpp"
+#include "resource_manager.hpp"
 #include <memory>
 
 Engine::Engine() : is_running_(true), is_paused_(false) {
-    scene_ = std::make_unique<Scene>();
-    renderer_ = std::make_unique<Renderer>(scene_.get());
+    renderer_ = std::make_unique<Renderer>();
+    rsrc_manager_ = std::make_unique<ResourceManager>();
+    scene_ = std::make_unique<Scene>(renderer_.get(), rsrc_manager_.get());
 
     input_handler.bind_key(KEY_SPACE, DOWN, INPUT_MOVE_UP);
     input_handler.bind_key(KEY_LEFT_SHIFT, DOWN, INPUT_MOVE_DOWN);
@@ -50,7 +52,6 @@ void Engine::update() {
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.on_fixed_update(*this);
         });
-        renderer_->fixed_update();
         accumulator_ -= fixed_dt_;
     }
 
@@ -62,15 +63,8 @@ void Engine::update() {
         obj.on_after_update(*this);
     });
 
-    renderer_->update();
 }
 
 void Engine::render() {
-    BeginDrawing();
-        ClearBackground(BLACK);
-        BeginMode3D(renderer_->cam_manager.camera);
-            renderer_->draw_3d();
-        EndMode3D();
-        renderer_->draw_ui();
-    EndDrawing();
+    renderer_->render();
 }

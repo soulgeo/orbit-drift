@@ -3,6 +3,7 @@
 #include "engine.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include <memory>
 
 float _smooth_towards(float start, float target, float speed, float dt, float threshold = 0.001f) {
     float value = Lerp(start, target, speed*dt);
@@ -52,7 +53,7 @@ void PlayerShip::fixed_update(Engine& engine) {
     // Position Movement
     Vector3 localTargetVelocity = {moveX * right_speed, moveY * up_speed, -moveZ * forward_speed};
     curr_velocity_ = _vector_3_smooth_towards(curr_velocity_, localTargetVelocity, fixed_dt, forward_accel);
-    Quaternion rot = QuaternionFromMatrix(transform);
+    Quaternion rot = QuaternionFromMatrix(transform_);
 
     Vector3 worldMovement = Vector3RotateByQuaternion(curr_velocity_, rot);
     worldMovement = worldMovement + ext_gravity_velocity_*fixed_dt;

@@ -4,6 +4,7 @@
 #include "input_handler.hpp"
 #include "raylib.h"
 #include "render.hpp"
+#include "resource_manager.hpp"
 #include "scene.hpp"
 #include <memory>
 
@@ -51,6 +52,7 @@ private:
     InputHandler::CommandList active_inputs;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Scene> scene_;
+    std::unique_ptr<ResourceManager> rsrc_manager_;
     bool is_running_;
     bool is_paused_;
     float dt_;

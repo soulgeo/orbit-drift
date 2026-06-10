@@ -9,8 +9,7 @@ int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
     SetTargetFPS(60);
 
-    Engine engine;
-    engine.run();
+    Engine().run();
 
     CloseWindow();
 

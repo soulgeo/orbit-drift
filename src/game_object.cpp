@@ -1,17 +1,22 @@
 #include "game_object.hpp"
 #include "raymath.h"
+#include <memory>
+
+void GameObject::add_renderable(std::unique_ptr<Renderable> rend) {
+    renderable_ = std::move(rend);
+}
 
 //================================================================================== 
 // Global Movement
 
 void GameObject::set_position_x(float x) {
-    this->transform.m12 = x; 
+    this->transform_.m12 = x; 
 }
 void GameObject::set_position_y(float y) {
-    this->transform.m13 = y; 
+    this->transform_.m13 = y; 
 }
 void GameObject::set_position_z(float z) {
-    this->transform.m14 = z; 
+    this->transform_.m14 = z; 
 }
 void GameObject::set_position(float x, float y, float z) {
     set_position_x(x); 
@@ -23,9 +28,9 @@ void GameObject::set_position(Vector3 position) {
     set_position_y(position.y); 
     set_position_z(position.z);
 }
-void GameObject::move_global_x(float delta_x) { this->transform.m12 += delta_x; }
-void GameObject::move_global_y(float delta_y) { this->transform.m13 += delta_y; }
-void GameObject::move_global_z(float delta_z) { this->transform.m14 += delta_z; }
+void GameObject::move_global_x(float delta_x) { this->transform_.m12 += delta_x; }
+void GameObject::move_global_y(float delta_y) { this->transform_.m13 += delta_y; }
+void GameObject::move_global_z(float delta_z) { this->transform_.m14 += delta_z; }
 
 void GameObject::move_global(float delta_x, float delta_y, float delta_z) {
     move_global_x(delta_x); move_global_y(delta_y); move_global_z(delta_z); 
@@ -44,42 +49,42 @@ void GameObject::move_global_vel(Vector3 velocity) {
 // Local Movement
 
 Vector3 GameObject::get_position() const { 
-    return (Vector3){ transform.m12, transform.m13, transform.m14 }; 
+    return (Vector3){ transform_.m12, transform_.m13, transform_.m14 }; 
 }
 
 Vector3 GameObject::get_right() const { 
-    return (Vector3){ transform.m0,  transform.m1,  transform.m2 }; 
+    return (Vector3){ transform_.m0,  transform_.m1,  transform_.m2 }; 
 }
 Vector3 GameObject::get_up() const { 
-    return (Vector3){ transform.m4,  transform.m5,  transform.m6 }; 
+    return (Vector3){ transform_.m4,  transform_.m5,  transform_.m6 }; 
 }
 Vector3 GameObject::get_forward() const { 
-    return (Vector3){ -transform.m8, -transform.m9, -transform.m10 }; 
+    return (Vector3){ -transform_.m8, -transform_.m9, -transform_.m10 }; 
 }
 
 void GameObject::move_local_right(float distance) {
     Matrix moveMat = MatrixTranslate(distance, 0.0f, 0.0f);
-    this->transform = moveMat * this->transform;
+    this->transform_ = moveMat * this->transform_;
 }
 void GameObject::move_local_up(float distance) {
     Matrix moveMat = MatrixTranslate(0.0f, distance, 0.0f);
-    this->transform = moveMat * this->transform;
+    this->transform_ = moveMat * this->transform_;
 }
 void GameObject::move_local_forward(float distance) {
     Matrix moveMat = MatrixTranslate(0.0f, 0.0f, -distance);
-    this->transform = moveMat * this->transform;
+    this->transform_ = moveMat * this->transform_;
 }
 
 //================================================================================== 
 // Rotation
 void GameObject::rotate_pitch(float angle_rad) {
-    this->transform = MatrixRotateX(angle_rad) * this->transform;
+    this->transform_ = MatrixRotateX(angle_rad) * this->transform_;
 }
 void GameObject::rotate_yaw(float angle_rad) {
-    this->transform = MatrixRotateY(angle_rad) * this->transform;
+    this->transform_ = MatrixRotateY(angle_rad) * this->transform_;
 }
 void GameObject::rotate_roll(float angle_rad) {
-    this->transform = MatrixRotateZ(angle_rad) * this->transform;
+    this->transform_ = MatrixRotateZ(angle_rad) * this->transform_;
 }
 
 void GameObject::rotate(float delta_pitch, float delta_yaw, float delta_roll) {
@@ -89,13 +94,16 @@ void GameObject::rotate(float delta_pitch, float delta_yaw, float delta_roll) {
 
     Matrix frame_rotation = p_mat * y_mat * r_mat;
 
-    this->transform = frame_rotation * this->transform;
+    this->transform_ = frame_rotation * this->transform_;
 }
 
 //================================================================================== 
 // Frame by frame behavior
 void GameObject::on_update(Engine& engine){
     update(engine);
+    if (renderable_) { // Check if renderable_ is valid
+        renderable_->update();
+    }
 }
 
 void GameObject::on_before_update(Engine& engine){

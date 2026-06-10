@@ -3,18 +3,23 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include "renderable.hpp"
+#include <memory>
 
 class Engine;
+
+class Renderable;
 
 class GameObject {
 public:
     virtual ~GameObject() {};
 
-    // Master matrix tracking position and orientation
-    Matrix transform = MatrixIdentity();
+    void add_renderable(std::unique_ptr<Renderable> rend);
 
     // Getters
     // TODO: Add Quaternion Getter
+    Matrix get_transform() const { return transform_; }
+
     Vector3 get_position() const;
     Vector3 get_forward() const;
     Vector3 get_up() const;
@@ -56,11 +61,15 @@ public:
     virtual void on_fixed_update(Engine& engine);
 
 protected:
+    Matrix transform_ = MatrixIdentity();
+
     virtual void update(Engine& engine) {};
     virtual void before_update(Engine& engine) {};
     virtual void after_update(Engine& engine) {};
 
     virtual void fixed_update(Engine& engine) {};
+    std::unique_ptr<Renderable> renderable_;
+
 };
 
 #endif // GAMEOBJECT_HPP

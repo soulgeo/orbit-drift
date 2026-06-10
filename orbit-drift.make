@@ -118,19 +118,27 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/camera.o
 GENERATED += $(OBJDIR)/engine.o
 GENERATED += $(OBJDIR)/entities.o
 GENERATED += $(OBJDIR)/game_object.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/planet_factory.o
 GENERATED += $(OBJDIR)/render.o
+GENERATED += $(OBJDIR)/renderable.o
+GENERATED += $(OBJDIR)/resource_manager.o
 GENERATED += $(OBJDIR)/scene.o
+OBJECTS += $(OBJDIR)/camera.o
 OBJECTS += $(OBJDIR)/engine.o
 OBJECTS += $(OBJDIR)/entities.o
 OBJECTS += $(OBJDIR)/game_object.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/planet_factory.o
 OBJECTS += $(OBJDIR)/render.o
+OBJECTS += $(OBJDIR)/renderable.o
+OBJECTS += $(OBJDIR)/resource_manager.o
 OBJECTS += $(OBJDIR)/scene.o
 
 # Rules
@@ -195,6 +203,9 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/camera.o: src/camera.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/engine.o: src/engine.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -210,7 +221,16 @@ $(OBJDIR)/input_handler.o: src/input_handler.cpp
 $(OBJDIR)/main.o: src/main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/planet_factory.o: src/planet_factory.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/render.o: src/render.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/renderable.o: src/renderable.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/resource_manager.o: src/resource_manager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/scene.o: src/scene.cpp
