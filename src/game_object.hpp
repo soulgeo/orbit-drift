@@ -20,8 +20,10 @@ public:
     // Getters
     // TODO: Add Quaternion Getter
     Matrix get_transform() const { return transform_; }
+    Matrix get_visual_transform() const { return visual_transform_; }
 
     Vector3 get_position() const;
+    Vector3 get_visual_position() const;
     Vector3 get_forward() const;
     Vector3 get_up() const;
     Vector3 get_right() const;
@@ -65,6 +67,8 @@ public:
 
 protected:
     Matrix transform_ = MatrixIdentity();
+    Matrix previous_transform_ = MatrixIdentity();
+    Matrix visual_transform_ = MatrixIdentity();
     std::unique_ptr<Renderable> renderable_;
     Debug debug_;
 

@@ -17,12 +17,12 @@ ResourceManager::~ResourceManager() {
     UnloadAllResources();
 }
 
-Model ResourceManager::LoadModel(const std::string& path) {
+Model ResourceManager::LoadModel(const char* path) {
     if (impl_->models_.count(path)) {
         return impl_->models_[path];
     }
 
-    Model model = ::LoadModel(path.c_str());
+    Model model = ::LoadModel(path);
     if (model.meshes == nullptr) {
         std::cerr << "ERROR: Failed to load model: " << path << std::endl;
         return Model{};
@@ -32,12 +32,12 @@ Model ResourceManager::LoadModel(const std::string& path) {
     return impl_->models_[path];
 }
 
-Texture2D ResourceManager::LoadTexture(const std::string& path) {
+Texture2D ResourceManager::LoadTexture(const char* path) {
     if (impl_->textures_.count(path)) {
         return impl_->textures_[path];
     }
 
-    Texture2D texture = ::LoadTexture(path.c_str());
+    Texture2D texture = ::LoadTexture(path);
     if (texture.id == 0) {
         std::cerr << "ERROR: Failed to load texture: " << path << std::endl;
         return Texture2D{};

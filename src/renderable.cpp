@@ -12,9 +12,9 @@ Renderable::~Renderable() {
     UnloadModel(model_);
 }
 
-void Renderable::update() {
+void Renderable::update(Matrix transform) {
     if (owner_ == nullptr) { return; }
-    model_.transform = initial_transform_ * owner_->get_transform();
+    model_.transform = initial_transform_ * transform;
 }
 
 void Renderable::draw() {

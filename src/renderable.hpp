@@ -10,7 +10,7 @@ class Renderable {
 public:
     Renderable(GameObject* owner, Renderer* renderer, Model& model);
     ~Renderable();
-    void update();
+    void update(Matrix transform);
     void draw();
     void set_color(Color color){
         color_ = color;

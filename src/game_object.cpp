@@ -1,5 +1,6 @@
 #include "game_object.hpp"
 #include "raymath.h"
+#include "engine.hpp"
 #include <memory>
 
 void GameObject::add_renderable(std::unique_ptr<Renderable> rend) {
@@ -52,6 +53,10 @@ Vector3 GameObject::get_position() const {
     return (Vector3){ transform_.m12, transform_.m13, transform_.m14 }; 
 }
 
+Vector3 GameObject::get_visual_position() const { 
+    return (Vector3){ visual_transform_.m12, visual_transform_.m13, visual_transform_.m14 }; 
+}
+
 Vector3 GameObject::get_right() const { 
     return (Vector3){ transform_.m0,  transform_.m1,  transform_.m2 }; 
 }
@@ -101,8 +106,26 @@ void GameObject::rotate(float delta_pitch, float delta_yaw, float delta_roll) {
 // Frame by frame behavior
 void GameObject::on_update(Engine& engine){
     update(engine);
-    if (renderable_) { // Check if renderable_ is valid
-        renderable_->update();
+    
+    float alpha = engine.get_interpolation_alpha();
+    
+    // Decompose transforms for proper interpolation
+    Vector3 old_pos = { previous_transform_.m12, previous_transform_.m13, previous_transform_.m14 };
+    Vector3 curr_pos = { transform_.m12, transform_.m13, transform_.m14 };
+    Vector3 interp_pos = Vector3Lerp(old_pos, curr_pos, alpha);
+
+    Quaternion old_rot = QuaternionFromMatrix(previous_transform_);
+    Quaternion curr_rot = QuaternionFromMatrix(transform_);
+    Quaternion interp_rot = QuaternionSlerp(old_rot, curr_rot, alpha);
+
+    // TODO: Handle scale if needed. For now assuming uniform scale 1.0
+    visual_transform_ = QuaternionToMatrix(interp_rot);
+    visual_transform_.m12 = interp_pos.x;
+    visual_transform_.m13 = interp_pos.y;
+    visual_transform_.m14 = interp_pos.z;
+
+    if (renderable_) {
+        renderable_->update(visual_transform_);
     }
 }
 
@@ -115,5 +138,6 @@ void GameObject::on_after_update(Engine& engine){
 }
 
 void GameObject::on_fixed_update(Engine& engine) {
+    previous_transform_ = transform_;
     fixed_update(engine);
 }

@@ -39,6 +39,10 @@ public:
         return fixed_dt_;
     }
 
+    float get_interpolation_alpha() const {
+        return accumulator_ / fixed_dt_;
+    }
+
     Scene& get_scene() const {
         return *scene_;
     }
@@ -63,7 +67,7 @@ private:
     bool is_running_;
     bool is_paused_;
     float dt_;
-    float fixed_dt_ = 0.01f;
+    float fixed_dt_ = 0.005f;
     float accumulator_ = 0.0f;
 
     void _write_debug();

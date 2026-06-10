@@ -53,7 +53,7 @@ void Renderer::render(Engine& engine) {
     debug_.writeln(TextFormat("Target: %.2f, %.2f, %.2f", camera_.target.x, camera_.target.y, camera_.target.z));
 
     if (camera_body_) {
-        camera_.position = camera_body_->get_position();
+        camera_.position = camera_body_->get_visual_position();
         camera_.projection = camera_body_->get_projection();
         camera_.fovy = (float)camera_body_->get_fovy();
         camera_.target = camera_body_->get_target();

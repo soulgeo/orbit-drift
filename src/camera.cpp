@@ -29,6 +29,9 @@ CameraBody::CameraBody(Scene* c_scene, Renderer* renderer) {
 }
 
 void CameraBody::fixed_update(Engine& engine) {
+    prev_target_pos_ = curr_target_pos_;
+    prev_up_ = up_;
+
     CameraProfile& active = impl_->camera_profiles[active_profile_id_];
 
     // If new transition is starting, save the current camera state
@@ -97,7 +100,7 @@ void CameraBody::fixed_update(Engine& engine) {
     // Finally translate to world space
     Vector3 world_target = target_position + curr_state_.targ_offset + targ_translated_offset;
 
-    curr_target_pos_ = Vector3Lerp(curr_target_pos_, world_target, follow_speed*engine.get_dt());
+    curr_target_pos_ = Vector3Lerp(curr_target_pos_, world_target, follow_speed*engine.get_fixed_dt());
 
     // Translate local offset from local to upright space
     Vector3 pos_translated_offset;
@@ -109,7 +112,7 @@ void CameraBody::fixed_update(Engine& engine) {
     // Finally translate to world space
     Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
 
-    set_position(Vector3Lerp(get_position(), world_position, follow_speed*engine.get_dt()));
+    set_position(Vector3Lerp(get_position(), world_position, follow_speed*engine.get_fixed_dt()));
 
     // Update Camera Up
     up_ = target_up;
@@ -124,4 +127,12 @@ void CameraBody::fixed_update(Engine& engine) {
             trans_iter_++;
         }
     }
+}
+
+void CameraBody::update(Engine& engine) {
+    float alpha = engine.get_interpolation_alpha();
+
+    visual_target_pos_ = Vector3Lerp(prev_target_pos_, curr_target_pos_, alpha);
+    visual_up_ = Vector3Lerp(prev_up_, up_, alpha);
+    visual_fovy_ = curr_state_.fovy; 
 }

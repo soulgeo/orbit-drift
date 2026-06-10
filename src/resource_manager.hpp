@@ -3,7 +3,6 @@
 
 #include "raylib.h"
 #include <memory>
-#include <string>
 
 struct ResourceManagerImpl;
 
@@ -12,8 +11,8 @@ public:
     ResourceManager();
     ~ResourceManager();
 
-    Model LoadModel(const std::string& path);
-    Texture2D LoadTexture(const std::string& path);
+    Model LoadModel(const char* path);
+    Texture2D LoadTexture(const char* path);
 
     void UnloadAllResources();
 
