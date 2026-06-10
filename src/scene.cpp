@@ -31,7 +31,8 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
         * MatrixRotateZ(180.0f * DEG2RAD) 
         * MatrixScale(0.2f, 0.2f, 0.2f);
     auto player_rend = std::make_unique<Renderable>(player.get(), renderer, player_model);
-
+    player_rend->set_initial_transform(player_model.transform);
+    player_rend->set_color(RAYWHITE);
     player->add_renderable(std::move(player_rend));
 
     auto planet_factory = PlanetFactory(renderer, rsrc_manager);
@@ -62,7 +63,12 @@ GameObject* Scene::get_game_object(const std::string& name) {
 
 void Scene::for_each_game_object(std::function<void(const std::string&, GameObject&)> func) {
     for (auto& [name, object] : impl_->game_objects) {
-        func(name, *object);
+        if (name != "camera_body") func(name, *object);
+    }
+
+    auto it = impl_->game_objects.find("camera_body");
+    if (it != impl_->game_objects.end()) {
+        func(it->first, *it->second);
     }
 }
 

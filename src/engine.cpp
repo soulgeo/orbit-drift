@@ -55,8 +55,8 @@ void Engine::update() {
         obj.on_before_update(*this);
     });
 
-    float dt = GetFrameTime();
-    accumulator_ += dt;
+    dt_ = GetFrameTime();
+    accumulator_ += dt_;
     while (accumulator_ >= fixed_dt_){
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.on_fixed_update(*this);

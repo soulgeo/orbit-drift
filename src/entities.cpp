@@ -85,6 +85,11 @@ void PlayerShip::after_update(Engine& engine){
     debug_.writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
     debug_.writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
     debug_.writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
+
+    Vector3 model_position = renderable_->get_position();
+    debug_.writeln(TextFormat("--- SHIP MODEL ---"));
+    debug_.writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+                              model_position.x, model_position.y, model_position.z));
 }
 
 void PlayerShip::add_gravity(Vector3 gravityAccel) {

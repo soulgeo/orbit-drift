@@ -1,4 +1,5 @@
 #include "camera.hpp"
+#include "engine.hpp"
 
 struct CameraBodyImpl {
     std::vector<CameraProfile> camera_profiles;
@@ -96,7 +97,7 @@ void CameraBody::fixed_update(Engine& engine) {
     // Finally translate to world space
     Vector3 world_target = target_position + curr_state_.targ_offset + targ_translated_offset;
 
-    curr_target_pos_ = Vector3Lerp(curr_target_pos_, world_target, follow_speed*GetFrameTime());
+    curr_target_pos_ = Vector3Lerp(curr_target_pos_, world_target, follow_speed*engine.get_dt());
 
     // Translate local offset from local to upright space
     Vector3 pos_translated_offset;
@@ -108,7 +109,7 @@ void CameraBody::fixed_update(Engine& engine) {
     // Finally translate to world space
     Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
 
-    set_position(Vector3Lerp(get_position(), world_position, follow_speed*GetFrameTime()));
+    set_position(Vector3Lerp(get_position(), world_position, follow_speed*engine.get_dt()));
 
     // Update Camera Up
     up_ = target_up;

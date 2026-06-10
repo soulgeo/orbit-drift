@@ -35,10 +35,9 @@ public:
     int get_new_profile_id() { return new_profile_id_; }
     int get_trans_iter() { return trans_iter_; }
     int get_projection() { return projection_; }
-    int get_fovy() { return fovy_; }
+    float get_fovy() { return curr_state_.fovy; }
     Vector3 get_target() { return curr_target_pos_; }
     Vector3 get_camera_up() { return up_; }
-
 
     void switch_profile(int target_profile){
         new_profile_id_ = target_profile;
@@ -53,7 +52,6 @@ private:
     CameraBodyImpl* impl_;
     Vector3 curr_target_pos_;
     Vector3 up_;
-    int fovy_;
     int projection_ = CAMERA_PERSPECTIVE;
     int active_profile_id_ = CP_DEFAULT;
     int new_profile_id_ = -1;

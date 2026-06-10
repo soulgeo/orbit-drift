@@ -12,11 +12,19 @@ public:
     ~Renderable();
     void update();
     void draw();
-    void set_color(Color& color){
+    void set_color(Color color){
         color_ = color;
     }
     void set_initial_transform(Matrix transform){
         initial_transform_ = transform;
+    }
+
+    Vector3 get_position() {
+        return (Vector3){
+            model_.transform.m12, 
+            model_.transform.m13, 
+            model_.transform.m14
+        };
     }
 
 protected:

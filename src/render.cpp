@@ -52,6 +52,14 @@ void Renderer::render(Engine& engine) {
     debug_.writeln(TextFormat("Pos: %.2f, %.2f, %.2f", camera_.position.x, camera_.position.y, camera_.position.z));
     debug_.writeln(TextFormat("Target: %.2f, %.2f, %.2f", camera_.target.x, camera_.target.y, camera_.target.z));
 
+    if (camera_body_) {
+        camera_.position = camera_body_->get_position();
+        camera_.projection = camera_body_->get_projection();
+        camera_.fovy = (float)camera_body_->get_fovy();
+        camera_.target = camera_body_->get_target();
+        camera_.up = camera_body_->get_camera_up();
+    }
+
     BeginDrawing();
         ClearBackground(BLACK);
         BeginMode3D(camera_);
@@ -62,13 +70,6 @@ void Renderer::render(Engine& engine) {
 }
 
 void Renderer::draw_3d() {
-    if (camera_body_) {
-        camera_.position = camera_body_->get_position();
-        camera_.projection = camera_body_->get_projection();
-        camera_.fovy = camera_body_->get_fovy();
-        camera_.target = camera_body_->get_target();
-        camera_.up = camera_body_->get_camera_up();
-    }
     //
     // int distLoc = GetShaderLocation(fog_, "viewPos");
     // SetShaderValue(fog_, distLoc, &camera_.position, SHADER_UNIFORM_VEC3);
