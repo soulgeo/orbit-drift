@@ -13,10 +13,8 @@ Renderable::~Renderable() {
 }
 
 void Renderable::update() {
-    if (owner_ == nullptr) {
-        return;
-    }
-    model_.transform = owner_->get_transform();
+    if (owner_ == nullptr) { return; }
+    model_.transform = initial_transform_ * owner_->get_transform();
 }
 
 void Renderable::draw() {

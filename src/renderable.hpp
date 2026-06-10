@@ -15,11 +15,15 @@ public:
     void set_color(Color& color){
         color_ = color;
     }
+    void set_initial_transform(Matrix transform){
+        initial_transform_ = transform;
+    }
 
 protected:
     GameObject* owner_;
     Color color_;
     Model model_;
+    Matrix initial_transform_;
 };
 
 #endif // !RENDERABLE_HPP

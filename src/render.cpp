@@ -6,6 +6,7 @@
 #include "raylib.h"
 #include "camera.hpp"
 #include "renderable.hpp"
+#include "engine.hpp"
 
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION 330
@@ -41,15 +42,22 @@ void Renderer::remove_renderable(Renderable* renderable) {
     );
 }
 
-Renderer::~Renderer() {}
+Renderer::~Renderer() {
+    delete impl_;
+}
 
-void Renderer::render() {
+void Renderer::render(Engine& engine) {
+    debug_.clean();
+    debug_.writeln("--- CAMERA ---");
+    debug_.writeln(TextFormat("Pos: %.2f, %.2f, %.2f", camera_.position.x, camera_.position.y, camera_.position.z));
+    debug_.writeln(TextFormat("Target: %.2f, %.2f, %.2f", camera_.target.x, camera_.target.y, camera_.target.z));
+
     BeginDrawing();
         ClearBackground(BLACK);
         BeginMode3D(camera_);
             draw_3d();
         EndMode3D();
-        draw_ui();
+        draw_ui(engine);
     EndDrawing();
 }
 
@@ -72,13 +80,13 @@ void Renderer::draw_3d() {
     }
 }
 
-void Renderer::draw_ui() {
-    // auto text = "CAM PROFILE: " + std::to_string(cam_manager.get_profile_id());
-    // DrawText(text.c_str(), 30, 50, 20, YELLOW);
-    // text = "CAM TRANSITION PROFILE: " + std::to_string(cam_manager.get_new_profile_id());
-    // DrawText(text.c_str(), 30, 75, 20, YELLOW);
-    // text = "CAM TRANSITION ITERATOR: " + std::to_string(cam_manager.get_trans_iter());
-    // DrawText(text.c_str(), 30, 100, 20, YELLOW);
+void Renderer::draw_ui(Engine& engine) {
+    int x = 30;
+    int y = 50;
+    for (int i = 0; i < engine.get_debug_line_count(); ++i) {
+        DrawText(engine.get_debug_line(i), x, y, 20, YELLOW);
+        y += 25;
+    }
 }
 
 // struct ShakeSetting {

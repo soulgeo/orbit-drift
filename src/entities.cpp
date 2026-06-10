@@ -3,7 +3,6 @@
 #include "engine.hpp"
 #include "raylib.h"
 #include "raymath.h"
-#include <memory>
 
 float _smooth_towards(float start, float target, float speed, float dt, float threshold = 0.001f) {
     float value = Lerp(start, target, speed*dt);
@@ -73,11 +72,19 @@ void PlayerShip::fixed_update(Engine& engine) {
 }
 
 void PlayerShip::after_update(Engine& engine){
+    debug_.clean();
     exited_gravity = false;
     if (in_gravity && !g_flag) {
         in_gravity = false;
         exited_gravity = true;
     }
+
+    Vector3 position = get_position();
+    debug_.writeln(TextFormat("--- SHIP ---"));
+    debug_.writeln(TextFormat("Position: %.2f, %.2f, %.2f", position.x, position.y, position.z));
+    debug_.writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
+    debug_.writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
+    debug_.writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
 }
 
 void PlayerShip::add_gravity(Vector3 gravityAccel) {

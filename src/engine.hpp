@@ -21,9 +21,12 @@ enum UserInput {
     INPUT_ROLL_CCW,
 };
 
+struct EngineImpl;
+
 class Engine {
 public:
     Engine();
+    ~Engine();
 
     InputHandler input_handler;
     bool is_active_input(int input);
@@ -48,7 +51,11 @@ public:
         }
     };
 
+    int get_debug_line_count() const;
+    const char* get_debug_line(int index) const;
+
 private:
+    std::unique_ptr<EngineImpl> impl_;
     InputHandler::CommandList active_inputs;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Scene> scene_;
@@ -58,6 +65,8 @@ private:
     float dt_;
     float fixed_dt_ = 0.01f;
     float accumulator_ = 0.0f;
+
+    void _write_debug();
 
     void process_input();
     void update();

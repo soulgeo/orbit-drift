@@ -1,6 +1,7 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
+#include "debug.hpp"
 #include "raylib.h"
 #include "raymath.h"
 #include "renderable.hpp"
@@ -60,15 +61,18 @@ public:
 
     virtual void on_fixed_update(Engine& engine);
 
+    Debug& get_debug() { return debug_; }
+
 protected:
     Matrix transform_ = MatrixIdentity();
+    std::unique_ptr<Renderable> renderable_;
+    Debug debug_;
 
     virtual void update(Engine& engine) {};
     virtual void before_update(Engine& engine) {};
     virtual void after_update(Engine& engine) {};
 
     virtual void fixed_update(Engine& engine) {};
-    std::unique_ptr<Renderable> renderable_;
 
 };
 
