@@ -1,4 +1,5 @@
 #include "debug.hpp"
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -6,7 +7,7 @@ struct Debug::Impl {
     std::vector<std::string> lines;
 };
 
-Debug::Debug() : impl_(new Impl()) {}
+Debug::Debug() : impl_(std::make_unique<Impl>()) {}
 
 Debug::~Debug() = default;
 

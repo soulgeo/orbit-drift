@@ -1,16 +1,15 @@
 #ifndef RENDERABLE_HPP
 #define RENDERABLE_HPP
 
+#include "component.hpp"
 #include "raylib.h"
 #include "render.hpp"
 
-class GameObject;
-
-class Renderable {
+class RenderableComponent : public Component {
 public:
-    Renderable(GameObject* owner, Renderer* renderer, Model& model);
-    ~Renderable();
-    void update(Matrix transform);
+    RenderableComponent(GameObject* owner, Renderer* renderer, Model& model);
+    ~RenderableComponent();
+    void update() override;
     void draw();
     void set_color(Color color){
         color_ = color;
@@ -28,7 +27,6 @@ public:
     }
 
 protected:
-    GameObject* owner_;
     Color color_;
     Model model_;
     Matrix initial_transform_;

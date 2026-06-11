@@ -23,12 +23,12 @@ public:
     float roll_speed = 3.0f;
     float roll_accel = 4.0f;
 
-    BoundingBox hitbox;
-
     bool g_flag = false;
     bool in_gravity = false;
     bool entered_gravity = false;
     bool exited_gravity = false;
+
+    BoundingBox get_hitbox();
 
     void add_gravity(Vector3 gravityAccel);
 
@@ -39,8 +39,9 @@ public:
 
 private:
     float curr_roll_speed_ = 0.0f;
-    Vector3 curr_velocity_ = Vector3Zero();
-    Vector3 ext_gravity_velocity_ = Vector3Zero();
+    Vector3 curr_velocity_;
+    Vector3 ext_gravity_velocity_;
+    BoundingBox hitbox_;
 };
 
 class Planet : public GameObject {

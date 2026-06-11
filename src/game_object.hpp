@@ -1,26 +1,24 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
+#include "component.hpp"
 #include "debug.hpp"
 #include "raylib.h"
-#include "raymath.h"
-#include "renderable.hpp"
 #include <memory>
 
 class Engine;
 
-class Renderable;
-
 class GameObject {
 public:
-    virtual ~GameObject() {};
+    GameObject();
+    ~GameObject();
 
-    void add_renderable(std::unique_ptr<Renderable> rend);
+    void add_component(std::unique_ptr<Component> comp);
 
     // Getters
     // TODO: Add Quaternion Getter
-    Matrix get_transform() const { return transform_; }
-    Matrix get_visual_transform() const { return visual_transform_; }
+    Matrix get_transform() const;
+    Matrix get_visual_transform() const;
 
     Vector3 get_position() const;
     Vector3 get_visual_position() const;
@@ -63,14 +61,11 @@ public:
 
     virtual void on_fixed_update(Engine& engine);
 
-    Debug& get_debug() { return debug_; }
+    Debug& get_debug();
 
 protected:
-    Matrix transform_ = MatrixIdentity();
-    Matrix previous_transform_ = MatrixIdentity();
-    Matrix visual_transform_ = MatrixIdentity();
-    std::unique_ptr<Renderable> renderable_;
-    Debug debug_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 
     virtual void update(Engine& engine) {};
     virtual void before_update(Engine& engine) {};

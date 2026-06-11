@@ -17,7 +17,7 @@
 
 
 struct Renderer::Impl {
-    std::vector<Renderable*> renderables;
+    std::vector<RenderableComponent*> renderables;
     Camera camera = {0};
     CameraBody* camera_body = nullptr;
     Shader fog;
@@ -37,11 +37,11 @@ Renderer::Renderer() {
     // }
 }
 
-void Renderer::add_renderable(Renderable* renderable) {
+void Renderer::register_renderable(RenderableComponent* renderable) {
     impl_->renderables.push_back(renderable);
 }
 
-void Renderer::remove_renderable(Renderable* renderable) {
+void Renderer::unregister_renderable(RenderableComponent* renderable) {
     impl_->renderables.erase(
         std::remove(impl_->renderables.begin(), impl_->renderables.end(), renderable), 
         impl_->renderables.end()

@@ -119,6 +119,7 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/camera.o
+GENERATED += $(OBJDIR)/component.o
 GENERATED += $(OBJDIR)/debug.o
 GENERATED += $(OBJDIR)/engine.o
 GENERATED += $(OBJDIR)/entities.o
@@ -132,6 +133,7 @@ GENERATED += $(OBJDIR)/resource_manager.o
 GENERATED += $(OBJDIR)/scene.o
 GENERATED += $(OBJDIR)/timer.o
 OBJECTS += $(OBJDIR)/camera.o
+OBJECTS += $(OBJDIR)/component.o
 OBJECTS += $(OBJDIR)/debug.o
 OBJECTS += $(OBJDIR)/engine.o
 OBJECTS += $(OBJDIR)/entities.o
@@ -208,6 +210,9 @@ endif
 # #############################################
 
 $(OBJDIR)/camera.o: src/camera.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/component.o: src/component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/debug.o: src/debug.cpp

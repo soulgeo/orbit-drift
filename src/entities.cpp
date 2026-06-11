@@ -18,9 +18,11 @@ Vector3 _vector_3_smooth_towards(Vector3 start, Vector3 target, float speed, flo
     return value;
 }
 
-PlayerShip::PlayerShip() {
-    hitbox = (BoundingBox){(Vector3){-0.2f, -0.2f, -0.2f}, (Vector3){0.2f, 0.2f, 0.2f}};
-}
+PlayerShip::PlayerShip() : 
+        curr_velocity_(Vector3Zero()), 
+        ext_gravity_velocity_(Vector3Zero()),
+        hitbox_((BoundingBox){(Vector3){-0.2f, -0.2f, -0.2f}, (Vector3){0.2f, 0.2f, 0.2f}}) 
+{}
 
 PlayerShip::~PlayerShip() {}
 
@@ -52,7 +54,7 @@ void PlayerShip::fixed_update(Engine& engine) {
     // Position Movement
     Vector3 localTargetVelocity = {moveX * right_speed, moveY * up_speed, -moveZ * forward_speed};
     curr_velocity_ = _vector_3_smooth_towards(curr_velocity_, localTargetVelocity, fixed_dt, forward_accel);
-    Quaternion rot = QuaternionFromMatrix(transform_);
+    Quaternion rot = QuaternionFromMatrix(get_transform());
 
     Vector3 worldMovement = Vector3RotateByQuaternion(curr_velocity_, rot);
     worldMovement = worldMovement + ext_gravity_velocity_*fixed_dt;
@@ -67,12 +69,12 @@ void PlayerShip::fixed_update(Engine& engine) {
 
     // Update hitbox position
     Vector3 pos = get_position();
-    hitbox.min = (Vector3){pos.x - 0.2f, pos.y - 0.2f, pos.z - 0.2f};
-    hitbox.max = (Vector3){pos.x + 0.2f, pos.y + 0.2f, pos.z + 0.2f};
+    hitbox_.min = (Vector3){pos.x - 0.2f, pos.y - 0.2f, pos.z - 0.2f};
+    hitbox_.max = (Vector3){pos.x + 0.2f, pos.y + 0.2f, pos.z + 0.2f};
 }
 
 void PlayerShip::after_update(Engine& engine){
-    debug_.clean();
+    get_debug().clean();
     exited_gravity = false;
     if (in_gravity && !g_flag) {
         in_gravity = false;
@@ -80,16 +82,15 @@ void PlayerShip::after_update(Engine& engine){
     }
 
     Vector3 position = get_position();
-    debug_.writeln(TextFormat("--- SHIP ---"));
-    debug_.writeln(TextFormat("Position: %.2f, %.2f, %.2f", position.x, position.y, position.z));
-    debug_.writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
-    debug_.writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
-    debug_.writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
+    get_debug().writeln(TextFormat("--- SHIP ---"));
+    get_debug().writeln(TextFormat("Position: %.2f, %.2f, %.2f", position.x, position.y, position.z));
+    get_debug().writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
+    get_debug().writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
+    get_debug().writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
+}
 
-    Vector3 model_position = renderable_->get_position();
-    debug_.writeln(TextFormat("--- SHIP MODEL ---"));
-    debug_.writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
-                              model_position.x, model_position.y, model_position.z));
+BoundingBox PlayerShip::get_hitbox() {
+    return hitbox_;
 }
 
 void PlayerShip::add_gravity(Vector3 gravityAccel) {
@@ -111,7 +112,7 @@ void Planet::update(Engine& engine) {}
 void Planet::fixed_update(Engine& engine) {
     auto& scene = engine.get_scene();
     PlayerShip* playerShip = (PlayerShip*)scene.get_game_object("player");
-    bool colliding = CheckCollisionBoxSphere(playerShip->hitbox, get_position(), gravity_radius);
+    bool colliding = CheckCollisionBoxSphere(playerShip->get_hitbox(), get_position(), gravity_radius);
     if (colliding) {
         if (!playerShip->in_gravity){
             playerShip->entered_gravity = true;

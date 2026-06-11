@@ -1,11 +1,10 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
-#include "raylib.h"
 #include "debug.hpp"
 #include <memory>
 
-class Renderable;
+class RenderableComponent;
 class CameraBody;
 class Engine;
 
@@ -14,8 +13,8 @@ public:
     Renderer();
     ~Renderer();
 
-    void add_renderable(Renderable* renderable);
-    void remove_renderable(Renderable* renderable);
+    void register_renderable(RenderableComponent* renderable);
+    void unregister_renderable(RenderableComponent* renderable);
 
     void set_camera_body(CameraBody* camera_body);
 

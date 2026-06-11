@@ -1,22 +1,22 @@
 #include "renderable.hpp"
 #include "game_object.hpp"
+#include "raymath.h"
 
-Renderable::Renderable(GameObject* owner, Renderer* renderer, Model& model) 
-    : model_(model), 
-      owner_(owner) 
+RenderableComponent::RenderableComponent(GameObject* owner, Renderer* renderer, Model& model) 
+    : Component(owner), model_(model)
 {
-    renderer->add_renderable(this);
+    renderer->register_renderable(this);
 }
  
-Renderable::~Renderable() {
+RenderableComponent::~RenderableComponent() {
     UnloadModel(model_);
 }
 
-void Renderable::update(Matrix transform) {
+void RenderableComponent::update() {
     if (owner_ == nullptr) { return; }
-    model_.transform = initial_transform_ * transform;
+    model_.transform = initial_transform_ * owner_->get_visual_transform();
 }
 
-void Renderable::draw() {
+void RenderableComponent::draw() {
     DrawModel(model_, (Vector3) {0.0f, 0.0f, 0.0f}, 1.0f, color_);
 }

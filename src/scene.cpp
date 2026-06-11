@@ -31,10 +31,10 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     player_model.transform *= MatrixRotateX(180.0f * DEG2RAD) 
         * MatrixRotateZ(180.0f * DEG2RAD) 
         * MatrixScale(0.2f, 0.2f, 0.2f);
-    auto player_rend = std::make_unique<Renderable>(player.get(), renderer, player_model);
+    auto player_rend = std::make_unique<RenderableComponent>(player.get(), renderer, player_model);
     player_rend->set_initial_transform(player_model.transform);
     player_rend->set_color(RAYWHITE);
-    player->add_renderable(std::move(player_rend));
+    player->add_component(std::move(player_rend));
 
     auto planet_factory = PlanetFactory(renderer, impl_->rsrc_manager);
     impl_->game_objects["planet1"] = planet_factory.create(

@@ -1,6 +1,7 @@
 #include "camera.hpp"
 #include "engine.hpp"
 #include "render.hpp"
+#include "raymath.h"
 #include <memory>
 
 struct CameraBody::Impl {
