@@ -51,20 +51,35 @@ function download_progress(total, current)
 end
 
 function check_raylib()
-    os.chdir("external")
-    if(os.isdir("raylib-master") == false) then
-        if(not os.isfile("raylib-master.zip")) then
-            print("Raylib not found, downloading from github")
-            local result_str, response_code = http.download("https://github.com/raysan5/raylib/archive/refs/heads/master.zip", "raylib-master.zip", {
-                progress = download_progress,
-                headers = { "From: Premake", "Referer: Premake" }
-            })
-        end
-        print("Unzipping to " ..  os.getcwd())
-        zip.extract("raylib-master.zip", os.getcwd())
-        os.remove("raylib-master.zip")
+    local original_dir = os.getcwd()
+    -- Ensure we are in the external directory relative to the script
+    local external_dir = path.getabsolute("external")
+    if not os.isdir(external_dir) then
+        os.mkdir(external_dir)
     end
-    os.chdir("../")
+    
+    os.chdir(external_dir)
+    
+    if not os.isdir("raylib-master") then
+        print("Raylib not found, downloading from github using curl...")
+        -- Use -f to fail on server errors, -L to follow redirects
+        local success = os.execute("curl -f -L -o raylib-master.zip https://github.com/raysan5/raylib/archive/refs/heads/master.zip")
+        
+        if success then
+            print("Unzipping raylib-master.zip...")
+            local unzip_success = zip.extract("raylib-master.zip", ".")
+            if not unzip_success then
+                print("Premake zip.extract failed, trying system unzip...")
+                os.execute("unzip -q raylib-master.zip")
+            end
+            os.remove("raylib-master.zip")
+        else
+            os.chdir(original_dir)
+            error("Failed to download Raylib using curl. Please check your internet connection.")
+        end
+    end
+    
+    os.chdir(original_dir)
 end
 
 function build_externals()

@@ -11,22 +11,22 @@ void GameObject::add_renderable(std::unique_ptr<Renderable> rend) {
 // Global Movement
 
 void GameObject::set_position_x(float x) {
-    this->transform_.m12 = x; 
+    this->transform_.m12 = x;
 }
 void GameObject::set_position_y(float y) {
-    this->transform_.m13 = y; 
+    this->transform_.m13 = y;
 }
 void GameObject::set_position_z(float z) {
-    this->transform_.m14 = z; 
+    this->transform_.m14 = z;
 }
 void GameObject::set_position(float x, float y, float z) {
-    set_position_x(x); 
-    set_position_y(y); 
+    set_position_x(x);
+    set_position_y(y);
     set_position_z(z);
 }
 void GameObject::set_position(Vector3 position) {
-    set_position_x(position.x); 
-    set_position_y(position.y); 
+    set_position_x(position.x);
+    set_position_y(position.y);
     set_position_z(position.z);
 }
 void GameObject::move_global_x(float delta_x) { this->transform_.m12 += delta_x; }
@@ -34,7 +34,7 @@ void GameObject::move_global_y(float delta_y) { this->transform_.m13 += delta_y;
 void GameObject::move_global_z(float delta_z) { this->transform_.m14 += delta_z; }
 
 void GameObject::move_global(float delta_x, float delta_y, float delta_z) {
-    move_global_x(delta_x); move_global_y(delta_y); move_global_z(delta_z); 
+    move_global_x(delta_x); move_global_y(delta_y); move_global_z(delta_z);
 }
 
 void GameObject::move_global(Vector3 delta) {
