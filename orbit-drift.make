@@ -130,6 +130,7 @@ GENERATED += $(OBJDIR)/render.o
 GENERATED += $(OBJDIR)/renderable.o
 GENERATED += $(OBJDIR)/resource_manager.o
 GENERATED += $(OBJDIR)/scene.o
+GENERATED += $(OBJDIR)/timer.o
 OBJECTS += $(OBJDIR)/camera.o
 OBJECTS += $(OBJDIR)/debug.o
 OBJECTS += $(OBJDIR)/engine.o
@@ -142,6 +143,7 @@ OBJECTS += $(OBJDIR)/render.o
 OBJECTS += $(OBJDIR)/renderable.o
 OBJECTS += $(OBJDIR)/resource_manager.o
 OBJECTS += $(OBJDIR)/scene.o
+OBJECTS += $(OBJDIR)/timer.o
 
 # Rules
 # #############################################
@@ -239,6 +241,9 @@ $(OBJDIR)/resource_manager.o: src/resource_manager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/scene.o: src/scene.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/timer.o: src/timer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

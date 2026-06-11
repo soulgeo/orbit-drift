@@ -1,6 +1,7 @@
 #include "render.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 #include "game_object.hpp"
 #include "raylib.h"
@@ -15,19 +16,24 @@
 #endif
 
 
-struct RendererImpl {
+struct Renderer::Impl {
     std::vector<Renderable*> renderables;
+    Camera camera = {0};
+    CameraBody* camera_body = nullptr;
+    Shader fog;
+    Debug debug;
+    float dt;
 };
 
 Renderer::Renderer() {
-    impl_ = new RendererImpl;
+    impl_ = std::make_unique<Impl>();
 
     // Init shaders
-    // fog_ = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
+    // impl_->fog = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
     //                  TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
     //
     // for (auto &[name, tuple] : impl_->obj_model_refs) {
-    //     std::get<0>(tuple).materials[0].shader = fog_;
+    //     std::get<0>(tuple).materials[0].shader = impl_->fog;
     // }
 }
 
@@ -42,27 +48,33 @@ void Renderer::remove_renderable(Renderable* renderable) {
     );
 }
 
-Renderer::~Renderer() {
-    delete impl_;
+Renderer::~Renderer() = default;
+
+void Renderer::set_camera_body(CameraBody* camera_body) {
+    impl_->camera_body = camera_body;
+}
+
+Debug& Renderer::get_debug() {
+    return impl_->debug;
 }
 
 void Renderer::render(Engine& engine) {
-    debug_.clean();
-    debug_.writeln("--- CAMERA ---");
-    debug_.writeln(TextFormat("Pos: %.2f, %.2f, %.2f", camera_.position.x, camera_.position.y, camera_.position.z));
-    debug_.writeln(TextFormat("Target: %.2f, %.2f, %.2f", camera_.target.x, camera_.target.y, camera_.target.z));
+    impl_->debug.clean();
+    impl_->debug.writeln("--- CAMERA ---");
+    impl_->debug.writeln(TextFormat("Pos: %.2f, %.2f, %.2f", impl_->camera.position.x, impl_->camera.position.y, impl_->camera.position.z));
+    impl_->debug.writeln(TextFormat("Target: %.2f, %.2f, %.2f", impl_->camera.target.x, impl_->camera.target.y, impl_->camera.target.z));
 
-    if (camera_body_) {
-        camera_.position = camera_body_->get_visual_position();
-        camera_.projection = camera_body_->get_projection();
-        camera_.fovy = (float)camera_body_->get_fovy();
-        camera_.target = camera_body_->get_target();
-        camera_.up = camera_body_->get_camera_up();
+    if (impl_->camera_body) {
+        impl_->camera.position = impl_->camera_body->get_visual_position();
+        impl_->camera.projection = impl_->camera_body->get_projection();
+        impl_->camera.fovy = (float)impl_->camera_body->get_fovy();
+        impl_->camera.target = impl_->camera_body->get_target();
+        impl_->camera.up = impl_->camera_body->get_camera_up();
     }
 
     BeginDrawing();
         ClearBackground(BLACK);
-        BeginMode3D(camera_);
+        BeginMode3D(impl_->camera);
             draw_3d();
         EndMode3D();
         draw_ui(engine);

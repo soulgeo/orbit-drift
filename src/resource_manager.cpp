@@ -4,22 +4,22 @@
 #include <memory>
 #include <unordered_map>
 
-struct ResourceManagerImpl {
-    std::unordered_map<std::string, Model> models_;
-    std::unordered_map<std::string, Texture2D> textures_;
+struct ResourceManager::Impl {
+    std::unordered_map<std::string, Model> models;
+    std::unordered_map<std::string, Texture2D> textures;
 };
 
 ResourceManager::ResourceManager() {
-    impl_ = std::make_unique<ResourceManagerImpl>();
+    impl_ = std::make_unique<Impl>();
 }
 
 ResourceManager::~ResourceManager() {
-    UnloadAllResources();
+    unload_all_resources();
 }
 
-Model ResourceManager::LoadModel(const char* path) {
-    if (impl_->models_.count(path)) {
-        return impl_->models_[path];
+Model ResourceManager::load_model(const char* path) {
+    if (impl_->models.count(path)) {
+        return impl_->models[path];
     }
 
     Model model = ::LoadModel(path);
@@ -28,13 +28,13 @@ Model ResourceManager::LoadModel(const char* path) {
         return Model{};
     }
 
-    impl_->models_[path] = model;
-    return impl_->models_[path];
+    impl_->models[path] = model;
+    return impl_->models[path];
 }
 
-Texture2D ResourceManager::LoadTexture(const char* path) {
-    if (impl_->textures_.count(path)) {
-        return impl_->textures_[path];
+Texture2D ResourceManager::load_texture(const char* path) {
+    if (impl_->textures.count(path)) {
+        return impl_->textures[path];
     }
 
     Texture2D texture = ::LoadTexture(path);
@@ -43,19 +43,19 @@ Texture2D ResourceManager::LoadTexture(const char* path) {
         return Texture2D{};
     }
 
-    impl_->textures_[path] = texture;
-    return impl_->textures_[path];
+    impl_->textures[path] = texture;
+    return impl_->textures[path];
 }
 
-void ResourceManager::UnloadAllResources() {
-    for (auto& pair : impl_->models_) {
+void ResourceManager::unload_all_resources() {
+    for (auto& pair : impl_->models) {
         ::UnloadModel(pair.second);
     }
-    impl_->models_.clear();
+    impl_->models.clear();
 
-    for (auto& pair : impl_->textures_) {
+    for (auto& pair : impl_->textures) {
         ::UnloadTexture(pair.second);
     }
-    impl_->textures_.clear();
+    impl_->textures.clear();
     std::cout << "INFO: Unloaded all resources." << std::endl;
 }

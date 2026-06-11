@@ -3,8 +3,7 @@
 
 #include <array>
 #include <cstddef>
-
-struct InputHandlerImpl;
+#include <memory>
 
 enum InputType {
     PRESSED,
@@ -28,7 +27,8 @@ public:
     void bind_key(int key, InputType type, int command);
 
 private:
-    InputHandlerImpl* impl_; 
+    struct Impl;
+    std::unique_ptr<Impl> impl_; 
 };
 
 #endif // INPUTHANDLER_HPP

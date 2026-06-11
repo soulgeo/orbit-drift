@@ -2,15 +2,13 @@
 #include <vector>
 #include <string>
 
-struct DebugImpl {
+struct Debug::Impl {
     std::vector<std::string> lines;
 };
 
-Debug::Debug() : impl_(new DebugImpl()) {}
+Debug::Debug() : impl_(new Impl()) {}
 
-Debug::~Debug() {
-    delete impl_;
-}
+Debug::~Debug() = default;
 
 void Debug::writeln(const char* line) {
     if (line) {

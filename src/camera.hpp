@@ -1,6 +1,7 @@
 #include "game_object.hpp"
 #include "raylib.h"
 #include "scene.hpp"
+#include <memory>
 
 struct CameraProfile {
     GameObject* target;
@@ -24,47 +25,26 @@ enum CameraProfileId {
     CP_IN_GRAVITY,
 };
 
-struct CameraBodyImpl;
 
 class CameraBody : public GameObject{
 public:
     CameraBody(Scene* scene, Renderer* renderer);
-    ~CameraBody() {};
+    ~CameraBody();
 
-    int get_profile_id() { return active_profile_id_; }
-    int get_new_profile_id() { return new_profile_id_; }
-    int get_trans_iter() { return trans_iter_; }
-    int get_projection() { return projection_; }
-    float get_fovy() { return visual_fovy_; }
-    Vector3 get_target() { return visual_target_pos_; }
-    Vector3 get_camera_up() { return visual_up_; }
+    int get_profile_id();
+    int get_new_profile_id();
+    int get_trans_iter();
+    int get_projection();
+    float get_fovy();
+    Vector3 get_target();
+    Vector3 get_camera_up();
 
-    void switch_profile(int target_profile){
-        new_profile_id_ = target_profile;
-        trans_iter_ = 0;
-    };
+    void switch_profile(int target_profile);
 
     void fixed_update(Engine& engine) override;
     void update(Engine& engine) override;
 
 private:
-    CameraState curr_state_;
-    CameraState saved_state_;
-    CameraBodyImpl* impl_;
-    
-    Vector3 curr_target_pos_;
-    Vector3 prev_target_pos_;
-    Vector3 visual_target_pos_;
-
-    Vector3 up_;
-    Vector3 prev_up_;
-    Vector3 visual_up_;
-
-    float visual_fovy_;
-
-    int projection_ = CAMERA_PERSPECTIVE;
-    int active_profile_id_ = CP_DEFAULT;
-    int new_profile_id_ = -1;
-    int trans_iter_ = 0;
-    int max_trans_iter_ = 16;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };

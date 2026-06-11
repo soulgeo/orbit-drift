@@ -3,12 +3,11 @@
 
 #include "raylib.h"
 #include "debug.hpp"
+#include <memory>
 
 class Renderable;
 class CameraBody;
 class Engine;
-
-struct RendererImpl;
 
 class Renderer {
 public:
@@ -18,24 +17,17 @@ public:
     void add_renderable(Renderable* renderable);
     void remove_renderable(Renderable* renderable);
 
-    void set_camera_body(CameraBody* camera_body){
-        camera_body_ = camera_body;
-    };
+    void set_camera_body(CameraBody* camera_body);
 
     void render(Engine& engine);
     void draw_3d();
     void draw_ui(Engine& engine);
 
-    Debug& get_debug() { return debug_; }
+    Debug& get_debug();
 
 private:
-    RendererImpl* impl_;
-    Camera camera_ = {0};
-    CameraBody* camera_body_ = nullptr;
-    Shader fog_;
-    Debug debug_;
-
-    float dt_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 #endif // !RENDER_HPP

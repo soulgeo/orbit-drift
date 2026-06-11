@@ -1,20 +1,19 @@
 #include "raylib.h"
 #include "input_handler.hpp"
+#include <memory>
 #include <utility>
 #include <vector>
 
-struct InputHandlerImpl {
+struct InputHandler::Impl {
     std::vector<std::pair<int, InputType>> active_key_codes;
     std::array<std::pair<InputType, int>, 350> bindings;
 };
 
 InputHandler::InputHandler() {
-    impl_ = new InputHandlerImpl();
+    impl_ = std::make_unique<Impl>();
 }
 
-InputHandler::~InputHandler() {
-    delete impl_;
-}
+InputHandler::~InputHandler() = default;
 
 void InputHandler::bind_key(int key, InputType type, int command) {
     impl_->bindings[key].first = type;

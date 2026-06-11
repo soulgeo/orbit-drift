@@ -1,12 +1,32 @@
 #include "camera.hpp"
 #include "engine.hpp"
+#include "render.hpp"
+#include <memory>
 
-struct CameraBodyImpl {
+struct CameraBody::Impl {
     std::vector<CameraProfile> camera_profiles;
+    CameraState curr_state;
+    CameraState saved_state;
+    
+    Vector3 curr_target_pos;
+    Vector3 prev_target_pos;
+    Vector3 visual_target_pos;
+
+    Vector3 up;
+    Vector3 prev_up;
+    Vector3 visual_up;
+
+    float visual_fovy;
+
+    int projection = CAMERA_PERSPECTIVE;
+    int active_profile_id = CP_DEFAULT;
+    int new_profile_id = -1;
+    int trans_iter = 0;
+    int max_trans_iter = 16;
 };
 
 CameraBody::CameraBody(Scene* c_scene, Renderer* renderer) {
-    impl_ = new CameraBodyImpl;
+    impl_ = std::make_unique<Impl>();
 
     // Define Camera Profiles
     CameraProfile defaultCamera;
@@ -23,60 +43,81 @@ CameraBody::CameraBody(Scene* c_scene, Renderer* renderer) {
     inGravityCamera.fovy = 80.0f;
     impl_->camera_profiles.push_back(inGravityCamera);
 
-    active_profile_id_ = CP_DEFAULT;
+    impl_->active_profile_id = CP_DEFAULT;
 
     renderer->set_camera_body(this);
 }
 
-void CameraBody::fixed_update(Engine& engine) {
-    prev_target_pos_ = curr_target_pos_;
-    prev_up_ = up_;
+CameraBody::~CameraBody() = default;
 
-    CameraProfile& active = impl_->camera_profiles[active_profile_id_];
+int CameraBody::get_profile_id() { return impl_->active_profile_id; }
+
+int CameraBody::get_new_profile_id() { return impl_->new_profile_id; }
+
+int CameraBody::get_trans_iter() { return impl_->trans_iter; }
+
+int CameraBody::get_projection() { return impl_->projection; }
+
+float CameraBody::get_fovy() { return impl_->visual_fovy; }
+
+Vector3 CameraBody::get_target() { return impl_->visual_target_pos; }
+
+Vector3 CameraBody::get_camera_up() { return impl_->visual_up; }
+
+void CameraBody::switch_profile(int target_profile){
+    impl_->new_profile_id = target_profile;
+    impl_->trans_iter = 0;
+};
+
+void CameraBody::fixed_update(Engine& engine) {
+    impl_->prev_target_pos = impl_->curr_target_pos;
+    impl_->prev_up = impl_->up;
+
+    CameraProfile& active = impl_->camera_profiles[impl_->active_profile_id];
 
     // If new transition is starting, save the current camera state
-    if (new_profile_id_ >= 0 && trans_iter_ == 0) {
-        saved_state_.pos_offset = curr_state_.pos_offset;
-        saved_state_.targ_offset = curr_state_.targ_offset;
-        saved_state_.pos_local_offset = curr_state_.pos_local_offset;
-        saved_state_.targ_local_offset = curr_state_.targ_local_offset;
-        saved_state_.fovy = curr_state_.fovy;
+    if (impl_->new_profile_id >= 0 && impl_->trans_iter == 0) {
+        impl_->saved_state.pos_offset = impl_->curr_state.pos_offset;
+        impl_->saved_state.targ_offset = impl_->curr_state.targ_offset;
+        impl_->saved_state.pos_local_offset = impl_->curr_state.pos_local_offset;
+        impl_->saved_state.targ_local_offset = impl_->curr_state.targ_local_offset;
+        impl_->saved_state.fovy = impl_->curr_state.fovy;
     }
 
-    if (new_profile_id_ < 0) {
+    if (impl_->new_profile_id < 0) {
         // Just set calced offsets to the active profile ones
-        curr_state_.pos_offset = active.pos_offset;
-        curr_state_.targ_offset = active.targ_offset;
-        curr_state_.pos_local_offset = active.pos_local_offset;
-        curr_state_.targ_local_offset = active.targ_local_offset;
-        curr_state_.fovy = active.fovy;
+        impl_->curr_state.pos_offset = active.pos_offset;
+        impl_->curr_state.targ_offset = active.targ_offset;
+        impl_->curr_state.pos_local_offset = active.pos_local_offset;
+        impl_->curr_state.targ_local_offset = active.targ_local_offset;
+        impl_->curr_state.fovy = active.fovy;
     } else {
         // Get calced offsets for transition from saved state to new profile
-        CameraProfile& next = impl_->camera_profiles[new_profile_id_];
-        curr_state_.targ_offset = Vector3Lerp(
-            saved_state_.targ_offset, 
+        CameraProfile& next = impl_->camera_profiles[impl_->new_profile_id];
+        impl_->curr_state.targ_offset = Vector3Lerp(
+            impl_->saved_state.targ_offset, 
             next.targ_offset, 
-            (float)trans_iter_/max_trans_iter_
+            (float)impl_->trans_iter/impl_->max_trans_iter
         );
-        curr_state_.pos_offset = Vector3Lerp(
-            saved_state_.pos_offset, 
+        impl_->curr_state.pos_offset = Vector3Lerp(
+            impl_->saved_state.pos_offset, 
             next.pos_offset, 
-            (float)trans_iter_/max_trans_iter_
+            (float)impl_->trans_iter/impl_->max_trans_iter
         );
-        curr_state_.targ_local_offset = Vector3Lerp(
-            saved_state_.targ_local_offset, 
+        impl_->curr_state.targ_local_offset = Vector3Lerp(
+            impl_->saved_state.targ_local_offset, 
             next.targ_local_offset, 
-            (float)trans_iter_/max_trans_iter_
+            (float)impl_->trans_iter/impl_->max_trans_iter
         );
-        curr_state_.pos_local_offset  = Vector3Lerp(
-            saved_state_.pos_local_offset, 
+        impl_->curr_state.pos_local_offset  = Vector3Lerp(
+            impl_->saved_state.pos_local_offset, 
             next.pos_local_offset, 
-            (float)trans_iter_/max_trans_iter_
+            (float)impl_->trans_iter/impl_->max_trans_iter
         );
-        curr_state_.fovy = Lerp(
-            saved_state_.fovy, 
+        impl_->curr_state.fovy = Lerp(
+            impl_->saved_state.fovy, 
             next.fovy, 
-            (float)trans_iter_/max_trans_iter_
+            (float)impl_->trans_iter/impl_->max_trans_iter
         );
     }
 
@@ -92,39 +133,39 @@ void CameraBody::fixed_update(Engine& engine) {
 
     // Translate local offset from local to upright space
     Vector3 targ_translated_offset;
-    Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
-    Vector3 up_offset = curr_state_.targ_local_offset.y * target_up;
-    Vector3 forward_offset = curr_state_.targ_local_offset.z * target_forward;
+    Vector3 right_offset = impl_->curr_state.targ_local_offset.x * target_right;
+    Vector3 up_offset = impl_->curr_state.targ_local_offset.y * target_up;
+    Vector3 forward_offset = impl_->curr_state.targ_local_offset.z * target_forward;
     targ_translated_offset = right_offset + up_offset + forward_offset;
 
     // Finally translate to world space
-    Vector3 world_target = target_position + curr_state_.targ_offset + targ_translated_offset;
+    Vector3 world_target = target_position + impl_->curr_state.targ_offset + targ_translated_offset;
 
-    curr_target_pos_ = Vector3Lerp(curr_target_pos_, world_target, follow_speed*engine.get_fixed_dt());
+    impl_->curr_target_pos = Vector3Lerp(impl_->curr_target_pos, world_target, follow_speed*engine.get_fixed_dt());
 
     // Translate local offset from local to upright space
     Vector3 pos_translated_offset;
-    right_offset = curr_state_.pos_local_offset.x * target_right;
-    up_offset = curr_state_.pos_local_offset.y * target_up;
-    forward_offset = curr_state_.pos_local_offset.z * target_forward;
+    right_offset = impl_->curr_state.pos_local_offset.x * target_right;
+    up_offset = impl_->curr_state.pos_local_offset.y * target_up;
+    forward_offset = impl_->curr_state.pos_local_offset.z * target_forward;
     pos_translated_offset = right_offset + up_offset + forward_offset;
 
     // Finally translate to world space
-    Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
+    Vector3 world_position = target_position + impl_->curr_state.pos_offset + pos_translated_offset;
 
     set_position(Vector3Lerp(get_position(), world_position, follow_speed*engine.get_fixed_dt()));
 
     // Update Camera Up
-    up_ = target_up;
+    impl_->up = target_up;
 
     // Manage transition loop
-    if (new_profile_id_ >= 0) {
-        if (trans_iter_ >= max_trans_iter_) {
-            active_profile_id_ = new_profile_id_;
-            new_profile_id_ = -1;
-            trans_iter_ = 0;
+    if (impl_->new_profile_id >= 0) {
+        if (impl_->trans_iter >= impl_->max_trans_iter) {
+            impl_->active_profile_id = impl_->new_profile_id;
+            impl_->new_profile_id = -1;
+            impl_->trans_iter = 0;
         } else {
-            trans_iter_++;
+            impl_->trans_iter++;
         }
     }
 }
@@ -132,7 +173,7 @@ void CameraBody::fixed_update(Engine& engine) {
 void CameraBody::update(Engine& engine) {
     float alpha = engine.get_interpolation_alpha();
 
-    visual_target_pos_ = Vector3Lerp(prev_target_pos_, curr_target_pos_, alpha);
-    visual_up_ = Vector3Lerp(prev_up_, up_, alpha);
-    visual_fovy_ = curr_state_.fovy; 
+    impl_->visual_target_pos = Vector3Lerp(impl_->prev_target_pos, impl_->curr_target_pos, alpha);
+    impl_->visual_up = Vector3Lerp(impl_->prev_up, impl_->up, alpha);
+    impl_->visual_fovy = impl_->curr_state.fovy; 
 }

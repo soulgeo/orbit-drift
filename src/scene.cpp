@@ -13,19 +13,20 @@
 #include "render.hpp"
 #include "resource_manager.hpp"
 
-struct SceneImpl {
+struct Scene::Impl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> game_objects;
+    ResourceManager* rsrc_manager;
 };
 
 Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager) 
-    : rsrc_manager_(rsrc_manager) 
 {
-    impl_ = new SceneImpl();
+    impl_ = std::make_unique<Impl>();
+    impl_->rsrc_manager = rsrc_manager;
 
     auto& player = impl_->game_objects["player"];
     player = std::make_unique<PlayerShip>();
-    auto player_model = rsrc_manager_->LoadModel("resources/models/scene.gltf");
-    auto texture = rsrc_manager_->LoadTexture("resources/models/textures/Material_baseColor.png");
+    auto player_model = impl_->rsrc_manager->load_model("resources/models/scene.gltf");
+    auto texture = impl_->rsrc_manager->load_texture("resources/models/textures/Material_baseColor.png");
     player_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
     player_model.transform *= MatrixRotateX(180.0f * DEG2RAD) 
         * MatrixRotateZ(180.0f * DEG2RAD) 
@@ -35,7 +36,7 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     player_rend->set_color(RAYWHITE);
     player->add_renderable(std::move(player_rend));
 
-    auto planet_factory = PlanetFactory(renderer, rsrc_manager);
+    auto planet_factory = PlanetFactory(renderer, impl_->rsrc_manager);
     impl_->game_objects["planet1"] = planet_factory.create(
         (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f, PURPLE);
     impl_->game_objects["planet2"] = planet_factory.create(
@@ -49,9 +50,7 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     impl_->game_objects["camera_body"] = std::move(camera_body);
 }
 
-Scene::~Scene() {
-    delete impl_;
-}
+Scene::~Scene() = default;
 
 GameObject* Scene::get_game_object(const std::string& name) {
     auto it = impl_->game_objects.find(name);

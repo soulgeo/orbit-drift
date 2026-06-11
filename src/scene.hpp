@@ -4,11 +4,9 @@
 #include "game_object.hpp"
 #include "render.hpp"
 #include "resource_manager.hpp"
+#include <memory>
 #include <string>
 #include <functional>
-
-
-struct SceneImpl;
 
 class Scene {
 public:
@@ -21,8 +19,8 @@ public:
     void for_each_game_object(std::function<void(const std::string&, GameObject&)> func);
 
 private:
-    SceneImpl* impl_;
-    ResourceManager* rsrc_manager_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 #endif // SCENE_HPP

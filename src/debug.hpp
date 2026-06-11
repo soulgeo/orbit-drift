@@ -1,7 +1,7 @@
 #ifndef DEBUG_HPP
 #define DEBUG_HPP
 
-struct DebugImpl;
+#include <memory>
 
 class Debug {
 public:
@@ -14,7 +14,8 @@ public:
     const char* get_line(int index) const;
 
 private:
-    DebugImpl* impl_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 #endif // DEBUG_HPP

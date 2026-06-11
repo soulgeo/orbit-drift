@@ -2,6 +2,7 @@
 #include "render.hpp"
 #include "resource_manager.hpp"
 #include <memory>
+
 class PlanetFactory {
 public:
     PlanetFactory(Renderer* renderer, ResourceManager* rsrc_manager)

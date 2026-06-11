@@ -4,20 +4,20 @@
 #include "raylib.h"
 #include <memory>
 
-struct ResourceManagerImpl;
 
 class ResourceManager {
 public:
     ResourceManager();
     ~ResourceManager();
 
-    Model LoadModel(const char* path);
-    Texture2D LoadTexture(const char* path);
+    Model load_model(const char* path);
+    Texture2D load_texture(const char* path);
 
-    void UnloadAllResources();
+    void unload_all_resources();
 
 private:
-    std::unique_ptr<ResourceManagerImpl> impl_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager& operator=(const ResourceManager&) = delete;
