@@ -1,13 +1,14 @@
-#include "render.hpp"
+#include "renderer.hpp"
 
 #include <algorithm>
 #include <memory>
 #include <vector>
 #include "game_object.hpp"
 #include "raylib.h"
-#include "camera.hpp"
-#include "renderable.hpp"
+#include "camera_component.hpp"
+#include "renderable_component.hpp"
 #include "engine.hpp"
+#include "debug_component.hpp"
 
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION 330
@@ -18,10 +19,10 @@
 
 struct Renderer::Impl {
     std::vector<RenderableComponent*> renderables;
+    std::vector<DebugComponent*> debugs;
     Camera camera = {0};
-    CameraBody* camera_body = nullptr;
+    CameraComponent* camera_body;
     Shader fog;
-    Debug debug;
     float dt;
 };
 
@@ -48,24 +49,26 @@ void Renderer::unregister_renderable(RenderableComponent* renderable) {
     );
 }
 
+void Renderer::register_debug(DebugComponent* debug) {
+    impl_->debugs.push_back(debug);
+}
+
+void Renderer::unregister_debug(DebugComponent* debug) {
+    impl_->debugs.erase(
+        std::remove(impl_->debugs.begin(), impl_->debugs.end(), debug), 
+        impl_->debugs.end()
+    );
+}
+
 Renderer::~Renderer() = default;
 
-void Renderer::set_camera_body(CameraBody* camera_body) {
+void Renderer::register_camera(CameraComponent* camera_body) {
     impl_->camera_body = camera_body;
 }
 
-Debug& Renderer::get_debug() {
-    return impl_->debug;
-}
-
 void Renderer::render(Engine& engine) {
-    impl_->debug.clean();
-    impl_->debug.writeln("--- CAMERA ---");
-    impl_->debug.writeln(TextFormat("Pos: %.2f, %.2f, %.2f", impl_->camera.position.x, impl_->camera.position.y, impl_->camera.position.z));
-    impl_->debug.writeln(TextFormat("Target: %.2f, %.2f, %.2f", impl_->camera.target.x, impl_->camera.target.y, impl_->camera.target.z));
-
     if (impl_->camera_body) {
-        impl_->camera.position = impl_->camera_body->get_visual_position();
+        impl_->camera.position = impl_->camera_body->get_position();
         impl_->camera.projection = impl_->camera_body->get_projection();
         impl_->camera.fovy = (float)impl_->camera_body->get_fovy();
         impl_->camera.target = impl_->camera_body->get_target();
@@ -77,7 +80,7 @@ void Renderer::render(Engine& engine) {
         BeginMode3D(impl_->camera);
             draw_3d();
         EndMode3D();
-        draw_ui(engine);
+        draw_ui();
     EndDrawing();
 }
 
@@ -93,12 +96,14 @@ void Renderer::draw_3d() {
     }
 }
 
-void Renderer::draw_ui(Engine& engine) {
+void Renderer::draw_ui() {
     int x = 30;
     int y = 50;
-    for (int i = 0; i < engine.get_debug_line_count(); ++i) {
-        DrawText(engine.get_debug_line(i), x, y, 20, YELLOW);
-        y += 25;
+    for (auto i = impl_->debugs.begin(); i != impl_->debugs.end(); i++){
+        for (int j = 0; j < (*i)->get_line_count(); ++j) {
+            DrawText((*i)->get_line(j), x, y, 20, YELLOW);
+            y += 25;
+        }
     }
 }
 

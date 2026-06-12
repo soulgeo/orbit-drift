@@ -4,8 +4,12 @@
 #include "raylib.h"
 #include <memory>
 
-
 class ResourceManager {
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+
+    ResourceManager(const ResourceManager&) = delete;
+    ResourceManager& operator=(const ResourceManager&) = delete;
 public:
     ResourceManager();
     ~ResourceManager();
@@ -14,13 +18,6 @@ public:
     Texture2D load_texture(const char* path);
 
     void unload_all_resources();
-
-private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
-
-    ResourceManager(const ResourceManager&) = delete;
-    ResourceManager& operator=(const ResourceManager&) = delete;
 };
 
 #endif // RESOURCE_MANAGER_HPP

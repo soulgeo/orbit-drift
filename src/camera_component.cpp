@@ -1,13 +1,14 @@
-#include "camera.hpp"
+#include "camera_component.hpp"
 #include "engine.hpp"
-#include "render.hpp"
+#include "renderer.hpp"
 #include "raymath.h"
+#include "transform_component.hpp"
 #include <memory>
 
-struct CameraBody::Impl {
-    std::vector<CameraProfile> camera_profiles;
-    CameraState curr_state;
-    CameraState saved_state;
+struct CameraComponent::Impl {
+    std::vector<Profile> camera_profiles;
+    State curr_state;
+    State saved_state;
     
     Vector3 curr_target_pos;
     Vector3 prev_target_pos;
@@ -23,58 +24,88 @@ struct CameraBody::Impl {
     int active_profile_id = CP_DEFAULT;
     int new_profile_id = -1;
     int trans_iter = 0;
-    int max_trans_iter = 16;
+    int max_trans_iter = 40;
+
+    TransformComponent* cached_transform;
+
+    Engine* engine;
 };
 
-CameraBody::CameraBody(Scene* c_scene, Renderer* renderer) {
+CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* renderer) :
+    Component(owner) 
+{
     impl_ = std::make_unique<Impl>();
 
     // Define Camera Profiles
-    CameraProfile defaultCamera;
+    Profile defaultCamera;
     defaultCamera.target = c_scene->get_game_object("player");
     defaultCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
     defaultCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
-    defaultCamera.fovy = 60.0f;
+    defaultCamera.fovy = 70.0f;
     impl_->camera_profiles.push_back(defaultCamera);
 
-    CameraProfile inGravityCamera;
+    Profile inGravityCamera;
     inGravityCamera.target = c_scene->get_game_object("player");
-    inGravityCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -3.8f};
+    inGravityCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.8f};
     inGravityCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
     inGravityCamera.fovy = 80.0f;
     impl_->camera_profiles.push_back(inGravityCamera);
 
     impl_->active_profile_id = CP_DEFAULT;
 
-    renderer->set_camera_body(this);
+    renderer->register_camera(this);
+
+    impl_->engine = owner_->get_engine();
 }
 
-CameraBody::~CameraBody() = default;
+CameraComponent::~CameraComponent() = default;
 
-int CameraBody::get_profile_id() { return impl_->active_profile_id; }
+int CameraComponent::get_profile_id() {
+    return impl_->active_profile_id;
+}
 
-int CameraBody::get_new_profile_id() { return impl_->new_profile_id; }
+int CameraComponent::get_new_profile_id() {
+    return impl_->new_profile_id;
+}
 
-int CameraBody::get_trans_iter() { return impl_->trans_iter; }
+int CameraComponent::get_trans_iter() {
+    return impl_->trans_iter; 
+}
 
-int CameraBody::get_projection() { return impl_->projection; }
+Vector3 CameraComponent::get_position() {
+    return impl_->cached_transform->get_position();
+}
 
-float CameraBody::get_fovy() { return impl_->visual_fovy; }
+int CameraComponent::get_projection() {
+    return impl_->projection;
+}
 
-Vector3 CameraBody::get_target() { return impl_->visual_target_pos; }
+float CameraComponent::get_fovy() {
+    return impl_->visual_fovy;
+}
 
-Vector3 CameraBody::get_camera_up() { return impl_->visual_up; }
+Vector3 CameraComponent::get_target() {
+    return impl_->visual_target_pos;
+}
 
-void CameraBody::switch_profile(int target_profile){
+Vector3 CameraComponent::get_camera_up() {
+    return impl_->visual_up; 
+}
+
+void CameraComponent::switch_profile(int target_profile) {
     impl_->new_profile_id = target_profile;
     impl_->trans_iter = 0;
-};
+}
 
-void CameraBody::fixed_update(Engine& engine) {
+void CameraComponent::start() {
+    impl_->cached_transform = owner_->get_component<TransformComponent>();
+}
+
+void CameraComponent::fixed_update() {
     impl_->prev_target_pos = impl_->curr_target_pos;
     impl_->prev_up = impl_->up;
 
-    CameraProfile& active = impl_->camera_profiles[impl_->active_profile_id];
+    Profile& active = impl_->camera_profiles[impl_->active_profile_id];
 
     // If new transition is starting, save the current camera state
     if (impl_->new_profile_id >= 0 && impl_->trans_iter == 0) {
@@ -94,7 +125,7 @@ void CameraBody::fixed_update(Engine& engine) {
         impl_->curr_state.fovy = active.fovy;
     } else {
         // Get calced offsets for transition from saved state to new profile
-        CameraProfile& next = impl_->camera_profiles[impl_->new_profile_id];
+        Profile& next = impl_->camera_profiles[impl_->new_profile_id];
         impl_->curr_state.targ_offset = Vector3Lerp(
             impl_->saved_state.targ_offset, 
             next.targ_offset, 
@@ -124,11 +155,12 @@ void CameraBody::fixed_update(Engine& engine) {
 
     // Update Camera Target
     GameObject& camera_target = *active.target;
+    TransformComponent& camera_target_transform = camera_target.transform();
 
-    Vector3 target_position = camera_target.get_position();
-    Vector3 target_forward = camera_target.get_forward();
-    Vector3 target_up = camera_target.get_up();
-    Vector3 target_right = camera_target.get_right();
+    Vector3 target_position = camera_target_transform.get_position();
+    Vector3 target_forward = camera_target_transform.get_forward();
+    Vector3 target_up = camera_target_transform.get_up();
+    Vector3 target_right = camera_target_transform.get_right();
 
     float follow_speed = 30.0f;
 
@@ -139,10 +171,14 @@ void CameraBody::fixed_update(Engine& engine) {
     Vector3 forward_offset = impl_->curr_state.targ_local_offset.z * target_forward;
     targ_translated_offset = right_offset + up_offset + forward_offset;
 
-    // Finally translate to world space
-    Vector3 world_target = target_position + impl_->curr_state.targ_offset + targ_translated_offset;
+    // Translate to world space
+    Vector3 world_target = 
+        target_position + impl_->curr_state.targ_offset + targ_translated_offset;
 
-    impl_->curr_target_pos = Vector3Lerp(impl_->curr_target_pos, world_target, follow_speed*engine.get_fixed_dt());
+    impl_->curr_target_pos = 
+        Vector3Lerp(
+            impl_->curr_target_pos, world_target, follow_speed * impl_->engine->get_fixed_dt()
+        );
 
     // Translate local offset from local to upright space
     Vector3 pos_translated_offset;
@@ -151,10 +187,13 @@ void CameraBody::fixed_update(Engine& engine) {
     forward_offset = impl_->curr_state.pos_local_offset.z * target_forward;
     pos_translated_offset = right_offset + up_offset + forward_offset;
 
-    // Finally translate to world space
-    Vector3 world_position = target_position + impl_->curr_state.pos_offset + pos_translated_offset;
+    // Translate to world space
+    Vector3 world_position = 
+        target_position + impl_->curr_state.pos_offset + pos_translated_offset;
 
-    set_position(Vector3Lerp(get_position(), world_position, follow_speed*engine.get_fixed_dt()));
+    impl_->cached_transform->set_position(
+        Vector3Lerp(get_position(), world_position, follow_speed * impl_->engine->get_fixed_dt())
+    );
 
     // Update Camera Up
     impl_->up = target_up;
@@ -171,8 +210,8 @@ void CameraBody::fixed_update(Engine& engine) {
     }
 }
 
-void CameraBody::update(Engine& engine) {
-    float alpha = engine.get_interpolation_alpha();
+void CameraComponent::update() {
+    float alpha = impl_->engine->get_interpolation_alpha();
 
     impl_->visual_target_pos = Vector3Lerp(impl_->prev_target_pos, impl_->curr_target_pos, alpha);
     impl_->visual_up = Vector3Lerp(impl_->prev_up, impl_->up, alpha);

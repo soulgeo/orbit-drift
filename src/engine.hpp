@@ -2,9 +2,7 @@
 #define ENGINE_HPP
 
 #include "input_handler.hpp"
-#include "raylib.h"
-#include "render.hpp"
-#include "resource_manager.hpp"
+#include "renderer.hpp"
 #include "scene.hpp"
 #include <memory>
 
@@ -22,6 +20,12 @@ enum UserInput {
 };
 
 class Engine {
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+
+    void process_input();
+    void update();
+    void render();
 public:
     Engine();
     ~Engine();
@@ -35,19 +39,6 @@ public:
     Scene& get_scene() const;
 
     void run();
-
-    int get_debug_line_count() const;
-    const char* get_debug_line(int index) const;
-
-private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
-
-    void _write_debug();
-
-    void process_input();
-    void update();
-    void render();
 };
 
 #endif // !ENGINE_HPP

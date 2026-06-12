@@ -2,12 +2,10 @@
 #include "game_object.hpp"
 #include "resource_manager.hpp"
 #include <memory>
-#include <vector>
 #include <string>
 #include "timer.hpp"
 
 struct Engine::Impl {
-    std::vector<std::string> debug_lines;
     InputHandler::CommandList active_inputs;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<Scene> scene;
@@ -90,58 +88,28 @@ void Engine::update() {
     Timer timer("Engine::update");
 
     impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
-        obj.on_before_update(*this);
+        obj.early_update();
     });
 
     impl_->dt = GetFrameTime();
     impl_->accumulator += impl_->dt;
     while (impl_->accumulator >= impl_->fixed_dt){
         impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
-            obj.on_fixed_update(*this);
+            obj.fixed_update();
         });
         impl_->accumulator -= impl_->fixed_dt;
     }
 
     impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
-        obj.on_update(*this);
+        obj.update();
     });
 
     impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
-        obj.on_after_update(*this);
+        obj.late_update();
     });
 
 }
 
 void Engine::render() {
-    _write_debug();
     impl_->renderer->render(*this);
-}
-
-void Engine::_write_debug() {
-    impl_->debug_lines.clear();
-
-    // Gather from Renderer
-    Debug& renderer_debug = impl_->renderer->get_debug();
-    for (int i = 0; i < renderer_debug.get_line_count(); ++i) {
-        impl_->debug_lines.push_back(renderer_debug.get_line(i));
-    }
-
-    // Gather from GameObjects
-    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
-        Debug& obj_debug = obj.get_debug();
-        for (int i = 0; i < obj_debug.get_line_count(); ++i) {
-            impl_->debug_lines.push_back(obj_debug.get_line(i));
-        }
-    });
-}
-
-int Engine::get_debug_line_count() const {
-    return static_cast<int>(impl_->debug_lines.size());
-}
-
-const char* Engine::get_debug_line(int index) const {
-    if (index >= 0 && index < static_cast<int>(impl_->debug_lines.size())) {
-        return impl_->debug_lines[index].c_str();
-    }
-    return nullptr;
 }

@@ -4,13 +4,13 @@
 #include <string>
 #include <unordered_map>
 
-#include "camera.hpp"
+#include "camera_component.hpp"
 #include "entities.hpp"
 #include "planet_factory.hpp"
 #include "raylib.h"
 #include "raymath.h"
-#include "renderable.hpp"
-#include "render.hpp"
+#include "renderable_component.hpp"
+#include "renderer.hpp"
 #include "resource_manager.hpp"
 
 struct Scene::Impl {
@@ -24,7 +24,10 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     impl_->rsrc_manager = rsrc_manager;
 
     auto& player = impl_->game_objects["player"];
-    player = std::make_unique<PlayerShip>();
+    player = std::make_unique<GameObject>();
+
+    auto player_ship = std::make_unique<PlayerShipComponent>(player.get());
+
     auto player_model = impl_->rsrc_manager->load_model("resources/models/scene.gltf");
     auto texture = impl_->rsrc_manager->load_texture("resources/models/textures/Material_baseColor.png");
     player_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
@@ -34,6 +37,8 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     auto player_rend = std::make_unique<RenderableComponent>(player.get(), renderer, player_model);
     player_rend->set_initial_transform(player_model.transform);
     player_rend->set_color(RAYWHITE);
+
+    player->add_component(std::move(player_ship));
     player->add_component(std::move(player_rend));
 
     auto planet_factory = PlanetFactory(renderer, impl_->rsrc_manager);
@@ -46,7 +51,8 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     impl_->game_objects["planet4"] = planet_factory.create(
         (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f, BLUE);
 
-    auto camera_body = std::make_unique<CameraBody>(this, renderer);
+    auto camera_body = std::make_unique<GameObject>();
+    auto camera_comp = std::make_unique<CameraComponent>(camera_body.get(), this, renderer);
     impl_->game_objects["camera_body"] = std::move(camera_body);
 }
 

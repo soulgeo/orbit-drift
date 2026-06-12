@@ -11,6 +11,8 @@ enum InputType {
 };
 
 class InputHandler {
+    struct Impl;
+    std::unique_ptr<Impl> impl_; 
 public:
     InputHandler();
     ~InputHandler();
@@ -25,10 +27,6 @@ public:
     CommandList handle_input();
 
     void bind_key(int key, InputType type, int command);
-
-private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_; 
 };
 
 #endif // INPUTHANDLER_HPP

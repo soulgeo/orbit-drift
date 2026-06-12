@@ -2,77 +2,43 @@
 #define GAMEOBJECT_HPP
 
 #include "component.hpp"
-#include "debug.hpp"
-#include "raylib.h"
 #include <memory>
+#include <cstddef>
 
 class Engine;
+class TransformComponent;
 
 class GameObject {
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 public:
     GameObject();
     ~GameObject();
 
     void add_component(std::unique_ptr<Component> comp);
 
-    // Getters
-    // TODO: Add Quaternion Getter
-    Matrix get_transform() const;
-    Matrix get_visual_transform() const;
+    size_t get_component_count() const;
+    Component* get_component_at(size_t index) const;
 
-    Vector3 get_position() const;
-    Vector3 get_visual_position() const;
-    Vector3 get_forward() const;
-    Vector3 get_up() const;
-    Vector3 get_right() const;
+    template <typename T> 
+    T* get_component() {
+        for (size_t i = 0; i < get_component_count(); ++i) {
+            T* result = dynamic_cast<T*>(get_component_at(i));
+            if (result) return result;
+        }
+        return nullptr;
+    }
 
-    // Setters
-    // TODO: Add Quaternion Setter
-    void set_position_x(float x);
-    void set_position_y(float y);
-    void set_position_z(float z);
-    void set_position(float x, float y, float z);
-    void set_position(Vector3 position);
+    void start();
 
-    // Global Movement
-    virtual void move_global_x(float deltaX);
-    virtual void move_global_y(float deltaY);
-    virtual void move_global_z(float deltaZ);
-    virtual void move_global(float deltaX, float deltaY, float deltaZ);
-    virtual void move_global(Vector3 delta);
-    virtual void move_global_vel(Vector3 velocity);
+    void early_update();
+    void fixed_update();
+    void update();
+    void late_update();
 
-    // Local Movement
-    virtual void move_local_right(float distance);
-    virtual void move_local_up(float distance);
-    virtual void move_local_forward(float distance);
+    TransformComponent& transform();
 
-    // Rotations
-    // TODO: Add Quaternion Rotation
-    virtual void rotate_pitch(float angleRad); // Rotation around Right axis
-    virtual void rotate_yaw(float angleRad); // Rotation around Up axis
-    virtual void rotate_roll(float angleRad); // Rotation around Forward axis
-    virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
-
-    // Frame by frame behavior
-    virtual void on_update(Engine& engine);
-    virtual void on_before_update(Engine& engine);
-    virtual void on_after_update(Engine& engine);
-
-    virtual void on_fixed_update(Engine& engine);
-
-    Debug& get_debug();
-
-protected:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
-
-    virtual void update(Engine& engine) {};
-    virtual void before_update(Engine& engine) {};
-    virtual void after_update(Engine& engine) {};
-
-    virtual void fixed_update(Engine& engine) {};
-
+    Engine* get_engine();
 };
 
 #endif // GAMEOBJECT_HPP

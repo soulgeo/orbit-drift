@@ -118,34 +118,36 @@ endif
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/camera.o
+GENERATED += $(OBJDIR)/camera_component.o
 GENERATED += $(OBJDIR)/component.o
-GENERATED += $(OBJDIR)/debug.o
+GENERATED += $(OBJDIR)/debug_component.o
 GENERATED += $(OBJDIR)/engine.o
 GENERATED += $(OBJDIR)/entities.o
 GENERATED += $(OBJDIR)/game_object.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/planet_factory.o
-GENERATED += $(OBJDIR)/render.o
-GENERATED += $(OBJDIR)/renderable.o
+GENERATED += $(OBJDIR)/renderable_component.o
+GENERATED += $(OBJDIR)/renderer.o
 GENERATED += $(OBJDIR)/resource_manager.o
 GENERATED += $(OBJDIR)/scene.o
 GENERATED += $(OBJDIR)/timer.o
-OBJECTS += $(OBJDIR)/camera.o
+GENERATED += $(OBJDIR)/transform_component.o
+OBJECTS += $(OBJDIR)/camera_component.o
 OBJECTS += $(OBJDIR)/component.o
-OBJECTS += $(OBJDIR)/debug.o
+OBJECTS += $(OBJDIR)/debug_component.o
 OBJECTS += $(OBJDIR)/engine.o
 OBJECTS += $(OBJDIR)/entities.o
 OBJECTS += $(OBJDIR)/game_object.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/planet_factory.o
-OBJECTS += $(OBJDIR)/render.o
-OBJECTS += $(OBJDIR)/renderable.o
+OBJECTS += $(OBJDIR)/renderable_component.o
+OBJECTS += $(OBJDIR)/renderer.o
 OBJECTS += $(OBJDIR)/resource_manager.o
 OBJECTS += $(OBJDIR)/scene.o
 OBJECTS += $(OBJDIR)/timer.o
+OBJECTS += $(OBJDIR)/transform_component.o
 
 # Rules
 # #############################################
@@ -209,13 +211,13 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/camera.o: src/camera.cpp
+$(OBJDIR)/camera_component.o: src/camera_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/component.o: src/component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/debug.o: src/debug.cpp
+$(OBJDIR)/debug_component.o: src/debug_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/engine.o: src/engine.cpp
@@ -236,10 +238,10 @@ $(OBJDIR)/main.o: src/main.cpp
 $(OBJDIR)/planet_factory.o: src/planet_factory.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/render.o: src/render.cpp
+$(OBJDIR)/renderable_component.o: src/renderable_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/renderable.o: src/renderable.cpp
+$(OBJDIR)/renderer.o: src/renderer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/resource_manager.o: src/resource_manager.cpp
@@ -249,6 +251,9 @@ $(OBJDIR)/scene.o: src/scene.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/timer.o: src/timer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/transform_component.o: src/transform_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
