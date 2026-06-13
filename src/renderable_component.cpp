@@ -1,7 +1,9 @@
 #include "renderable_component.hpp"
 #include "game_object.hpp"
+#include "raylib.h"
 #include "raymath.h"
 #include "transform_component.hpp"
+#include "debug_component.hpp"
 
 RenderableComponent::RenderableComponent(GameObject* owner, Renderer* renderer, Model& model) 
     : Component(owner), model_(model)
@@ -30,14 +32,25 @@ void RenderableComponent::set_initial_transform(Matrix transform){
 }
 
 void RenderableComponent::start() {
-    cached_transform = owner_->get_component<TransformComponent>();
+    transform_ = owner_->get_component<TransformComponent>();
+    debug_ = owner_->get_component<DebugComponent>();
 }
 
 void RenderableComponent::update() {
     if (owner_ == nullptr) { return; }
     model_.transform = 
         initial_transform_ * 
-        cached_transform->get_visual_transform();
+        transform_->get_visual_transform();
+
+    Vector3 position = transform_->get_position();
+    Vector3 up = transform_->get_up();
+    if (debug_) {
+        debug_->writeln(TextFormat("--- MODEL ---"));
+        debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+                                   position.x, position.y, position.z));
+        debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
+                                   up.x, up.y, up.z));
+    }
 }
 
 void RenderableComponent::draw() {

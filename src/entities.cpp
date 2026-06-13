@@ -41,9 +41,6 @@ void PlayerShipComponent::start() {
 void PlayerShipComponent::early_update() {
     g_flag = false;
     entered_gravity = false;
-    if (debug_){
-        debug_->clean();
-    }
 }
 
 void PlayerShipComponent::fixed_update() {
@@ -103,10 +100,13 @@ void PlayerShipComponent::late_update(){
     }
 
     Vector3 position = transform_->get_position();
+    Vector3 up = transform_->get_up();
     if (debug_){
         debug_->writeln(TextFormat("--- SHIP ---"));
         debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
                                    position.x, position.y, position.z));
+        debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
+                                   up.x, up.y, up.z));
         debug_->writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", 
                                    curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
         debug_->writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));

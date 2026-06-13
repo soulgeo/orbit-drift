@@ -20,14 +20,22 @@ enum UserInput {
 };
 
 class Engine {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    InputHandler::CommandList active_inputs_;
+    std::unique_ptr<Renderer> renderer_;
+    std::unique_ptr<Scene> scene_;
+    std::unique_ptr<class ResourceManager> rsrc_manager_;
+    bool is_running_;
+    bool is_paused_;
+    float dt_;
+    float fixed_dt_ = 0.005f;
+    float accumulator_ = 0.0f;
 
     void start();
 
     void process_input();
     void update();
     void render();
+
 public:
     Engine();
     ~Engine();

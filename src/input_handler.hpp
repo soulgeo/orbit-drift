@@ -3,7 +3,8 @@
 
 #include <array>
 #include <cstddef>
-#include <memory>
+#include <vector>
+#include <utility>
 
 enum InputType {
     PRESSED,
@@ -11,8 +12,9 @@ enum InputType {
 };
 
 class InputHandler {
-    struct Impl;
-    std::unique_ptr<Impl> impl_; 
+    std::vector<std::pair<int, InputType>> active_key_codes_;
+    std::array<std::pair<InputType, int>, 350> bindings_;
+
 public:
     InputHandler();
     ~InputHandler();
@@ -27,6 +29,7 @@ public:
     CommandList handle_input();
 
     void bind_key(int key, InputType type, int command);
+
 };
 
 #endif // INPUTHANDLER_HPP

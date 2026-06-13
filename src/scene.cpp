@@ -14,23 +14,16 @@
 #include "renderer.hpp"
 #include "resource_manager.hpp"
 
-struct Scene::Impl {
-    std::unordered_map<std::string, std::unique_ptr<GameObject>> game_objects;
-    ResourceManager* rsrc_manager;
-    Engine* engine;
-};
-
 Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) 
 {
-    impl_ = std::make_unique<Impl>();
-    impl_->rsrc_manager = rsrc_manager;
-    impl_->engine = engine;
+    rsrc_manager_ = rsrc_manager;
+    engine_ = engine;
 
-    auto& player = impl_->game_objects["player"];
+    auto& player = game_objects_["player"];
     player = std::make_unique<GameObject>(engine);
 
-    auto player_model = impl_->rsrc_manager->load_model("resources/models/scene.gltf");
-    auto texture = impl_->rsrc_manager->load_texture("resources/models/textures/Material_baseColor.png");
+    auto player_model = rsrc_manager_->load_model("resources/models/scene.gltf");
+    auto texture = rsrc_manager_->load_texture("resources/models/textures/Material_baseColor.png");
     player_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
     player_model.transform *= MatrixRotateX(180.0f * DEG2RAD) 
         * MatrixRotateZ(180.0f * DEG2RAD) 
@@ -43,17 +36,7 @@ Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager)
     player->add_component(std::make_unique<PlayerShipComponent>(player.get()));
     player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
 
-    // auto planet_factory = PlanetFactory(engine, renderer, rsrc_manager);
-    // impl_->game_objects["planet1"] = planet_factory.create(
-    //     (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f, PURPLE);
-    // impl_->game_objects["planet2"] = planet_factory.create(
-    //     (Vector3){100.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f, GREEN);
-    // impl_->game_objects["planet3"] = planet_factory.create(
-    //     (Vector3){-200.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f, YELLOW);
-    // impl_->game_objects["planet4"] = planet_factory.create(
-    //     (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f, BLUE);
-
-    auto& camera_body = impl_->game_objects["camera_body"];
+    auto& camera_body = game_objects_["camera_body"];
     camera_body = std::make_unique<GameObject>(engine);
     camera_body->add_component(std::make_unique<CameraComponent>(camera_body.get(), this, renderer));
     camera_body->add_component(std::make_unique<DebugComponent>(camera_body.get(), renderer));
@@ -62,21 +45,20 @@ Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager)
 Scene::~Scene() = default;
 
 GameObject* Scene::get_game_object(const std::string& name) {
-    auto it = impl_->game_objects.find(name);
-    if (it != impl_->game_objects.end()) {
+    auto it = game_objects_.find(name);
+    if (it != game_objects_.end()) {
         return it->second.get();
     }
     return nullptr;
 }
 
 void Scene::for_each_game_object(std::function<void(const std::string&, GameObject&)> func) {
-    for (auto& [name, object] : impl_->game_objects) {
+    for (auto& [name, object] : game_objects_) {
         if (name != "camera_body") func(name, *object);
     }
 
-    auto it = impl_->game_objects.find("camera_body");
-    if (it != impl_->game_objects.end()) {
+    auto it = game_objects_.find("camera_body");
+    if (it != game_objects_.end()) {
         func(it->first, *it->second);
     }
 }
-

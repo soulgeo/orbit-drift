@@ -1,7 +1,8 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include <memory>
+#include "raylib.h"
+#include <vector>
 
 class RenderableComponent;
 class DebugComponent;
@@ -9,8 +10,12 @@ class CameraComponent;
 class Engine;
 
 class Renderer {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::vector<RenderableComponent*> renderables_;
+    std::vector<DebugComponent*> debugs_;
+    Camera camera_ = {0};
+    CameraComponent* camera_body_;
+    Shader fog_;
+    float dt_;
 
 public:
     Renderer();

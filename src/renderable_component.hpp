@@ -10,7 +10,8 @@ class RenderableComponent : public Component {
     Color color_;
     Model model_;
     Matrix initial_transform_;
-    TransformComponent* cached_transform;
+    TransformComponent* transform_;
+    DebugComponent* debug_;
 
 public:
     RenderableComponent(GameObject* owner, Renderer* renderer, Model& model);

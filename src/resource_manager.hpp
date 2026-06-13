@@ -2,11 +2,12 @@
 #define RESOURCE_MANAGER_HPP
 
 #include "raylib.h"
-#include <memory>
+#include <unordered_map>
+#include <string>
 
 class ResourceManager {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::unordered_map<std::string, Model> models_;
+    std::unordered_map<std::string, Texture2D> textures_;
 
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager& operator=(const ResourceManager&) = delete;

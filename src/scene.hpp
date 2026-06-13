@@ -4,13 +4,14 @@
 #include "game_object.hpp"
 #include "renderer.hpp"
 #include "resource_manager.hpp"
-#include <memory>
+#include <unordered_map>
 #include <string>
 #include <functional>
 
 class Scene {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::unordered_map<std::string, std::unique_ptr<GameObject>> game_objects_;
+    ResourceManager* rsrc_manager_;
+    Engine* engine_;
 
 public:
     Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager);

@@ -1,16 +1,9 @@
 #include "resource_manager.hpp"
 #include "raylib.h"
 #include <iostream>
-#include <memory>
 #include <unordered_map>
 
-struct ResourceManager::Impl {
-    std::unordered_map<std::string, Model> models;
-    std::unordered_map<std::string, Texture2D> textures;
-};
-
 ResourceManager::ResourceManager() {
-    impl_ = std::make_unique<Impl>();
 }
 
 ResourceManager::~ResourceManager() {
@@ -18,8 +11,8 @@ ResourceManager::~ResourceManager() {
 }
 
 Model ResourceManager::load_model(const char* path) {
-    if (impl_->models.count(path)) {
-        return impl_->models[path];
+    if (models_.count(path)) {
+        return models_[path];
     }
 
     Model model = ::LoadModel(path);
@@ -28,13 +21,13 @@ Model ResourceManager::load_model(const char* path) {
         return Model{};
     }
 
-    impl_->models[path] = model;
-    return impl_->models[path];
+    models_[path] = model;
+    return models_[path];
 }
 
 Texture2D ResourceManager::load_texture(const char* path) {
-    if (impl_->textures.count(path)) {
-        return impl_->textures[path];
+    if (textures_.count(path)) {
+        return textures_[path];
     }
 
     Texture2D texture = ::LoadTexture(path);
@@ -43,19 +36,19 @@ Texture2D ResourceManager::load_texture(const char* path) {
         return Texture2D{};
     }
 
-    impl_->textures[path] = texture;
-    return impl_->textures[path];
+    textures_[path] = texture;
+    return textures_[path];
 }
 
 void ResourceManager::unload_all_resources() {
-    for (auto& pair : impl_->models) {
+    for (auto& pair : models_) {
         ::UnloadModel(pair.second);
     }
-    impl_->models.clear();
+    models_.clear();
 
-    for (auto& pair : impl_->textures) {
+    for (auto& pair : textures_) {
         ::UnloadTexture(pair.second);
     }
-    impl_->textures.clear();
+    textures_.clear();
     std::cout << "INFO: Unloaded all resources." << std::endl;
 }

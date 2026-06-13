@@ -3,11 +3,11 @@
 
 #include "component.hpp"
 #include "renderer.hpp"
-#include <memory>
+#include <vector>
+#include <string>
 
 class DebugComponent : public Component{
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::vector<std::string> lines_;
 public:
     DebugComponent(GameObject* owner, Renderer* renderer);
     ~DebugComponent();

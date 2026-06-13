@@ -5,154 +5,125 @@
 #include "renderer.hpp"
 #include "raymath.h"
 #include "transform_component.hpp"
-#include <memory>
-
-struct CameraComponent::Impl {
-    std::vector<Profile> camera_profiles;
-    State curr_state;
-    State saved_state;
-    
-    Vector3 curr_target_pos;
-    Vector3 prev_target_pos;
-    Vector3 visual_target_pos;
-
-    Vector3 up;
-    Vector3 prev_up;
-    Vector3 visual_up;
-
-    float visual_fovy;
-
-    int projection = CAMERA_PERSPECTIVE;
-    int active_profile_id = CP_DEFAULT;
-    int new_profile_id = -1;
-    int trans_iter = 0;
-    int max_trans_iter = 40;
-
-    TransformComponent* transform;
-    DebugComponent* debug;
-    Engine* engine;
-};
 
 CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* renderer) :
     Component(owner) 
 {
-    impl_ = std::make_unique<Impl>();
-
     // Define Camera Profiles
     Profile default_camera;
     default_camera.target = c_scene->get_game_object("player");
     default_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
-    default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
+    default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 0.0f};
     default_camera.fovy = 70.0f;
-    impl_->camera_profiles.push_back(default_camera);
+    camera_profiles_.push_back(default_camera);
 
     Profile in_gravity_camera;
     in_gravity_camera.target = c_scene->get_game_object("player");
     in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.8f};
-    in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
+    in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 9.0f};
     in_gravity_camera.fovy = 80.0f;
-    impl_->camera_profiles.push_back(in_gravity_camera);
+    camera_profiles_.push_back(in_gravity_camera);
 
-    impl_->active_profile_id = CP_DEFAULT;
+    active_profile_id_ = CP_DEFAULT;
 
     renderer->register_camera(this);
 
-    impl_->engine = owner_->get_engine();
+    engine_ = owner_->get_engine();
 }
 
 CameraComponent::~CameraComponent() = default;
 
 int CameraComponent::get_profile_id() {
-    return impl_->active_profile_id;
+    return active_profile_id_;
 }
 
 int CameraComponent::get_new_profile_id() {
-    return impl_->new_profile_id;
+    return new_profile_id_;
 }
 
 int CameraComponent::get_trans_iter() {
-    return impl_->trans_iter; 
+    return trans_iter_; 
 }
 
 Vector3 CameraComponent::get_position() {
-    return impl_->transform->get_position();
+    return transform_->get_position();
 }
 
 int CameraComponent::get_projection() {
-    return impl_->projection;
+    return projection_;
 }
 
 float CameraComponent::get_fovy() {
-    return impl_->visual_fovy;
+    return visual_fovy_;
 }
 
 Vector3 CameraComponent::get_target() {
-    return impl_->visual_target_pos;
+    return visual_target_pos_;
 }
 
 Vector3 CameraComponent::get_camera_up() {
-    return impl_->visual_up; 
+    return visual_up_; 
 }
 
 void CameraComponent::switch_profile(int target_profile) {
-    impl_->new_profile_id = target_profile;
-    impl_->trans_iter = 0;
+    new_profile_id_ = target_profile;
+    trans_iter_ = 0;
 }
 
 void CameraComponent::start() {
-    impl_->transform = owner_->get_component<TransformComponent>();
-    impl_->debug = owner_->get_component<DebugComponent>();
+    transform_ = owner_->get_component<TransformComponent>();
+    debug_ = owner_->get_component<DebugComponent>();
 }
 
 void CameraComponent::fixed_update() {
-    impl_->prev_target_pos = impl_->curr_target_pos;
-    impl_->prev_up = impl_->up;
+    prev_target_pos_ = curr_target_pos_;
+    prev_up_ = up_;
 
-    Profile& active = impl_->camera_profiles[impl_->active_profile_id];
+    Profile& active = camera_profiles_[active_profile_id_];
 
     // If new transition is starting, save the current camera state
-    if (impl_->new_profile_id >= 0 && impl_->trans_iter == 0) {
-        impl_->saved_state.pos_offset = impl_->curr_state.pos_offset;
-        impl_->saved_state.targ_offset = impl_->curr_state.targ_offset;
-        impl_->saved_state.pos_local_offset = impl_->curr_state.pos_local_offset;
-        impl_->saved_state.targ_local_offset = impl_->curr_state.targ_local_offset;
-        impl_->saved_state.fovy = impl_->curr_state.fovy;
+    if (new_profile_id_ >= 0 && trans_iter_ == 0) {
+        saved_state_.pos_offset = curr_state_.pos_offset;
+        saved_state_.targ_offset = curr_state_.targ_offset;
+        saved_state_.pos_local_offset = curr_state_.pos_local_offset;
+        saved_state_.targ_local_offset = curr_state_.targ_local_offset;
+        saved_state_.fovy = curr_state_.fovy;
     }
 
-    if (impl_->new_profile_id < 0) {
+    if (new_profile_id_ < 0) {
         // Just set calced offsets to the active profile ones
-        impl_->curr_state.pos_offset = active.pos_offset;
-        impl_->curr_state.targ_offset = active.targ_offset;
-        impl_->curr_state.pos_local_offset = active.pos_local_offset;
-        impl_->curr_state.targ_local_offset = active.targ_local_offset;
-        impl_->curr_state.fovy = active.fovy;
+        curr_state_.pos_offset = active.pos_offset;
+        curr_state_.targ_offset = active.targ_offset;
+        curr_state_.pos_local_offset = active.pos_local_offset;
+        curr_state_.targ_local_offset = active.targ_local_offset;
+        curr_state_.fovy = active.fovy;
     } else {
         // Get calced offsets for transition from saved state to new profile
-        Profile& next = impl_->camera_profiles[impl_->new_profile_id];
-        impl_->curr_state.targ_offset = Vector3Lerp(
-            impl_->saved_state.targ_offset, 
+        Profile& next = camera_profiles_[new_profile_id_];
+        curr_state_.targ_offset = Vector3Lerp(
+            saved_state_.targ_offset, 
             next.targ_offset, 
-            (float)impl_->trans_iter/impl_->max_trans_iter
+            (float)trans_iter_/max_trans_iter_
         );
-        impl_->curr_state.pos_offset = Vector3Lerp(
-            impl_->saved_state.pos_offset, 
+        curr_state_.pos_offset = Vector3Lerp(
+            saved_state_.pos_offset, 
             next.pos_offset, 
-            (float)impl_->trans_iter/impl_->max_trans_iter
+            (float)trans_iter_/max_trans_iter_
         );
-        impl_->curr_state.targ_local_offset = Vector3Lerp(
-            impl_->saved_state.targ_local_offset, 
+        curr_state_.targ_local_offset = Vector3Lerp(
+            saved_state_.targ_local_offset, 
             next.targ_local_offset, 
-            (float)impl_->trans_iter/impl_->max_trans_iter
+            (float)trans_iter_/max_trans_iter_
         );
-        impl_->curr_state.pos_local_offset  = Vector3Lerp(
-            impl_->saved_state.pos_local_offset, 
+        curr_state_.pos_local_offset  = Vector3Lerp(
+            saved_state_.pos_local_offset, 
             next.pos_local_offset, 
-            (float)impl_->trans_iter/impl_->max_trans_iter
+            (float)trans_iter_/max_trans_iter_
         );
-        impl_->curr_state.fovy = Lerp(
-            impl_->saved_state.fovy, 
+        curr_state_.fovy = Lerp(
+            saved_state_.fovy, 
             next.fovy, 
-            (float)impl_->trans_iter/impl_->max_trans_iter
+            (float)trans_iter_/max_trans_iter_
         );
     }
 
@@ -169,61 +140,110 @@ void CameraComponent::fixed_update() {
 
     // Translate local offset from local to upright space
     Vector3 targ_translated_offset;
-    Vector3 right_offset = impl_->curr_state.targ_local_offset.x * target_right;
-    Vector3 up_offset = impl_->curr_state.targ_local_offset.y * target_up;
-    Vector3 forward_offset = impl_->curr_state.targ_local_offset.z * target_forward;
+    Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
+    Vector3 up_offset = curr_state_.targ_local_offset.y * target_up;
+    Vector3 forward_offset = curr_state_.targ_local_offset.z * target_forward;
     targ_translated_offset = right_offset + up_offset + forward_offset;
 
     // Translate to world space
     Vector3 world_target = 
-        target_position + impl_->curr_state.targ_offset + targ_translated_offset;
+        target_position + curr_state_.targ_offset + targ_translated_offset;
 
-    impl_->curr_target_pos = 
+    curr_target_pos_ = 
         Vector3Lerp(
-            impl_->curr_target_pos, world_target, follow_speed * impl_->engine->get_fixed_dt()
+            curr_target_pos_, world_target, follow_speed * engine_->get_fixed_dt()
         );
 
     // Translate local offset from local to upright space
     Vector3 pos_translated_offset;
-    right_offset = impl_->curr_state.pos_local_offset.x * target_right;
-    up_offset = impl_->curr_state.pos_local_offset.y * target_up;
-    forward_offset = impl_->curr_state.pos_local_offset.z * target_forward;
+    right_offset = curr_state_.pos_local_offset.x * target_right;
+    up_offset = curr_state_.pos_local_offset.y * target_up;
+    forward_offset = curr_state_.pos_local_offset.z * target_forward;
     pos_translated_offset = right_offset + up_offset + forward_offset;
 
     // Translate to world space
     Vector3 world_position = 
-        target_position + impl_->curr_state.pos_offset + pos_translated_offset;
+        target_position + curr_state_.pos_offset + pos_translated_offset;
 
-    impl_->transform->set_position(
-        Vector3Lerp(get_position(), world_position, follow_speed * impl_->engine->get_fixed_dt())
+    transform_->set_position(
+        Vector3Lerp(get_position(), world_position, follow_speed * engine_->get_fixed_dt())
     );
 
     // Update Camera Up
-    impl_->up = target_up;
+    up_ = target_up;
 
     // Manage transition loop
-    if (impl_->new_profile_id >= 0) {
-        if (impl_->trans_iter >= impl_->max_trans_iter) {
-            impl_->active_profile_id = impl_->new_profile_id;
-            impl_->new_profile_id = -1;
-            impl_->trans_iter = 0;
+    if (new_profile_id_ >= 0) {
+        if (trans_iter_ >= max_trans_iter_) {
+            active_profile_id_ = new_profile_id_;
+            new_profile_id_ = -1;
+            trans_iter_ = 0;
         } else {
-            impl_->trans_iter++;
+            trans_iter_++;
         }
     }
 }
 
 void CameraComponent::update() {
-    float alpha = impl_->engine->get_interpolation_alpha();
+    float alpha = engine_->get_interpolation_alpha();
 
-    impl_->visual_target_pos = Vector3Lerp(impl_->prev_target_pos, impl_->curr_target_pos, alpha);
-    impl_->visual_up = Vector3Lerp(impl_->prev_up, impl_->up, alpha);
-    impl_->visual_fovy = impl_->curr_state.fovy; 
+    visual_target_pos_ = Vector3Lerp(prev_target_pos_, curr_target_pos_, alpha);
+    visual_up_ = Vector3Lerp(prev_up_, up_, alpha);
+    visual_fovy_ = curr_state_.fovy; 
 
-    Vector3 position = impl_->transform->get_position();
-    if (impl_->debug) {
-        impl_->debug->writeln(TextFormat("--- CAMERA ---"));
-        impl_->debug->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
-                                         position.x, position.y, position.z));
+    Vector3 position = transform_->get_position();
+    Vector3 up = transform_->get_up();
+    if (debug_) {
+        debug_->writeln(TextFormat("--- CAMERA ---"));
+        debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+                                   position.x, position.y, position.z));
+        debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
+                                   up.x, up.y, up.z));
+        debug_->writeln(TextFormat("Active Profile: %d", active_profile_id_));
+        debug_->writeln(TextFormat("Current Target Pos: %.2f, %.2f, %.2f",
+                                   curr_target_pos_.x, 
+                                   curr_target_pos_.y, 
+                                   curr_target_pos_.z));
     }
 }
+
+// struct ShakeSetting {
+//     float min;
+//     float max;
+//     float speed;
+//     float maxFrames;
+// };
+//
+// struct ShakeState {
+//     float value;
+//     int mult = 1;
+//     int accum = 0;
+// };
+//
+// struct Vector3ShakeState {
+//     Vector3 value;
+//     Vector3 mult = {1, 1, 1};
+//     int accum = 0;
+// };
+//
+// void _shake(ShakeState* stateRef, ShakeSetting s) {
+//     auto eval = [stateRef, s]() {
+//         return stateRef->value + s.speed * stateRef->mult * GetFrameTime();
+//     };
+//
+//     float targetValue = eval();
+//     if (targetValue > s.max || targetValue < s.min) {
+//         stateRef->mult *= -1;
+//         targetValue = eval();
+//
+//     } else if (stateRef->accum == s.maxFrames) {
+//         auto gen = std::bind(std::uniform_int_distribution<>(0,1),std::default_random_engine());
+//         bool flip = gen();
+//
+//         if (flip) {
+//             stateRef->mult *= -1;
+//             targetValue = eval();
+//         }
+//     }
+//     stateRef->value = targetValue;
+// }

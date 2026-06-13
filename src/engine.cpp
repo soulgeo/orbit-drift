@@ -5,26 +5,12 @@
 #include <string>
 #include "timer.hpp"
 
-struct Engine::Impl {
-    InputHandler::CommandList active_inputs;
-    std::unique_ptr<Renderer> renderer;
-    std::unique_ptr<Scene> scene;
-    std::unique_ptr<ResourceManager> rsrc_manager;
-    bool is_running;
-    bool is_paused;
-    float dt;
-    float fixed_dt = 0.005f;
-    float accumulator = 0.0f;
-};
-
 Engine::Engine() {
-    impl_ = std::make_unique<Impl>();
-
-    impl_->is_running = true;
-    impl_->is_paused = false;
-    impl_->renderer = std::make_unique<Renderer>();
-    impl_->rsrc_manager = std::make_unique<ResourceManager>();
-    impl_->scene = std::make_unique<Scene>(this, impl_->renderer.get(), impl_->rsrc_manager.get());
+    is_running_ = true;
+    is_paused_ = false;
+    renderer_ = std::make_unique<Renderer>();
+    rsrc_manager_ = std::make_unique<ResourceManager>();
+    scene_ = std::make_unique<Scene>(this, renderer_.get(), rsrc_manager_.get());
 
     input_handler.bind_key(KEY_SPACE, DOWN, INPUT_MOVE_UP);
     input_handler.bind_key(KEY_LEFT_SHIFT, DOWN, INPUT_MOVE_DOWN);
@@ -40,8 +26,8 @@ Engine::Engine() {
 Engine::~Engine() = default;
 
 bool Engine::is_active_input(int input) {
-    for (size_t i = 0; i < impl_->active_inputs.count; ++i) {
-        if (impl_->active_inputs.commands[i] == input) {
+    for (size_t i = 0; i < active_inputs_.count; ++i) {
+        if (active_inputs_.commands[i] == input) {
             return true;
         }
     }
@@ -49,24 +35,24 @@ bool Engine::is_active_input(int input) {
 }
 
 float Engine::get_dt() const {
-    return impl_->dt;
+    return dt_;
 }
 
 float Engine::get_fixed_dt() const {
-    return impl_->fixed_dt;
+    return fixed_dt_;
 }
 
 float Engine::get_interpolation_alpha() const {
-    return impl_->accumulator / impl_->fixed_dt;
+    return accumulator_ / fixed_dt_;
 }
 
 Scene& Engine::get_scene() const {
-    return *impl_->scene;
+    return *scene_;
 }
 
 void Engine::run() {
     start();
-    while (impl_->is_running && !WindowShouldClose()) {
+    while (is_running_ && !WindowShouldClose()) {
         process_input();
         update();
         render();
@@ -74,50 +60,50 @@ void Engine::run() {
 }
 
 void Engine::start() {
-    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+    scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
         obj.start();
     });
 }
 
 void Engine::process_input() {
-    impl_->active_inputs = input_handler.handle_input();
+    active_inputs_ = input_handler.handle_input();
 
-    for (size_t i = 0; i < impl_->active_inputs.count; ++i) {
-        if (impl_->active_inputs.commands[i] == INPUT_PAUSE) {
-            impl_->is_paused = !impl_->is_paused;
+    for (size_t i = 0; i < active_inputs_.count; ++i) {
+        if (active_inputs_.commands[i] == INPUT_PAUSE) {
+            is_paused_ = !is_paused_;
         }
     }
 }
 
 
 void Engine::update() {
-    if (impl_->is_paused) return;
+    if (is_paused_) return;
 
     Timer timer("Engine::update");
 
-    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+    scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
         obj.early_update();
     });
 
-    impl_->dt = GetFrameTime();
-    impl_->accumulator += impl_->dt;
-    while (impl_->accumulator >= impl_->fixed_dt){
-        impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+    dt_ = GetFrameTime();
+    accumulator_ += dt_;
+    while (accumulator_ >= fixed_dt_){
+        scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.fixed_update();
         });
-        impl_->accumulator -= impl_->fixed_dt;
+        accumulator_ -= fixed_dt_;
     }
 
-    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+    scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
         obj.update();
     });
 
-    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+    scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
         obj.late_update();
     });
 
 }
 
 void Engine::render() {
-    impl_->renderer->render(*this);
+    renderer_->render(*this);
 }

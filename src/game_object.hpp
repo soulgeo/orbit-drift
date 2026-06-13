@@ -2,6 +2,7 @@
 #define GAMEOBJECT_HPP
 
 #include "component.hpp"
+#include <vector>
 #include <memory>
 #include <cstddef>
 
@@ -9,8 +10,10 @@ class Engine;
 class TransformComponent;
 
 class GameObject {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::vector<std::unique_ptr<Component>> components_;
+    TransformComponent* transform_;
+    Engine* engine_;
+
 public:
     GameObject(Engine* engine);
     ~GameObject();
