@@ -123,8 +123,9 @@ GENERATED += $(OBJDIR)/component.o
 GENERATED += $(OBJDIR)/control_component.o
 GENERATED += $(OBJDIR)/debug_component.o
 GENERATED += $(OBJDIR)/engine.o
-GENERATED += $(OBJDIR)/entities.o
 GENERATED += $(OBJDIR)/game_object.o
+GENERATED += $(OBJDIR)/gravity_component.o
+GENERATED += $(OBJDIR)/hitbox_component.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/physics_component.o
@@ -140,8 +141,9 @@ OBJECTS += $(OBJDIR)/component.o
 OBJECTS += $(OBJDIR)/control_component.o
 OBJECTS += $(OBJDIR)/debug_component.o
 OBJECTS += $(OBJDIR)/engine.o
-OBJECTS += $(OBJDIR)/entities.o
 OBJECTS += $(OBJDIR)/game_object.o
+OBJECTS += $(OBJDIR)/gravity_component.o
+OBJECTS += $(OBJDIR)/hitbox_component.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/physics_component.o
@@ -230,10 +232,13 @@ $(OBJDIR)/debug_component.o: src/debug_component.cpp
 $(OBJDIR)/engine.o: src/engine.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/entities.o: src/entities.cpp
+$(OBJDIR)/game_object.o: src/game_object.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/game_object.o: src/game_object.cpp
+$(OBJDIR)/gravity_component.o: src/gravity_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/hitbox_component.o: src/hitbox_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/input_handler.o: src/input_handler.cpp
