@@ -1,5 +1,7 @@
 #include "camera_component.hpp"
+#include "debug_component.hpp"
 #include "engine.hpp"
+#include "raylib.h"
 #include "renderer.hpp"
 #include "raymath.h"
 #include "transform_component.hpp"
@@ -26,8 +28,8 @@ struct CameraComponent::Impl {
     int trans_iter = 0;
     int max_trans_iter = 40;
 
-    TransformComponent* cached_transform;
-
+    TransformComponent* transform;
+    DebugComponent* debug;
     Engine* engine;
 };
 
@@ -37,19 +39,19 @@ CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* re
     impl_ = std::make_unique<Impl>();
 
     // Define Camera Profiles
-    Profile defaultCamera;
-    defaultCamera.target = c_scene->get_game_object("player");
-    defaultCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
-    defaultCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
-    defaultCamera.fovy = 70.0f;
-    impl_->camera_profiles.push_back(defaultCamera);
+    Profile default_camera;
+    default_camera.target = c_scene->get_game_object("player");
+    default_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
+    default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
+    default_camera.fovy = 70.0f;
+    impl_->camera_profiles.push_back(default_camera);
 
-    Profile inGravityCamera;
-    inGravityCamera.target = c_scene->get_game_object("player");
-    inGravityCamera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.8f};
-    inGravityCamera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
-    inGravityCamera.fovy = 80.0f;
-    impl_->camera_profiles.push_back(inGravityCamera);
+    Profile in_gravity_camera;
+    in_gravity_camera.target = c_scene->get_game_object("player");
+    in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.8f};
+    in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
+    in_gravity_camera.fovy = 80.0f;
+    impl_->camera_profiles.push_back(in_gravity_camera);
 
     impl_->active_profile_id = CP_DEFAULT;
 
@@ -73,7 +75,7 @@ int CameraComponent::get_trans_iter() {
 }
 
 Vector3 CameraComponent::get_position() {
-    return impl_->cached_transform->get_position();
+    return impl_->transform->get_position();
 }
 
 int CameraComponent::get_projection() {
@@ -98,7 +100,8 @@ void CameraComponent::switch_profile(int target_profile) {
 }
 
 void CameraComponent::start() {
-    impl_->cached_transform = owner_->get_component<TransformComponent>();
+    impl_->transform = owner_->get_component<TransformComponent>();
+    impl_->debug = owner_->get_component<DebugComponent>();
 }
 
 void CameraComponent::fixed_update() {
@@ -191,7 +194,7 @@ void CameraComponent::fixed_update() {
     Vector3 world_position = 
         target_position + impl_->curr_state.pos_offset + pos_translated_offset;
 
-    impl_->cached_transform->set_position(
+    impl_->transform->set_position(
         Vector3Lerp(get_position(), world_position, follow_speed * impl_->engine->get_fixed_dt())
     );
 
@@ -216,4 +219,11 @@ void CameraComponent::update() {
     impl_->visual_target_pos = Vector3Lerp(impl_->prev_target_pos, impl_->curr_target_pos, alpha);
     impl_->visual_up = Vector3Lerp(impl_->prev_up, impl_->up, alpha);
     impl_->visual_fovy = impl_->curr_state.fovy; 
+
+    Vector3 position = impl_->transform->get_position();
+    if (impl_->debug) {
+        impl_->debug->writeln(TextFormat("--- CAMERA ---"));
+        impl_->debug->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+                                         position.x, position.y, position.z));
+    }
 }

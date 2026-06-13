@@ -11,6 +11,7 @@ class RenderableComponent : public Component {
     Model model_;
     Matrix initial_transform_;
     TransformComponent* cached_transform;
+
 public:
     RenderableComponent(GameObject* owner, Renderer* renderer, Model& model);
     ~RenderableComponent();

@@ -41,7 +41,9 @@ void PlayerShipComponent::start() {
 void PlayerShipComponent::early_update() {
     g_flag = false;
     entered_gravity = false;
-    debug_->clean();
+    if (debug_){
+        debug_->clean();
+    }
 }
 
 void PlayerShipComponent::fixed_update() {
@@ -94,7 +96,6 @@ void PlayerShipComponent::update() {}
 
 
 void PlayerShipComponent::late_update(){
-    debug_->clean();
     exited_gravity = false;
     if (in_gravity && !g_flag) {
         in_gravity = false;
@@ -102,13 +103,15 @@ void PlayerShipComponent::late_update(){
     }
 
     Vector3 position = transform_->get_position();
-    debug_->writeln(TextFormat("--- SHIP ---"));
-    debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
-                               position.x, position.y, position.z));
-    debug_->writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", 
-                               curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
-    debug_->writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
-    debug_->writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
+    if (debug_){
+        debug_->writeln(TextFormat("--- SHIP ---"));
+        debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+                                   position.x, position.y, position.z));
+        debug_->writeln(TextFormat("Velocity: %.2f, %.2f, %.2f", 
+                                   curr_velocity_.x, curr_velocity_.y, curr_velocity_.z));
+        debug_->writeln(TextFormat("Roll Speed: %.2f", curr_roll_speed_));
+        debug_->writeln(TextFormat("Gravity: %s", in_gravity ? "YES" : "NO"));
+    }
 }
 
 BoundingBox PlayerShipComponent::get_hitbox() {

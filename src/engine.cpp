@@ -19,11 +19,12 @@ struct Engine::Impl {
 
 Engine::Engine() {
     impl_ = std::make_unique<Impl>();
+
     impl_->is_running = true;
     impl_->is_paused = false;
     impl_->renderer = std::make_unique<Renderer>();
     impl_->rsrc_manager = std::make_unique<ResourceManager>();
-    impl_->scene = std::make_unique<Scene>(impl_->renderer.get(), impl_->rsrc_manager.get());
+    impl_->scene = std::make_unique<Scene>(this, impl_->renderer.get(), impl_->rsrc_manager.get());
 
     input_handler.bind_key(KEY_SPACE, DOWN, INPUT_MOVE_UP);
     input_handler.bind_key(KEY_LEFT_SHIFT, DOWN, INPUT_MOVE_DOWN);
@@ -64,11 +65,18 @@ Scene& Engine::get_scene() const {
 }
 
 void Engine::run() {
+    start();
     while (impl_->is_running && !WindowShouldClose()) {
         process_input();
         update();
         render();
     }
+}
+
+void Engine::start() {
+    impl_->scene->for_each_game_object([this](const std::string& s, GameObject& obj){
+        obj.start();
+    });
 }
 
 void Engine::process_input() {

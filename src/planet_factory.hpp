@@ -6,11 +6,12 @@
 class PlanetFactory {
     Renderer* renderer_;
     ResourceManager* rsrc_manager_;
-public:
-    PlanetFactory(Renderer* renderer, ResourceManager* rsrc_manager)
-    : renderer_(renderer), rsrc_manager_(rsrc_manager) {}
+    Engine* engine_;
 
+public:
+    PlanetFactory(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager);
     ~PlanetFactory() {};
+
     std::unique_ptr<GameObject> create(
         Vector3 position, 
         float radius, 

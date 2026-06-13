@@ -5,6 +5,9 @@
 #include "raymath.h"
 #include <memory>
 
+PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) : 
+    engine_(engine), renderer_(renderer), rsrc_manager_(rsrc_manager) {}
+
 std::unique_ptr<GameObject> PlanetFactory::create(
     Vector3 position, 
     float radius, 
@@ -12,7 +15,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     float gravity_force,
     Color color
 ) {
-    auto planet = std::make_unique<GameObject>();
+    auto planet = std::make_unique<GameObject>(engine_);
 
     auto planet_comp = std::make_unique<PlanetComponent>(
             planet.get(), position, radius, gravity_radius, gravity_force

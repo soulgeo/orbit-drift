@@ -23,6 +23,8 @@ class Engine {
     struct Impl;
     std::unique_ptr<Impl> impl_;
 
+    void start();
+
     void process_input();
     void update();
     void render();

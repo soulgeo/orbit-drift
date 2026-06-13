@@ -11,8 +11,9 @@
 class Scene {
     struct Impl;
     std::unique_ptr<Impl> impl_;
+
 public:
-    Scene(Renderer* renderer, ResourceManager* rsrc_manager);
+    Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager);
     ~Scene();
 
     static constexpr size_t MAX_GAMEOBJECT_COUNT = 200;

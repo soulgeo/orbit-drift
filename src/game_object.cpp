@@ -10,10 +10,12 @@ struct GameObject::Impl {
     Engine* engine;
 };
 
-GameObject::GameObject() {
+GameObject::GameObject(Engine* engine) {
     impl_ = std::make_unique<Impl>();
+    impl_->engine = engine;
 
     auto transform_comp = std::make_unique<TransformComponent>(this, impl_->engine);
+    impl_->transform = transform_comp.get();
     add_component(std::move(transform_comp));
 }
 
@@ -40,10 +42,10 @@ Engine* GameObject::get_engine() {
 }
 
 void GameObject::start() {
+    impl_->transform = get_component<TransformComponent>();
     for (auto i = impl_->components.begin(); i != impl_->components.end(); i++) {
         (*i)->start();
     }
-    impl_->transform = get_component<TransformComponent>();
 }
 
 void GameObject::update() {

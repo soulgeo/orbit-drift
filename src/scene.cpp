@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "camera_component.hpp"
+#include "debug_component.hpp"
 #include "entities.hpp"
 #include "planet_factory.hpp"
 #include "raylib.h"
@@ -16,17 +17,17 @@
 struct Scene::Impl {
     std::unordered_map<std::string, std::unique_ptr<GameObject>> game_objects;
     ResourceManager* rsrc_manager;
+    Engine* engine;
 };
 
-Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager) 
+Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) 
 {
     impl_ = std::make_unique<Impl>();
     impl_->rsrc_manager = rsrc_manager;
+    impl_->engine = engine;
 
     auto& player = impl_->game_objects["player"];
-    player = std::make_unique<GameObject>();
-
-    auto player_ship = std::make_unique<PlayerShipComponent>(player.get());
+    player = std::make_unique<GameObject>(engine);
 
     auto player_model = impl_->rsrc_manager->load_model("resources/models/scene.gltf");
     auto texture = impl_->rsrc_manager->load_texture("resources/models/textures/Material_baseColor.png");
@@ -38,22 +39,24 @@ Scene::Scene(Renderer* renderer, ResourceManager* rsrc_manager)
     player_rend->set_initial_transform(player_model.transform);
     player_rend->set_color(RAYWHITE);
 
-    player->add_component(std::move(player_ship));
     player->add_component(std::move(player_rend));
+    player->add_component(std::make_unique<PlayerShipComponent>(player.get()));
+    player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
 
-    auto planet_factory = PlanetFactory(renderer, impl_->rsrc_manager);
-    impl_->game_objects["planet1"] = planet_factory.create(
-        (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f, PURPLE);
-    impl_->game_objects["planet2"] = planet_factory.create(
-        (Vector3){100.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f, GREEN);
-    impl_->game_objects["planet3"] = planet_factory.create(
-        (Vector3){-200.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f, YELLOW);
-    impl_->game_objects["planet4"] = planet_factory.create(
-        (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f, BLUE);
+    // auto planet_factory = PlanetFactory(engine, renderer, rsrc_manager);
+    // impl_->game_objects["planet1"] = planet_factory.create(
+    //     (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f, PURPLE);
+    // impl_->game_objects["planet2"] = planet_factory.create(
+    //     (Vector3){100.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f, GREEN);
+    // impl_->game_objects["planet3"] = planet_factory.create(
+    //     (Vector3){-200.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f, YELLOW);
+    // impl_->game_objects["planet4"] = planet_factory.create(
+    //     (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f, BLUE);
 
-    auto camera_body = std::make_unique<GameObject>();
-    auto camera_comp = std::make_unique<CameraComponent>(camera_body.get(), this, renderer);
-    impl_->game_objects["camera_body"] = std::move(camera_body);
+    auto& camera_body = impl_->game_objects["camera_body"];
+    camera_body = std::make_unique<GameObject>(engine);
+    camera_body->add_component(std::make_unique<CameraComponent>(camera_body.get(), this, renderer));
+    camera_body->add_component(std::make_unique<DebugComponent>(camera_body.get(), renderer));
 }
 
 Scene::~Scene() = default;

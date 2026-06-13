@@ -12,7 +12,7 @@ class GameObject {
     struct Impl;
     std::unique_ptr<Impl> impl_;
 public:
-    GameObject();
+    GameObject(Engine* engine);
     ~GameObject();
 
     void add_component(std::unique_ptr<Component> comp);
