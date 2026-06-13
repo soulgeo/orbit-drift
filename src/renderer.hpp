@@ -16,6 +16,7 @@ class Renderer {
     CameraComponent* camera_body_;
     Shader fog_;
     float dt_;
+    bool show_debug_;
 
 public:
     Renderer();

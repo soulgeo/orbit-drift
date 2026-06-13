@@ -16,7 +16,7 @@
 #define GLSL_VERSION 100
 #endif
 
-Renderer::Renderer() {
+Renderer::Renderer() : show_debug_(false){
     // Init shaders
     // fog_ = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
     //                  TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
@@ -63,6 +63,10 @@ void Renderer::render(Engine& engine) {
         camera_.up = camera_body_->get_camera_up();
     }
 
+    if (engine.is_active_input(INPUT_DEBUG)) {
+        show_debug_ = !show_debug_;
+    }
+
     BeginDrawing();
         ClearBackground(BLACK);
         BeginMode3D(camera_);
@@ -85,27 +89,14 @@ void Renderer::draw_3d() {
 }
 
 void Renderer::draw_ui() {
-    int x = 30;
-    int y = 50;
-    for (auto i = debugs_.begin(); i != debugs_.end(); i++){
-        for (int j = 0; j < (*i)->get_line_count(); ++j) {
-            DrawText((*i)->get_line(j), x, y, 20, YELLOW);
-            y += 25;
+    if (show_debug_) {
+        int x = 30;
+        int y = 50;
+        for (auto i = debugs_.begin(); i != debugs_.end(); i++){
+            for (int j = 0; j < (*i)->get_line_count(); ++j) {
+                DrawText((*i)->get_line(j), x, y, 20, YELLOW);
+                y += 25;
+            }
         }
     }
-    // std::cout << "Raylib camera position: " << 
-    //     camera_.position.x << ", " <<
-    //     camera_.position.y << ", " <<
-    //     camera_.position.z << ", " <<
-    //     std::endl;
-    // std::cout << "Raylib camera target: " << 
-    //     camera_.target.x << ", " <<
-    //     camera_.target.y << ", " <<
-    //     camera_.target.z << ", " <<
-    //     std::endl;
-    std::cout << "Raylib camera up: " << 
-        camera_.up.x << ", " <<
-        camera_.up.y << ", " <<
-        camera_.up.z << ", " <<
-        std::endl;
 }

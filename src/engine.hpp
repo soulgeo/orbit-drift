@@ -9,6 +9,7 @@
 enum UserInput {
     INPUT_NONE = 0,
     INPUT_PAUSE,
+    INPUT_DEBUG,
     INPUT_MOVE_UP,
     INPUT_MOVE_DOWN,
     INPUT_MOVE_FORWARD,

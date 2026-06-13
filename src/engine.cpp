@@ -21,6 +21,7 @@ Engine::Engine() {
     input_handler.bind_key(KEY_E, DOWN, INPUT_ROLL_CW);
     input_handler.bind_key(KEY_Q, DOWN, INPUT_ROLL_CCW);
     input_handler.bind_key(KEY_LEFT_ALT, PRESSED, INPUT_PAUSE);
+    input_handler.bind_key(KEY_F3, PRESSED, INPUT_DEBUG);
 }
 
 Engine::~Engine() = default;

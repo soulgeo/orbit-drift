@@ -7,7 +7,7 @@
 int main() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
-    SetTargetFPS(60);
+    SetTargetFPS(144);
 
     Engine().run();
 
