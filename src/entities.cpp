@@ -134,6 +134,7 @@ PlanetComponent::~PlanetComponent() {}
 
 void PlanetComponent::start() {
     transform_ = owner_->get_component<TransformComponent>();
+    transform_->set_position(init_position_);
 
     Scene& scene = owner_->get_engine()->get_scene();
     GameObject* player = scene.get_game_object("player");

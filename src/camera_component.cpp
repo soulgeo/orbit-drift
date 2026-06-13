@@ -78,6 +78,51 @@ void CameraComponent::switch_profile(int target_profile) {
 void CameraComponent::start() {
     transform_ = owner_->get_component<TransformComponent>();
     debug_ = owner_->get_component<DebugComponent>();
+
+    Profile& active = camera_profiles_[active_profile_id_];
+    
+    // Initialize current state from active profile
+    curr_state_.pos_offset = active.pos_offset;
+    curr_state_.targ_offset = active.targ_offset;
+    curr_state_.pos_local_offset = active.pos_local_offset;
+    curr_state_.targ_local_offset = active.targ_local_offset;
+    curr_state_.fovy = active.fovy;
+
+    // Get target transform info
+    GameObject& camera_target = *active.target;
+    TransformComponent& camera_target_transform = camera_target.transform();
+
+    Vector3 target_position = camera_target_transform.get_position();
+    Vector3 target_forward = camera_target_transform.get_forward();
+    Vector3 target_up = camera_target_transform.get_up();
+    Vector3 target_right = camera_target_transform.get_right();
+
+    // Calculate initial target position
+    Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
+    Vector3 up_offset = curr_state_.targ_local_offset.y * target_up;
+    Vector3 forward_offset = curr_state_.targ_local_offset.z * target_forward;
+    Vector3 targ_translated_offset = right_offset + up_offset + forward_offset;
+
+    curr_target_pos_ = target_position + curr_state_.targ_offset + targ_translated_offset;
+    prev_target_pos_ = curr_target_pos_;
+    visual_target_pos_ = curr_target_pos_;
+
+    // Calculate initial camera position
+    right_offset = curr_state_.pos_local_offset.x * target_right;
+    up_offset = curr_state_.pos_local_offset.y * target_up;
+    forward_offset = curr_state_.pos_local_offset.z * target_forward;
+    Vector3 pos_translated_offset = right_offset + up_offset + forward_offset;
+
+    Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
+    transform_->set_position(world_position);
+    
+    // Initialize Up vector
+    up_ = target_up;
+    prev_up_ = up_;
+    visual_up_ = up_;
+
+    // Initialize FOV
+    visual_fovy_ = curr_state_.fovy;
 }
 
 void CameraComponent::fixed_update() {

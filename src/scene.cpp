@@ -36,6 +36,16 @@ Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager)
     player->add_component(std::make_unique<PlayerShipComponent>(player.get()));
     player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
 
+    auto planet_factory = PlanetFactory(engine, renderer, rsrc_manager);
+    game_objects_["planet1"] = planet_factory.create(
+        (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 40.0f, 40.0f, PURPLE);
+    game_objects_["planet2"] = planet_factory.create(
+        (Vector3){100.0f, 10.0f, -100.0f}, 20.0f, 80.0f, 40.0f, GREEN);
+    game_objects_["planet3"] = planet_factory.create(
+        (Vector3){-200.0f, -30.0f, 100.0f}, 40.0f, 160.0f, 40.0f, YELLOW);
+    game_objects_["planet4"] = planet_factory.create(
+        (Vector3){120.0f, -70.0f, 200.0f}, 5.0f, 20.0f, 40.0f, BLUE);
+
     auto& camera_body = game_objects_["camera_body"];
     camera_body = std::make_unique<GameObject>(engine);
     camera_body->add_component(std::make_unique<CameraComponent>(camera_body.get(), this, renderer));
