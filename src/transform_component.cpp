@@ -126,6 +126,10 @@ void TransformComponent::rotate(float delta_pitch, float delta_yaw, float delta_
 }
 
 // Updates
+void TransformComponent::fixed_update() {
+    previous_transform_ = transform_;
+}
+
 void TransformComponent::update() {
     float alpha = engine_->get_interpolation_alpha();
     

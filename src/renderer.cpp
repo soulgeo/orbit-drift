@@ -56,7 +56,7 @@ void Renderer::register_camera(CameraComponent* camera_body) {
 
 void Renderer::render(Engine& engine) {
     if (camera_body_) {
-        camera_.position = camera_body_->get_position();
+        camera_.position = camera_body_->get_visual_position();
         camera_.projection = camera_body_->get_projection();
         camera_.fovy = (float)camera_body_->get_fovy();
         camera_.target = camera_body_->get_target();
@@ -93,14 +93,19 @@ void Renderer::draw_ui() {
             y += 25;
         }
     }
-    std::cout << "Raylib camera position: " << 
-        camera_.position.x << ", " <<
-        camera_.position.y << ", " <<
-        camera_.position.z << ", " <<
-        std::endl;
-    std::cout << "Raylib camera target: " << 
-        camera_.target.x << ", " <<
-        camera_.target.y << ", " <<
-        camera_.target.z << ", " <<
+    // std::cout << "Raylib camera position: " << 
+    //     camera_.position.x << ", " <<
+    //     camera_.position.y << ", " <<
+    //     camera_.position.z << ", " <<
+    //     std::endl;
+    // std::cout << "Raylib camera target: " << 
+    //     camera_.target.x << ", " <<
+    //     camera_.target.y << ", " <<
+    //     camera_.target.z << ", " <<
+    //     std::endl;
+    std::cout << "Raylib camera up: " << 
+        camera_.up.x << ", " <<
+        camera_.up.y << ", " <<
+        camera_.up.z << ", " <<
         std::endl;
 }

@@ -62,6 +62,7 @@ public:
     int get_new_profile_id();
     int get_trans_iter();
     Vector3 get_position();
+    Vector3 get_visual_position();
     int get_projection();
     float get_fovy();
     Vector3 get_target();

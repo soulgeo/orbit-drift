@@ -55,6 +55,7 @@ public:
     virtual void rotate_roll(float angleRad); // Rotation around Forward axis
     virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
+    void fixed_update() override;
     void update() override;
 };
 

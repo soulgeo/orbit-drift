@@ -13,7 +13,7 @@ CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* re
     Profile default_camera;
     default_camera.target = c_scene->get_game_object("player");
     default_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
-    default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 0.0f};
+    default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
     default_camera.fovy = 70.0f;
     camera_profiles_.push_back(default_camera);
 
@@ -48,6 +48,11 @@ int CameraComponent::get_trans_iter() {
 Vector3 CameraComponent::get_position() {
     return transform_->get_position();
 }
+
+Vector3 CameraComponent::get_visual_position() {
+    return transform_->get_visual_position();
+}
+
 
 int CameraComponent::get_projection() {
     return projection_;
@@ -191,19 +196,18 @@ void CameraComponent::update() {
     visual_up_ = Vector3Lerp(prev_up_, up_, alpha);
     visual_fovy_ = curr_state_.fovy; 
 
-    Vector3 position = transform_->get_position();
-    Vector3 up = transform_->get_up();
+    Vector3 position = transform_->get_visual_position();
     if (debug_) {
         debug_->writeln(TextFormat("--- CAMERA ---"));
         debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
                                    position.x, position.y, position.z));
         debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
-                                   up.x, up.y, up.z));
+                                   visual_up_.x, visual_up_.y, visual_up_.z));
         debug_->writeln(TextFormat("Active Profile: %d", active_profile_id_));
         debug_->writeln(TextFormat("Current Target Pos: %.2f, %.2f, %.2f",
-                                   curr_target_pos_.x, 
-                                   curr_target_pos_.y, 
-                                   curr_target_pos_.z));
+                                   visual_target_pos_.x, 
+                                   visual_target_pos_.y, 
+                                   visual_target_pos_.z));
     }
 }
 
@@ -246,4 +250,5 @@ void CameraComponent::update() {
 //         }
 //     }
 //     stateRef->value = targetValue;
+// }
 // }
