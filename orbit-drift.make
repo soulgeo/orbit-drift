@@ -120,12 +120,14 @@ OBJECTS :=
 
 GENERATED += $(OBJDIR)/camera_component.o
 GENERATED += $(OBJDIR)/component.o
+GENERATED += $(OBJDIR)/control_component.o
 GENERATED += $(OBJDIR)/debug_component.o
 GENERATED += $(OBJDIR)/engine.o
 GENERATED += $(OBJDIR)/entities.o
 GENERATED += $(OBJDIR)/game_object.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/physics_component.o
 GENERATED += $(OBJDIR)/planet_factory.o
 GENERATED += $(OBJDIR)/renderable_component.o
 GENERATED += $(OBJDIR)/renderer.o
@@ -135,12 +137,14 @@ GENERATED += $(OBJDIR)/timer.o
 GENERATED += $(OBJDIR)/transform_component.o
 OBJECTS += $(OBJDIR)/camera_component.o
 OBJECTS += $(OBJDIR)/component.o
+OBJECTS += $(OBJDIR)/control_component.o
 OBJECTS += $(OBJDIR)/debug_component.o
 OBJECTS += $(OBJDIR)/engine.o
 OBJECTS += $(OBJDIR)/entities.o
 OBJECTS += $(OBJDIR)/game_object.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/physics_component.o
 OBJECTS += $(OBJDIR)/planet_factory.o
 OBJECTS += $(OBJDIR)/renderable_component.o
 OBJECTS += $(OBJDIR)/renderer.o
@@ -217,6 +221,9 @@ $(OBJDIR)/camera_component.o: src/camera_component.cpp
 $(OBJDIR)/component.o: src/component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/control_component.o: src/control_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/debug_component.o: src/debug_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -233,6 +240,9 @@ $(OBJDIR)/input_handler.o: src/input_handler.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/physics_component.o: src/physics_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/planet_factory.o: src/planet_factory.cpp

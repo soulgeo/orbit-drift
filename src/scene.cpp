@@ -3,10 +3,12 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "camera_component.hpp"
+#include "control_component.hpp"
 #include "debug_component.hpp"
-#include "entities.hpp"
+#include "physics_component.hpp"
 #include "planet_factory.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -33,7 +35,12 @@ Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager)
     player_rend->set_color(RAYWHITE);
 
     player->add_component(std::move(player_rend));
-    player->add_component(std::make_unique<PlayerShipComponent>(player.get()));
+
+    auto player_physics = std::make_unique<PhysicsComponent>(
+        player.get(), Vector3Zero(), Vector3Zero(), 10.0f);    
+    player_physics->set_drag(4.0f);
+    player->add_component(std::move(player_physics));
+    player->add_component(std::make_unique<ControlComponent>(player.get()));
     player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
 
     auto planet_factory = PlanetFactory(engine, renderer, rsrc_manager);

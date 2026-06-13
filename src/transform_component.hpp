@@ -16,7 +16,6 @@ public:
     ~TransformComponent();
 
     // Getters
-    // TODO: Add Quaternion Getter
     Matrix get_transform() const;
     Matrix get_visual_transform() const;
 
@@ -27,13 +26,16 @@ public:
     Vector3 get_up() const;
     Vector3 get_right() const;
 
+    Quaternion get_rotation() const;
+
     // Setters
-    // TODO: Add Quaternion Setter
     void set_position_x(float x);
     void set_position_y(float y);
     void set_position_z(float z);
     void set_position(float x, float y, float z);
     void set_position(Vector3 position);
+
+    void set_rotation(Quaternion rotation);
 
     // Global Movement
     virtual void move_global_x(float deltaX);
@@ -49,7 +51,6 @@ public:
     virtual void move_local_forward(float distance);
 
     // Rotations
-    // TODO: Add Quaternion Rotation
     virtual void rotate_pitch(float angleRad); // Rotation around Right axis
     virtual void rotate_yaw(float angleRad); // Rotation around Up axis
     virtual void rotate_roll(float angleRad); // Rotation around Forward axis

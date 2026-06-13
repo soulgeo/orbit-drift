@@ -146,6 +146,7 @@ void PlanetComponent::fixed_update() {
     Engine* engine = owner_->get_engine();
     auto& scene = engine->get_scene();
     GameObject* player = scene.get_game_object("player");
+    if (!player_ship_) return;
     bool colliding = CheckCollisionBoxSphere(
         player_ship_->get_hitbox(), transform_->get_position(), gravity_radius_
     );

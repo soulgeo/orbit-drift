@@ -1,0 +1,49 @@
+#ifndef PHYSICS_COMPONENT_HPP
+#define PHYSICS_COMPONENT_HPP
+
+#include "component.hpp"
+#include "raylib.h"
+#include "renderer.hpp"
+#include "transform_component.hpp"
+#include <vector>
+
+class PhysicsComponent : public Component {
+    Vector3 v_;
+    Vector3 a_;
+    float mass_;
+    float drag_;
+    bool is_kinematic_;
+
+    std::vector<Vector3> forces_;
+
+    TransformComponent* transform_;
+    DebugComponent* debug_;
+
+public:
+    PhysicsComponent(GameObject* owner, Vector3 init_v, Vector3 init_a);
+    PhysicsComponent(GameObject* owner, Vector3 init_v, Vector3 init_a, float mass);
+    ~PhysicsComponent();
+
+    Vector3 velocity();
+    Vector3 acceleration();
+    float mass();
+    float drag();
+
+    Vector3 local_velocity();
+    Vector3 local_acceleration();
+
+    void set_velocity(Vector3 v);
+    void set_acceleration(Vector3 a);
+    void set_mass(float mass);
+    void set_drag(float drag);
+
+    void apply_force(Vector3 force);
+    void apply_force_local(Vector3 force);
+
+    void start() override;
+    void fixed_update() override;
+    void late_update() override;
+};
+
+#endif // !PHYSICS_COMPONENT_HPP
+

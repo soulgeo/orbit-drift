@@ -104,7 +104,7 @@ void TransformComponent::move_local_forward(float distance) {
 }
 
 //================================================================================== 
-// Rotation
+// Local Rotation
 void TransformComponent::rotate_pitch(float angle_rad) {
     transform_ = MatrixRotateX(angle_rad) * transform_;
 }
@@ -123,6 +123,17 @@ void TransformComponent::rotate(float delta_pitch, float delta_yaw, float delta_
     Matrix frame_rotation = p_mat * y_mat * r_mat;
 
     transform_ = frame_rotation * transform_;
+}
+
+//================================================================================== 
+// Global Rotation
+Quaternion TransformComponent::get_rotation() const {
+    return QuaternionFromMatrix(transform_);
+}
+
+void TransformComponent::set_rotation(Quaternion rotation) {
+    Matrix rotation_matrix = QuaternionToMatrix(rotation);
+    transform_ = rotation_matrix * transform_;
 }
 
 // Updates

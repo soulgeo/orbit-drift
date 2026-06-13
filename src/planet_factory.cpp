@@ -3,6 +3,7 @@
 #include "game_object.hpp"
 #include "renderable_component.hpp"
 #include "raymath.h"
+#include "transform_component.hpp"
 #include <memory>
 
 PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) : 
@@ -16,6 +17,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     Color color
 ) {
     auto planet = std::make_unique<GameObject>(engine_);
+    planet->get_component<TransformComponent>()->set_position(position);
 
     auto planet_comp = std::make_unique<PlanetComponent>(
             planet.get(), position, radius, gravity_radius, gravity_force
@@ -30,7 +32,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     planet_rend->set_color(color);
 
     planet->add_component(std::move(planet_rend));
-    planet->add_component(std::move(planet_comp));
+    // planet->add_component(std::move(planet_comp));
 
     return std::move(planet);
 }

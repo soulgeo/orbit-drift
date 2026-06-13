@@ -8,6 +8,7 @@
 
 class DebugComponent : public Component{
     std::vector<std::string> lines_;
+
 public:
     DebugComponent(GameObject* owner, Renderer* renderer);
     ~DebugComponent();
