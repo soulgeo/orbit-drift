@@ -5,7 +5,7 @@
 ControlComponent::ControlComponent(GameObject* owner) : Component(owner) {
     x_amp_ = 200.0f;
     y_amp_ = 200.0f;
-    z_amp_ = 550.0f;
+    z_amp_ = 1000.0f;
     roll_amp_ = 5.0f;
     pan_amp_ = 0.004f;
 }

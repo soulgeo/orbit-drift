@@ -186,7 +186,7 @@ void CameraComponent::fixed_update() {
     Vector3 target_up = camera_target_transform.get_up();
     Vector3 target_right = camera_target_transform.get_right();
 
-    float follow_speed = 30.0f;
+    float follow_speed = 50.0f;
 
     // Translate local offset from local to upright space
     Vector3 targ_translated_offset;

@@ -1,6 +1,7 @@
 #include "planet_factory.hpp"
 #include "game_object.hpp"
 #include "gravity_component.hpp"
+#include "raylib.h"
 #include "renderable_component.hpp"
 #include "collider_component.hpp"
 #include "raymath.h"
@@ -37,7 +38,19 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     planet_rend->set_initial_transform(model.transform);
     planet_rend->set_color(color);
 
+    auto gravity_model = LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
+    gravity_model.transform *= 
+        MatrixScale(gravity_radius, gravity_radius, gravity_radius);
+    auto planet_gravity_rend = std::make_unique<RenderableComponent>(
+        planet.get(), renderer_, gravity_model
+    );
+    planet_gravity_rend->set_initial_transform(gravity_model.transform);
+    planet_gravity_rend->set_color(GRAY);
+    planet_gravity_rend->set_alpha(0.1f);
+    planet_gravity_rend->set_draw_wires(true);
+
     planet->add_component(std::move(planet_rend));
+    planet->add_component(std::move(planet_gravity_rend));
     planet->add_component(std::move(planet_gravity));
     planet->add_component(std::move(planet_collider));
     planet->add_component(std::make_unique<DebugComponent>(planet.get(), renderer_));

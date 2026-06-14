@@ -15,25 +15,52 @@
 #define GLSL_VERSION 100
 #endif
 
+#include "raymath.h"
+
 Renderer::Renderer() : show_debug_(false){
-    // Init shaders
-    // fog_ = LoadShader(TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
-    //                  TextFormat("resources/shaders/ambient.frag", GLSL_VERSION));
-    //
-    // for (auto &[name, tuple] : obj_model_refs) {
-    //     std::get<0>(tuple).materials[0].shader = fog_;
-    // }
 }
 
 void Renderer::register_renderable(RenderableComponent* renderable) {
-    renderables_.push_back(renderable);
+    if (renderable->alpha() >= 1.0f) {
+        opaque_renderables_.push_back(renderable);
+    } else {
+        transparent_renderables_.push_back(renderable);
+    }
 }
 
 void Renderer::unregister_renderable(RenderableComponent* renderable) {
-    renderables_.erase(
-        std::remove(renderables_.begin(), renderables_.end(), renderable), 
-        renderables_.end()
-    );
+    if (renderable->alpha() >= 1.0f) {
+        opaque_renderables_.erase(
+            std::remove(opaque_renderables_.begin(), opaque_renderables_.end(), renderable), 
+            opaque_renderables_.end()
+        );
+    } else {
+        transparent_renderables_.erase(
+            std::remove(transparent_renderables_.begin(), transparent_renderables_.end(), renderable), 
+            transparent_renderables_.end()
+        );
+    }
+}
+
+void Renderer::update_renderable_alpha(RenderableComponent* renderable, float old_alpha, float new_alpha) {
+    bool was_opaque = old_alpha >= 1.0f;
+    bool is_opaque = new_alpha >= 1.0f;
+
+    if (was_opaque != is_opaque) {
+        if (was_opaque) {
+            opaque_renderables_.erase(
+                std::remove(opaque_renderables_.begin(), opaque_renderables_.end(), renderable), 
+                opaque_renderables_.end()
+            );
+            transparent_renderables_.push_back(renderable);
+        } else {
+            transparent_renderables_.erase(
+                std::remove(transparent_renderables_.begin(), transparent_renderables_.end(), renderable), 
+                transparent_renderables_.end()
+            );
+            opaque_renderables_.push_back(renderable);
+        }
+    }
 }
 
 void Renderer::register_debug(DebugComponent* debug) {
@@ -76,13 +103,21 @@ void Renderer::render(Engine& engine) {
 }
 
 void Renderer::draw_3d() {
-    //
-    // int distLoc = GetShaderLocation(fog_, "viewPos");
-    // SetShaderValue(fog_, distLoc, &camera_.position, SHADER_UNIFORM_VEC3);
-    // SetShaderValue(fog_, fog_.locs[SHADER_LOC_VECTOR_VIEW], &camera_.position,
-    //                SHADER_UNIFORM_VEC3);
+    // Draw opaque first
+    for (auto renderable : opaque_renderables_) {
+        renderable->draw();
+    }
 
-    for (auto& renderable : renderables_) {
+    // Sort transparent by distance to camera (farthest first)
+    Vector3 camera_pos = camera_.position;
+    std::sort(transparent_renderables_.begin(), transparent_renderables_.end(), [camera_pos](const RenderableComponent* a, const RenderableComponent* b) {
+        float dist_sq_a = Vector3DistanceSqr(a->get_position(), camera_pos);
+        float dist_sq_b = Vector3DistanceSqr(b->get_position(), camera_pos);
+        return dist_sq_a > dist_sq_b;
+    });
+
+    // Draw transparent last (sorted)
+    for (auto renderable : transparent_renderables_) {
         renderable->draw();
     }
 }
