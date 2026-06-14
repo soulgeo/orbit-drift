@@ -8,6 +8,7 @@
 #include "camera_component.hpp"
 #include "control_component.hpp"
 #include "debug_component.hpp"
+#include "g_boost_component.hpp"
 #include "physics_component.hpp"
 #include "planet_factory.hpp"
 #include "raylib.h"
@@ -42,19 +43,20 @@ Scene::Scene(Engine* engine, Renderer* renderer, Physics* physics, ResourceManag
     player_physics->set_drag(10.0f);
     player->add_component(std::move(player_physics));
     player->add_component(std::make_unique<ColliderComponent>(
-        player.get(), physics, Vector3Zero(), 2.0f, false));
+        player.get(), physics, Vector3Zero(), 2.0f, true));
     player->add_component(std::make_unique<ControlComponent>(player.get()));
     player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
+    player->add_component(std::make_unique<GBoostComponent>(player.get()));
 
     auto planet_factory = PlanetFactory(engine, renderer, physics, rsrc_manager);
     game_objects_["planet1"] = planet_factory.create(
-        (Vector3){-60.0f, 10.0f, -500.0f}, 10.0f, 60.0f, 750.0f, PURPLE);
+        (Vector3){-60.0f, 10.0f, -500.0f}, 10.0f, 60.0f, 7000.0f, PURPLE);
     game_objects_["planet2"] = planet_factory.create(
-        (Vector3){200.0f, 20.0f, -200.0f}, 20.0f, 120.0f, 750.0f, GREEN);
+        (Vector3){200.0f, 20.0f, -200.0f}, 20.0f, 120.0f, 7000.0f, GREEN);
     game_objects_["planet3"] = planet_factory.create(
-        (Vector3){-600.0f, -60.0f, 200.0f}, 40.0f, 240.0f, 750.0f, YELLOW);
+        (Vector3){-600.0f, -60.0f, 200.0f}, 40.0f, 240.0f, 7000.0f, YELLOW);
     game_objects_["planet4"] = planet_factory.create(
-        (Vector3){240.0f, -140.0f, 400.0f}, 5.0f, 30.0f, 750.0f, BLUE);
+        (Vector3){240.0f, -140.0f, 400.0f}, 5.0f, 30.0f, 7000.0f, BLUE);
 
     auto& camera_body = game_objects_["camera_body"];
     camera_body = std::make_unique<GameObject>(engine);

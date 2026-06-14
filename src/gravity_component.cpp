@@ -49,7 +49,7 @@ void GravityComponent::on_trigger_stay(GameObject* other) {
     center_ = transform_->get_position();
 
     float distance = Vector3Distance(center_, other_position);
-    float distanceFactor = 1.0f - Clamp(distance / radius_, 0.1f, 1.0f);
+    float distanceFactor = 1.0f - Clamp(distance / radius_, 0.8f, 1.0f);
     Vector3 direction = Vector3Normalize(center_ - other_position);
     Vector3 force = direction * (force_amp_ * distanceFactor);
     other_physics->apply_force(force);

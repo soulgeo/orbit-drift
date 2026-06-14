@@ -64,13 +64,13 @@ void RenderableComponent::update() {
 
     Vector3 position = transform_->get_position();
     Vector3 up = transform_->get_up();
-    if (debug_) {
-        debug_->writeln(TextFormat("--- MODEL ---"));
-        debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
-                                   position.x, position.y, position.z));
-        debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
-                                   up.x, up.y, up.z));
-    }
+    // if (debug_) {
+    //     debug_->writeln(TextFormat("--- MODEL ---"));
+    //     debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
+    //                                position.x, position.y, position.z));
+    //     debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
+    //                                up.x, up.y, up.z));
+    // }
 }
 
 void RenderableComponent::draw() {
