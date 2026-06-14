@@ -14,7 +14,7 @@ class Scene {
     Engine* engine_;
 
 public:
-    Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager);
+    Scene(Engine* engine, Renderer* renderer, class Physics* physics, ResourceManager* rsrc_manager);
     ~Scene();
 
     static constexpr size_t MAX_GAMEOBJECT_COUNT = 200;

@@ -1,7 +1,6 @@
 #include "renderer.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <vector>
 #include "game_object.hpp"
 #include "raylib.h"

@@ -24,6 +24,7 @@ class Engine {
     InputHandler::CommandList active_inputs_;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Scene> scene_;
+    std::unique_ptr<class Physics> physics_;
     std::unique_ptr<class ResourceManager> rsrc_manager_;
     bool is_running_;
     bool is_paused_;

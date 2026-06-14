@@ -15,8 +15,9 @@
 #include "renderable_component.hpp"
 #include "renderer.hpp"
 #include "resource_manager.hpp"
+#include "physics.hpp"
 
-Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) 
+Scene::Scene(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager) 
 {
     rsrc_manager_ = rsrc_manager;
     engine_ = engine;
@@ -37,7 +38,7 @@ Scene::Scene(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager)
     player->add_component(std::move(player_rend));
 
     auto player_physics = std::make_unique<PhysicsComponent>(
-        player.get(), Vector3Zero(), Vector3Zero(), 10.0f);    
+        player.get(), physics, Vector3Zero(), Vector3Zero(), 10.0f);    
     player_physics->set_drag(4.0f);
     player->add_component(std::move(player_physics));
     player->add_component(std::make_unique<ControlComponent>(player.get()));

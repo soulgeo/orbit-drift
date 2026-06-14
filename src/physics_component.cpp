@@ -4,12 +4,13 @@
 #include "transform_component.hpp"
 #include "debug_component.hpp"
 #include "raymath.h"
-#include <iostream>
 #include <stdexcept>
+#include "physics.hpp"
 
 PhysicsComponent::PhysicsComponent(
-    GameObject* owner, Vector3 init_v, Vector3 init_a) : Component(owner) 
+    GameObject* owner, Physics* physics, Vector3 init_v, Vector3 init_a) : Component(owner) 
 {
+    physics->register_body(this);
     v_ = init_v;
     a_ = init_a;
     mass_ = 0.0f;
@@ -18,8 +19,9 @@ PhysicsComponent::PhysicsComponent(
 }
 
 PhysicsComponent::PhysicsComponent(
-    GameObject* owner, Vector3 init_v, Vector3 init_a, float mass) : Component(owner) 
+    GameObject* owner, Physics* physics, Vector3 init_v, Vector3 init_a, float mass) : Component(owner) 
 {
+    physics->register_body(this);
     v_ = init_v;
     a_ = init_a;
     mass_ = mass;
@@ -41,20 +43,41 @@ float PhysicsComponent::mass() {
     return mass_;
 }
 
-void PhysicsComponent::set_velocity(Vector3 v) {
-    v_ = v;
+float PhysicsComponent::drag() {
+    return drag_;
 }
 
-void PhysicsComponent::set_acceleration(Vector3 a) {
-    a_ = a;
-}
-DebugComponent* debug_;
-
-void PhysicsComponent::set_mass(float mass) {
-    mass_ = mass;
-    is_kinematic_ = false;
+bool PhysicsComponent::is_kinematic() {
+    return is_kinematic_;
 }
 
+TransformComponent* PhysicsComponent::transform() {
+    return transform_;
+}
+
+size_t PhysicsComponent::get_force_count() const {
+    return forces_.size();
+}
+
+Vector3 PhysicsComponent::get_force_at(size_t index) const {
+    return forces_[index];
+}
+
+// void PhysicsComponent::set_velocity(Vector3 v) {
+//     v_ = v;
+// }
+//
+// void PhysicsComponent::set_acceleration(Vector3 a) {
+//     a_ = a;
+// }
+//
+// DebugComponent* debug_;
+//
+// void PhysicsComponent::set_mass(float mass) {
+//     mass_ = mass;
+//     is_kinematic_ = false;
+// }
+//
 void PhysicsComponent::set_drag(float drag) {
     if (is_kinematic_) {
         throw std::logic_error("Cannot set drag for kinematic component.");
@@ -72,29 +95,28 @@ void PhysicsComponent::apply_force_local(Vector3 force) {
     forces_.push_back(world_force);
 }
 
+void PhysicsComponent::clear_forces() {
+    forces_.clear();
+}
+
 void PhysicsComponent::start() {
     transform_ = owner_->get_component<TransformComponent>();
     debug_ = owner_->get_component<DebugComponent>();
 }
 
-void PhysicsComponent::fixed_update() {
-    float f_dt = owner_->get_engine()->get_fixed_dt();
-
+void PhysicsComponent::calculate_physics(float dt) {
     if (!is_kinematic_) {
         apply_force(-drag_ * v_);
     }
-    
+
     for (auto i = forces_.begin(); i != forces_.end(); i++) {
         a_ += (*i)/mass_;
     }
 
-    v_ += a_ * f_dt;
-    std::cout << "Acceleration x: " << a_.x << std::endl;
-    std::cout << "Fixed dt: " << f_dt << std::endl;
-    std::cout << "Velocity x: " << v_.x << std::endl;
+    v_ += a_ * dt;
 
     Vector3 current_pos = transform_->get_position();
-    transform_->set_position(current_pos + (v_ * f_dt));
+    transform_->set_position(current_pos + (v_ * dt));
 }
 
 void PhysicsComponent::late_update() {
@@ -106,6 +128,6 @@ void PhysicsComponent::late_update() {
                                    a_.x, a_.y, a_.z));
     }
 
-    forces_.clear();
+    clear_forces();
     a_ = Vector3Zero();
 }
