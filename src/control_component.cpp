@@ -3,9 +3,9 @@
 #include "transform_component.hpp"
 
 ControlComponent::ControlComponent(GameObject* owner) : Component(owner) {
-    x_amp_ = 100.0f;
-    y_amp_ = 100.5f;
-    z_amp_ = 2000.5f;
+    x_amp_ = 200.0f;
+    y_amp_ = 200.0f;
+    z_amp_ = 550.0f;
     roll_amp_ = 5.0f;
     pan_amp_ = 0.004f;
 }

@@ -33,11 +33,17 @@ public:
     }
 
     void start();
-
     void early_update();
     void fixed_update();
     void update();
     void late_update();
+
+    void on_collision_enter(GameObject* other);
+    void on_collision_exit(GameObject* other);
+
+    void on_trigger_enter(GameObject* other);
+    void on_trigger_stay(GameObject* other);
+    void on_trigger_exit(GameObject* other);
 
     TransformComponent& transform();
 

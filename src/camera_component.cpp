@@ -19,8 +19,8 @@ CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* re
 
     Profile in_gravity_camera;
     in_gravity_camera.target = c_scene->get_game_object("player");
-    in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.8f};
-    in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 9.0f};
+    in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.6f};
+    in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
     in_gravity_camera.fovy = 80.0f;
     camera_profiles_.push_back(in_gravity_camera);
 

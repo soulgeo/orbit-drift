@@ -8,6 +8,13 @@
 class Physics {
     std::vector<PhysicsComponent*> bodies_;
     std::vector<ColliderComponent*> colliders_;
+    
+    void handle_collision_enter(
+        ColliderComponent* collider_a, ColliderComponent* collider_b);
+    void handle_collision_stay(
+        ColliderComponent* collider_a, ColliderComponent* collider_b);
+    void handle_collision_exit(
+        ColliderComponent* collider_a, ColliderComponent* collider_b);
 
 public:
     Physics();

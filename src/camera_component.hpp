@@ -25,11 +25,6 @@ class CameraComponent : public Component {
         float fovy;
     };
 
-    enum ProfileId {
-        CP_DEFAULT = 0,
-        CP_IN_GRAVITY,
-    };
-
     std::vector<Profile> camera_profiles_;
     State curr_state_;
     State saved_state_;
@@ -48,7 +43,7 @@ class CameraComponent : public Component {
     int active_profile_id_ = CP_DEFAULT;
     int new_profile_id_ = -1;
     int trans_iter_ = 0;
-    int max_trans_iter_ = 40;
+    int max_trans_iter_ = 30;
 
     class TransformComponent* transform_;
     class DebugComponent* debug_;
@@ -57,6 +52,11 @@ class CameraComponent : public Component {
 public:
     CameraComponent(GameObject* owner, Scene* scene, Renderer* renderer);
     ~CameraComponent();
+
+    enum ProfileId {
+        CP_DEFAULT = 0,
+        CP_IN_GRAVITY,
+    };
 
     int get_profile_id();
     int get_new_profile_id();

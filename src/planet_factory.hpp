@@ -3,13 +3,16 @@
 #include "resource_manager.hpp"
 #include <memory>
 
+class Physics;
+
 class PlanetFactory {
     Renderer* renderer_;
     ResourceManager* rsrc_manager_;
     Engine* engine_;
+    Physics* physics_;
 
 public:
-    PlanetFactory(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager);
+    PlanetFactory(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager);
     ~PlanetFactory() {};
 
     std::unique_ptr<GameObject> create(

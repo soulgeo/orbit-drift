@@ -1,4 +1,5 @@
 #include "component.hpp"
+#include "game_object.hpp"
 
 Component::Component(GameObject* owner) : owner_(owner) {}
 
@@ -10,3 +11,9 @@ void Component::fixed_update() {}
 void Component::update() {}
 void Component::late_update() {}
 
+
+void Component::on_collision_enter(GameObject* other) {}
+void Component::on_collision_exit(GameObject* other) {}
+void Component::on_trigger_enter(GameObject* other) {}
+void Component::on_trigger_stay(GameObject* other) {}
+void Component::on_trigger_exit(GameObject* other) {}

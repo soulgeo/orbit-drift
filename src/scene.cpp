@@ -39,12 +39,14 @@ Scene::Scene(Engine* engine, Renderer* renderer, Physics* physics, ResourceManag
 
     auto player_physics = std::make_unique<PhysicsComponent>(
         player.get(), physics, Vector3Zero(), Vector3Zero(), 10.0f);    
-    player_physics->set_drag(4.0f);
+    player_physics->set_drag(10.0f);
     player->add_component(std::move(player_physics));
+    player->add_component(std::make_unique<ColliderComponent>(
+        player.get(), physics, Vector3Zero(), 2.0f, false));
     player->add_component(std::make_unique<ControlComponent>(player.get()));
     player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
 
-    auto planet_factory = PlanetFactory(engine, renderer, rsrc_manager);
+    auto planet_factory = PlanetFactory(engine, renderer, physics, rsrc_manager);
     game_objects_["planet1"] = planet_factory.create(
         (Vector3){-30.0f, 5.0f, -150.0f}, 10.0f, 60.0f, 750.0f, PURPLE);
     game_objects_["planet2"] = planet_factory.create(

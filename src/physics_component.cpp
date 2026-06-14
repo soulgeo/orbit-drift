@@ -105,15 +105,16 @@ void PhysicsComponent::start() {
 }
 
 void PhysicsComponent::calculate_physics(float dt) {
-    if (!is_kinematic_) {
+    if (!is_kinematic_ && mass_ != 0.0f) {
         apply_force(-drag_ * v_);
-    }
+        for (auto i = forces_.begin(); i != forces_.end(); i++) {
+            a_ += (*i)/mass_;
+        }
 
-    for (auto i = forces_.begin(); i != forces_.end(); i++) {
-        a_ += (*i)/mass_;
+        v_ += a_ * dt;
+        clear_forces();
+        a_ = Vector3Zero();
     }
-
-    v_ += a_ * dt;
 
     Vector3 current_pos = transform_->get_position();
     transform_->set_position(current_pos + (v_ * dt));
@@ -128,6 +129,4 @@ void PhysicsComponent::late_update() {
                                    a_.x, a_.y, a_.z));
     }
 
-    clear_forces();
-    a_ = Vector3Zero();
 }

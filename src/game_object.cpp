@@ -41,15 +41,21 @@ void GameObject::start() {
     }
 }
 
-void GameObject::update() {
-    for (auto i = components_.begin(); i != components_.end(); i++) {
-        (*i)->update();
-    }
-}
-
 void GameObject::early_update() {
     for (auto i = components_.begin(); i != components_.end(); i++) {
         (*i)->early_update();
+    }
+}
+
+void GameObject::fixed_update() {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->fixed_update();
+    }
+}
+
+void GameObject::update() {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->update();
     }
 }
 
@@ -59,8 +65,32 @@ void GameObject::late_update() {
     }
 }
 
-void GameObject::fixed_update() {
+void GameObject::on_collision_enter(GameObject* other) {
     for (auto i = components_.begin(); i != components_.end(); i++) {
-        (*i)->fixed_update();
+        (*i)->on_collision_enter(other);
+    }
+}
+
+void GameObject::on_collision_exit(GameObject* other) {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->on_collision_exit(other);
+    }
+}
+
+void GameObject::on_trigger_enter(GameObject* other) {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->on_trigger_enter(other);
+    }
+}
+
+void GameObject::on_trigger_stay(GameObject* other) {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->on_trigger_stay(other);
+    }
+}
+
+void GameObject::on_trigger_exit(GameObject* other) {
+    for (auto i = components_.begin(); i != components_.end(); i++) {
+        (*i)->on_trigger_exit(other);
     }
 }

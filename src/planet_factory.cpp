@@ -2,13 +2,14 @@
 #include "game_object.hpp"
 #include "gravity_component.hpp"
 #include "renderable_component.hpp"
+#include "collider_component.hpp"
 #include "raymath.h"
 #include "renderer.hpp"
 #include "transform_component.hpp"
 #include <memory>
 
-PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, ResourceManager* rsrc_manager) : 
-    engine_(engine), renderer_(renderer), rsrc_manager_(rsrc_manager) {}
+PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager) : 
+    engine_(engine), renderer_(renderer), physics_(physics), rsrc_manager_(rsrc_manager) {}
 
 std::unique_ptr<GameObject> PlanetFactory::create(
     Vector3 position, 
@@ -23,6 +24,10 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     auto planet_gravity = std::make_unique<GravityComponent>(
             planet.get(), gravity_radius, gravity_force_amp
         );
+    
+    auto planet_collider = std::make_unique<ColliderComponent>(
+        planet.get(), physics_, Vector3Zero(), gravity_radius, true
+    );
 
     auto model = LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
     model.transform *= MatrixScale(radius, radius, radius);
@@ -34,6 +39,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
 
     planet->add_component(std::move(planet_rend));
     planet->add_component(std::move(planet_gravity));
+    planet->add_component(std::move(planet_collider));
     planet->add_component(std::make_unique<DebugComponent>(planet.get(), renderer_));
 
     return std::move(planet);
