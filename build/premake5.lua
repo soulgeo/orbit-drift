@@ -220,7 +220,6 @@ if (downloadRaylib) then
         filter{}
         
         includedirs { "../src" }
-        includedirs { "../src/engine" }
         includedirs { "../src/game" }
         includedirs { "../include" }
 

@@ -1,7 +1,9 @@
 #include "control_component.hpp"
-#include "game_object.hpp"
-#include "transform_component.hpp"
-#include "engine.hpp"
+#include "sputnik/ecs/game_object.hpp"
+#include "sputnik/ecs/transform_component.hpp"
+#include "sputnik/core/engine.hpp"
+
+using namespace Sputnik;
 
 ControlComponent::ControlComponent(GameObject* owner) : Component(owner) {
     x_amp_ = 400.0f;

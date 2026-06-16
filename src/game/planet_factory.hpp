@@ -1,21 +1,20 @@
-#include "game_object.hpp"
-#include "renderer.hpp"
-#include "resource_manager.hpp"
+#include "sputnik/ecs/game_object.hpp"
+#include "sputnik/physics/physics.hpp"
+#include "sputnik/rendering/renderer.hpp"
+#include "sputnik/core/resource_manager.hpp"
 #include <memory>
 
-class Physics;
-
 class PlanetFactory {
-    Renderer* renderer_;
-    ResourceManager* rsrc_manager_;
-    Engine* engine_;
-    Physics* physics_;
+    Sputnik::Renderer* renderer_;
+    Sputnik::ResourceManager* rsrc_manager_;
+    Sputnik::Engine* engine_;
+    Sputnik::Physics* physics_;
 
 public:
-    PlanetFactory(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager);
+    PlanetFactory(Sputnik::Engine* engine, Sputnik::Renderer* renderer, Sputnik::Physics* physics, Sputnik::ResourceManager* rsrc_manager);
     ~PlanetFactory() {};
 
-    std::unique_ptr<GameObject> create(
+    std::unique_ptr<Sputnik::GameObject> create(
         Vector3 position, 
         float radius, 
         float gravity_radius, 

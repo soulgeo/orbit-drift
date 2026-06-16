@@ -1,32 +1,32 @@
 #ifndef GRAVITY_COMPONENT_HPP
 #define GRAVITY_COMPONENT_HPP
 
-#include "component.hpp"
-#include "debug_component.hpp"
-#include "game_object.hpp"
-#include "raylib.h"
-#include "renderer.hpp"
+#include "sputnik/ecs/component.hpp"
+#include "sputnik/rendering/debug_component.hpp"
+#include "sputnik/ecs/game_object.hpp"
+#include <raylib.h>
+#include "sputnik/rendering/renderer.hpp"
 
-class GravityComponent : public Component {
+class GravityComponent : public Sputnik::Component {
     Vector3 center_;
     float radius_;
     float force_amp_;
 
-    TransformComponent* transform_;
-    DebugComponent* debug_;
+    Sputnik::TransformComponent* transform_;
+    Sputnik::DebugComponent* debug_;
 
-    CameraComponent* camera_;
+    Sputnik::CameraComponent* camera_;
 
 public:
-    GravityComponent(GameObject* owner, float radius, float force_amp);
+    GravityComponent(Sputnik::GameObject* owner, float radius, float force_amp);
     ~GravityComponent();
 
     void start() override;
     void late_update() override;
 
-    void on_trigger_enter(GameObject* other) override;
-    void on_trigger_stay(GameObject* other) override;
-    void on_trigger_exit(GameObject* other) override;
+    void on_trigger_enter(Sputnik::GameObject* other) override;
+    void on_trigger_stay(Sputnik::GameObject* other) override;
+    void on_trigger_exit(Sputnik::GameObject* other) override;
 
     float force_amp() const;
 };

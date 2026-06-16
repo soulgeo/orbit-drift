@@ -1,11 +1,13 @@
 #include "gravity_component.hpp"
-#include "camera_component.hpp"
-#include "control_component.hpp"
-#include "physics_component.hpp"
-#include "raylib.h"
-#include "raymath.h"
-#include "transform_component.hpp"
-#include "engine.hpp"
+#include "sputnik/rendering/camera_component.hpp"
+#include "sputnik/control_component.hpp"
+#include "sputnik/physics/physics_component.hpp"
+#include <raylib.h>
+#include <raymath.h>
+#include "sputnik/ecs/transform_component.hpp"
+#include "sputnik/core/engine.hpp"
+
+using namespace Sputnik;
 
 GravityComponent::GravityComponent(GameObject* owner, float radius, float force_amp) :
     Component(owner),

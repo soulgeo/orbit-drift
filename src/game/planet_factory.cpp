@@ -1,13 +1,16 @@
 #include "planet_factory.hpp"
-#include "game_object.hpp"
+#include "sputnik/ecs/game_object.hpp"
 #include "gravity_component.hpp"
-#include "raylib.h"
-#include "renderable_component.hpp"
-#include "collider_component.hpp"
-#include "raymath.h"
-#include "renderer.hpp"
-#include "transform_component.hpp"
+#include <raylib.h>
+#include "sputnik/rendering/renderable_component.hpp"
+#include "spytnik/physics/collider_component.hpp"
+#include <raymath.h>
+#include "sputnik/rendering/renderer.hpp"
+#include "sputnik/ecs/transform_component.hpp"
+#include "sputnik/core/engine.hpp"
 #include <memory>
+
+using namespace Sputnik;
 
 PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager) : 
     engine_(engine), renderer_(renderer), physics_(physics), rsrc_manager_(rsrc_manager) {}

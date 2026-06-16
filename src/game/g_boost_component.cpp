@@ -1,6 +1,8 @@
 #include "g_boost_component.hpp"
 #include "gravity_component.hpp"
 
+using namespace Sputnik;
+
 GBoostComponent::GBoostComponent(GameObject* owner) : Component(owner) {
     boost_amp_ = 1000.0f;
 }

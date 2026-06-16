@@ -1,5 +1,5 @@
-#include "engine.hpp"
-#include "raylib.h"
+#include "sputnik/core/engine.hpp"
+#include <raylib.h>
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -9,7 +9,7 @@ int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
     SetTargetFPS(144);
 
-    Engine().run();
+    Sputnik::Engine().run();
 
     CloseWindow();
 
