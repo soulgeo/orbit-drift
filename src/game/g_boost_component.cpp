@@ -2,7 +2,7 @@
 #include "gravity_component.hpp"
 
 GBoostComponent::GBoostComponent(GameObject* owner) : Component(owner) {
-    boost_amp_ = 500.0f;
+    boost_amp_ = 1000.0f;
 }
 
 GBoostComponent::~GBoostComponent() = default;
@@ -15,7 +15,10 @@ void GBoostComponent::on_trigger_stay(GameObject* other) {
     auto gravity = other->get_component<GravityComponent>();
     if (!gravity || !physics_) return;
 
-    physics_->apply_force_local({0.0f, 0.0f, -boost_amp_});
+    float gravity_amp = gravity->force_amp();
+    float final_boost_amp = boost_amp_ + gravity_amp * 1/40;
+
+    physics_->apply_force_local({0.0f, 0.0f, -final_boost_amp});
 }
 
 void GBoostComponent::on_trigger_exit(GameObject* other) {

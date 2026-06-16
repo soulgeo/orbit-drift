@@ -1,11 +1,12 @@
 #include "control_component.hpp"
 #include "game_object.hpp"
 #include "transform_component.hpp"
+#include "engine.hpp"
 
 ControlComponent::ControlComponent(GameObject* owner) : Component(owner) {
-    x_amp_ = 200.0f;
-    y_amp_ = 200.0f;
-    z_amp_ = 1000.0f;
+    x_amp_ = 400.0f;
+    y_amp_ = 400.0f;
+    z_amp_ = 1600.0f;
     roll_amp_ = 5.0f;
     pan_amp_ = 0.004f;
 }

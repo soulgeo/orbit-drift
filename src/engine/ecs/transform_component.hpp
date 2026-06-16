@@ -3,7 +3,8 @@
 
 #include "component.hpp"
 #include "raylib.h"
-#include "engine.hpp"
+
+class Engine;
 
 class TransformComponent : public Component {
     Matrix transform_;
@@ -11,6 +12,7 @@ class TransformComponent : public Component {
     Matrix visual_transform_;
 
     Engine* engine_;
+
 public:
     TransformComponent(GameObject* owner, Engine* engine);
     ~TransformComponent();

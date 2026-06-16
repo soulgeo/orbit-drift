@@ -2,6 +2,7 @@
 #include "collider_component.hpp"
 #include "physics_component.hpp"
 #include <algorithm>
+#include "engine.hpp"
 
 Physics::Physics() {}
 Physics::~Physics() {}

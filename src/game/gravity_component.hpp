@@ -27,6 +27,8 @@ public:
     void on_trigger_enter(GameObject* other) override;
     void on_trigger_stay(GameObject* other) override;
     void on_trigger_exit(GameObject* other) override;
+
+    float force_amp() const;
 };
 
 #endif // !GRAVITY_COMPONENT_HPP

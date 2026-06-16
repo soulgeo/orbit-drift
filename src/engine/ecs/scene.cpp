@@ -50,13 +50,13 @@ Scene::Scene(Engine* engine, Renderer* renderer, Physics* physics, ResourceManag
 
     auto planet_factory = PlanetFactory(engine, renderer, physics, rsrc_manager);
     game_objects_["planet1"] = planet_factory.create(
-        (Vector3){-60.0f, 10.0f, -500.0f}, 10.0f, 60.0f, 7000.0f, PURPLE);
+        (Vector3){-60.0f, 10.0f, -500.0f}, 40.0f, 200.0f, 7500.0f, PURPLE);
     game_objects_["planet2"] = planet_factory.create(
-        (Vector3){200.0f, 20.0f, -200.0f}, 20.0f, 120.0f, 7000.0f, GREEN);
+        (Vector3){-300.0f, 20.0f, -1500.0f}, 80.0f, 320.0f, 1150.0f, GREEN);
     game_objects_["planet3"] = planet_factory.create(
-        (Vector3){-600.0f, -60.0f, 200.0f}, 40.0f, 240.0f, 7000.0f, YELLOW);
+        (Vector3){600.0f, -60.0f, -2800.0f}, 160.0f, 480.0f, 15000.0f, YELLOW);
     game_objects_["planet4"] = planet_factory.create(
-        (Vector3){240.0f, -140.0f, 400.0f}, 5.0f, 30.0f, 7000.0f, BLUE);
+        (Vector3){240.0f, -140.0f, -4500.0f}, 20.0f, 120.0f, 4500.0f, BLUE);
 
     auto& camera_body = game_objects_["camera_body"];
     camera_body = std::make_unique<GameObject>(engine);

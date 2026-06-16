@@ -2,6 +2,7 @@
 #include "game_object.hpp"
 #include "component.hpp"
 #include "raymath.h"
+#include "engine.hpp"
 
 TransformComponent::TransformComponent(GameObject* owner, Engine* engine) : Component(owner) {
     transform_ = MatrixIdentity();

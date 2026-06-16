@@ -5,6 +5,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "transform_component.hpp"
+#include "engine.hpp"
 
 GravityComponent::GravityComponent(GameObject* owner, float radius, float force_amp) :
     Component(owner),
@@ -62,4 +63,8 @@ void GravityComponent::on_trigger_exit(GameObject* other) {
     if (camera_profile == CameraComponent::CP_IN_GRAVITY) {
         camera_->switch_profile(CameraComponent::CP_DEFAULT);
     }
+}
+
+float GravityComponent::force_amp() const {
+    return force_amp_;
 }

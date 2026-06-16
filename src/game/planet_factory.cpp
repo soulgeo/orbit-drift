@@ -30,7 +30,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
         planet.get(), physics_, Vector3Zero(), gravity_radius, true
     );
 
-    auto model = LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
+    auto model = LoadModelFromMesh(GenMeshSphere(1.0f, 48.0f, 48.0f));
     model.transform *= MatrixScale(radius, radius, radius);
     auto planet_rend = std::make_unique<RenderableComponent>(
         planet.get(), renderer_, model
@@ -38,7 +38,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     planet_rend->set_initial_transform(model.transform);
     planet_rend->set_color(color);
 
-    auto gravity_model = LoadModelFromMesh(GenMeshSphere(1.0f, 30.0f, 30.0f));
+    auto gravity_model = LoadModelFromMesh(GenMeshSphere(1.0f, 48.0f, 48.0f));
     gravity_model.transform *= 
         MatrixScale(gravity_radius, gravity_radius, gravity_radius);
     auto planet_gravity_rend = std::make_unique<RenderableComponent>(

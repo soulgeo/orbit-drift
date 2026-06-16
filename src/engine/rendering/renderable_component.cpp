@@ -78,7 +78,7 @@ void RenderableComponent::draw() {
     if (draw_wires_) {
         DrawModelWires(
             model_, (Vector3) {0.0f, 0.0f, 0.0f}, 1.0f, 
-            ColorTint(ColorAlpha(color_, alpha_), GRAY)
+            ColorTint(ColorAlpha(color_, alpha_), RAYWHITE)
         );
     }
 }
