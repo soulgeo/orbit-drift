@@ -56,11 +56,11 @@ namespace Sputnik {
         return owner_;
     }
 
-    size_t ColliderComponent::get_tracked_collider_count() const {
+    size_t ColliderComponent::tracked_collider_count() const {
         return tracked_collisions_.size();
     }
 
-    ColliderComponent* ColliderComponent::get_tracked_collider_at(size_t index) const {
+    ColliderComponent* ColliderComponent::tracked_collider_at(size_t index) const {
         return tracked_collisions_[index];
     }
 
@@ -123,11 +123,11 @@ namespace Sputnik {
     }
 
     void ColliderComponent::start() {
-        transform_ = owner_->get_component<TransformComponent>();
+        transform_ = owner_->component<TransformComponent>();
     }
 
     void ColliderComponent::fixed_update() {
-        center_ = transform_->get_position() + offset_;
+        center_ = transform_->position() + offset_;
     }
 
 }

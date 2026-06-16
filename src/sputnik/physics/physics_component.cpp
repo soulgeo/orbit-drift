@@ -57,29 +57,14 @@ namespace Sputnik {
         return transform_;
     }
 
-    size_t PhysicsComponent::get_force_count() const {
+    size_t PhysicsComponent::force_count() const {
         return forces_.size();
     }
 
-    Vector3 PhysicsComponent::get_force_at(size_t index) const {
+    Vector3 PhysicsComponent::force_at(size_t index) const {
         return forces_[index];
     }
 
-    // void PhysicsComponent::set_velocity(Vector3 v) {
-    //     v_ = v;
-    // }
-    //
-    // void PhysicsComponent::set_acceleration(Vector3 a) {
-    //     a_ = a;
-    // }
-    //
-    // DebugComponent* debug_;
-    //
-    // void PhysicsComponent::set_mass(float mass) {
-    //     mass_ = mass;
-    //     is_kinematic_ = false;
-    // }
-    //
     void PhysicsComponent::set_drag(float drag) {
         if (is_kinematic_) {
             throw std::logic_error("Cannot set drag for kinematic component.");
@@ -92,7 +77,7 @@ namespace Sputnik {
     }
 
     void PhysicsComponent::apply_force_local(Vector3 force) {
-        Quaternion rot = QuaternionFromMatrix(transform_->get_transform());
+        Quaternion rot = QuaternionFromMatrix(transform_->transform());
         Vector3 world_force = Vector3RotateByQuaternion(force, rot);
         forces_.push_back(world_force);
     }
@@ -102,8 +87,8 @@ namespace Sputnik {
     }
 
     void PhysicsComponent::start() {
-        transform_ = owner_->get_component<TransformComponent>();
-        debug_ = owner_->get_component<DebugComponent>();
+        transform_ = owner_->component<TransformComponent>();
+        debug_ = owner_->component<DebugComponent>();
     }
 
     void PhysicsComponent::calculate_physics(float dt) {
@@ -118,7 +103,7 @@ namespace Sputnik {
             a_ = Vector3Zero();
         }
 
-        Vector3 current_pos = transform_->get_position();
+        Vector3 current_pos = transform_->position();
         transform_->set_position(current_pos + (v_ * dt));
     }
 

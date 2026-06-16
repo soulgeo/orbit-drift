@@ -14,56 +14,52 @@ namespace Sputnik {
     {
         is_running_ = true;
         is_paused_ = false;
-
-        input_handler.bind_key(KEY_SPACE, DOWN, INPUT_MOVE_UP);
-        input_handler.bind_key(KEY_LEFT_SHIFT, DOWN, INPUT_MOVE_DOWN);
-        input_handler.bind_key(KEY_W, DOWN, INPUT_MOVE_FORWARD);
-        input_handler.bind_key(KEY_S, DOWN, INPUT_MOVE_BACK);
-        input_handler.bind_key(KEY_A, DOWN, INPUT_MOVE_LEFT);
-        input_handler.bind_key(KEY_D, DOWN, INPUT_MOVE_RIGHT);
-        input_handler.bind_key(KEY_E, DOWN, INPUT_ROLL_CW);
-        input_handler.bind_key(KEY_Q, DOWN, INPUT_ROLL_CCW);
-        input_handler.bind_key(KEY_LEFT_ALT, PRESSED, INPUT_PAUSE);
-        input_handler.bind_key(KEY_F3, PRESSED, INPUT_DEBUG);
     }
 
     Engine::~Engine() = default;
 
-    const Renderer& Engine::renderer() const {
+    Renderer& Engine::renderer() {
         return renderer_;
     }
 
-    const ResourceManager& Engine::resource_manager() const {
+    ResourceManager& Engine::resource_manager() {
         return rsrc_manager_;
     }
 
-    const Physics& Engine::physics() const {
+    Physics& Engine::physics() {
         return physics_;
     }
 
-    bool Engine::is_active_input(int input) {
-        for (size_t i = 0; i < active_inputs_.count; ++i) {
-            if (active_inputs_.commands[i] == input) {
-                return true;
-            }
-        }
-        return false;
+    InputHandler& Engine::input_handler() {
+        return input_handler_;
     }
 
-    float Engine::get_dt() const {
+    bool Engine::is_paused() const {
+        return is_paused_;
+    }
+
+    void Engine::toggle_pause() {
+        is_paused_ = !is_paused_;
+    }
+
+    float Engine::dt() const {
         return dt_;
     }
 
-    float Engine::get_fixed_dt() const {
+    float Engine::fixed_dt() const {
         return fixed_dt_;
     }
 
-    float Engine::get_interpolation_alpha() const {
+    float Engine::interpolation_alpha() const {
         return accumulator_ / fixed_dt_;
     }
 
-    Scene& Engine::get_scene() const {
+    Scene& Engine::scene() const {
         return *scene_;
+    }
+
+    void Engine::set_scene(std::unique_ptr<Scene> scene) {
+        scene_ = std::move(scene);
     }
 
     void Engine::run() {
@@ -82,13 +78,7 @@ namespace Sputnik {
     }
 
     void Engine::process_input() {
-        active_inputs_ = input_handler.handle_input();
-
-        for (size_t i = 0; i < active_inputs_.count; ++i) {
-            if (active_inputs_.commands[i] == INPUT_PAUSE) {
-                is_paused_ = !is_paused_;
-            }
-        }
+        input_handler_.update();
     }
 
 

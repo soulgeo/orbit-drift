@@ -13,14 +13,14 @@ namespace Sputnik {
     {
         // Define Camera Profiles
         Profile default_camera;
-        default_camera.target = c_scene->get_game_object("player");
+        default_camera.target = c_scene->game_object("player");
         default_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
         default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
         default_camera.fovy = 70.0f;
         camera_profiles_.push_back(default_camera);
 
         Profile in_gravity_camera;
-        in_gravity_camera.target = c_scene->get_game_object("player");
+        in_gravity_camera.target = c_scene->game_object("player");
         in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.6f};
         in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
         in_gravity_camera.fovy = 80.0f;
@@ -30,45 +30,45 @@ namespace Sputnik {
 
         renderer->register_camera(this);
 
-        engine_ = owner_->get_engine();
+        engine_ = owner_->engine();
     }
 
     CameraComponent::~CameraComponent() = default;
 
-    int CameraComponent::get_profile_id() {
+    int CameraComponent::profile_id() {
         return active_profile_id_;
     }
 
-    int CameraComponent::get_new_profile_id() {
+    int CameraComponent::new_profile_id() {
         return new_profile_id_;
     }
 
-    int CameraComponent::get_trans_iter() {
+    int CameraComponent::trans_iter() {
         return trans_iter_; 
     }
 
-    Vector3 CameraComponent::get_position() {
-        return transform_->get_position();
+    Vector3 CameraComponent::position() {
+        return transform_->position();
     }
 
-    Vector3 CameraComponent::get_visual_position() {
-        return transform_->get_visual_position();
+    Vector3 CameraComponent::visual_position() {
+        return transform_->visual_position();
     }
 
 
-    int CameraComponent::get_projection() {
+    int CameraComponent::projection() {
         return projection_;
     }
 
-    float CameraComponent::get_fovy() {
+    float CameraComponent::fovy() {
         return visual_fovy_;
     }
 
-    Vector3 CameraComponent::get_target() {
+    Vector3 CameraComponent::target() {
         return visual_target_pos_;
     }
 
-    Vector3 CameraComponent::get_camera_up() {
+    Vector3 CameraComponent::camera_up() {
         return visual_up_; 
     }
 
@@ -78,8 +78,8 @@ namespace Sputnik {
     }
 
     void CameraComponent::start() {
-        transform_ = owner_->get_component<TransformComponent>();
-        debug_ = owner_->get_component<DebugComponent>();
+        transform_ = owner_->component<TransformComponent>();
+        debug_ = owner_->component<DebugComponent>();
 
         Profile& active = camera_profiles_[active_profile_id_];
         
@@ -94,10 +94,10 @@ namespace Sputnik {
         GameObject& camera_target = *active.target;
         TransformComponent& camera_target_transform = camera_target.transform();
 
-        Vector3 target_position = camera_target_transform.get_position();
-        Vector3 target_forward = camera_target_transform.get_forward();
-        Vector3 target_up = camera_target_transform.get_up();
-        Vector3 target_right = camera_target_transform.get_right();
+        Vector3 target_position = camera_target_transform.position();
+        Vector3 target_forward = camera_target_transform.forward();
+        Vector3 target_up = camera_target_transform.up();
+        Vector3 target_right = camera_target_transform.right();
 
         // Calculate initial target position
         Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
@@ -183,10 +183,10 @@ namespace Sputnik {
         GameObject& camera_target = *active.target;
         TransformComponent& camera_target_transform = camera_target.transform();
 
-        Vector3 target_position = camera_target_transform.get_position();
-        Vector3 target_forward = camera_target_transform.get_forward();
-        Vector3 target_up = camera_target_transform.get_up();
-        Vector3 target_right = camera_target_transform.get_right();
+        Vector3 target_position = camera_target_transform.position();
+        Vector3 target_forward = camera_target_transform.forward();
+        Vector3 target_up = camera_target_transform.up();
+        Vector3 target_right = camera_target_transform.right();
 
         float follow_speed = 100.0f;
 
@@ -203,7 +203,7 @@ namespace Sputnik {
 
         curr_target_pos_ = 
             Vector3Lerp(
-                curr_target_pos_, world_target, follow_speed * engine_->get_fixed_dt()
+                curr_target_pos_, world_target, follow_speed * engine_->fixed_dt()
             );
 
         // Translate local offset from local to upright space
@@ -218,7 +218,7 @@ namespace Sputnik {
             target_position + curr_state_.pos_offset + pos_translated_offset;
 
         transform_->set_position(
-            Vector3Lerp(get_position(), world_position, follow_speed * engine_->get_fixed_dt())
+            Vector3Lerp(position(), world_position, follow_speed * engine_->fixed_dt())
         );
 
         // Update Camera Up
@@ -237,13 +237,13 @@ namespace Sputnik {
     }
 
     void CameraComponent::update() {
-        float alpha = engine_->get_interpolation_alpha();
+        float alpha = engine_->interpolation_alpha();
 
         visual_target_pos_ = Vector3Lerp(prev_target_pos_, curr_target_pos_, alpha);
         visual_up_ = Vector3Lerp(prev_up_, up_, alpha);
         visual_fovy_ = curr_state_.fovy; 
 
-        Vector3 position = transform_->get_visual_position();
+        Vector3 position = transform_->visual_position();
         if (debug_) {
             debug_->writeln(TextFormat("--- CAMERA ---"));
             debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 

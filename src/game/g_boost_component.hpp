@@ -1,7 +1,7 @@
 #ifndef GBOOST_COMPONENT_HPP
 #define GBOOST_COMPONENT_HPP
 
-#include "spuntik/ecs/component.hpp"
+#include "sputnik/ecs/component.hpp"
 #include "sputnik/ecs/game_object.hpp"
 #include "sputnik/physics/physics_component.hpp"
 

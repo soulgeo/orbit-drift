@@ -25,11 +25,11 @@ namespace Sputnik {
         clean();
     }
 
-    int DebugComponent::get_line_count() const {
+    int DebugComponent::line_count() const {
         return static_cast<int>(lines_.size());
     }
 
-    const char* DebugComponent::get_line(int index) const {
+    const char* DebugComponent::line(int index) const {
         if (index >= 0 && index < static_cast<int>(lines_.size())) {
             return lines_[index].c_str();
         }

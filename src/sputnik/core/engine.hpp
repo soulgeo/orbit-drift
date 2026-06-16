@@ -10,28 +10,13 @@
 
 namespace Sputnik {
 
-    enum UserInput {
-        INPUT_NONE = 0,
-        INPUT_PAUSE,
-        INPUT_DEBUG,
-        INPUT_MOVE_UP,
-        INPUT_MOVE_DOWN,
-        INPUT_MOVE_FORWARD,
-        INPUT_MOVE_BACK,
-        INPUT_MOVE_LEFT,
-        INPUT_MOVE_RIGHT,
-        INPUT_ROLL_CW,
-        INPUT_ROLL_CCW,
-    };
-
     class Physics;
 
     class Engine {
         Renderer renderer_;
         Physics physics_;
         ResourceManager rsrc_manager_;
-
-        InputHandler::CommandList active_inputs_;
+        InputHandler input_handler_;
 
         std::unique_ptr<Scene> scene_;
         bool is_running_;
@@ -50,19 +35,20 @@ namespace Sputnik {
         Engine();
         ~Engine();
 
-        const Renderer& renderer() const;
-        const ResourceManager& resource_manager() const;
-        const Physics& physics() const;
+        Renderer& renderer();
+        ResourceManager& resource_manager();
+        Physics& physics();
+        InputHandler& input_handler();
 
-        InputHandler input_handler;
-        bool is_active_input(int input);
+        void toggle_pause();
+        bool is_paused() const;
 
-        float get_dt() const;
-        float get_fixed_dt() const;
-        float get_interpolation_alpha() const;
-        Scene& get_scene() const;
+        float dt() const;
+        float fixed_dt() const;
+        float interpolation_alpha() const;
+        Scene& scene() const;
+        void set_scene(std::unique_ptr<Scene> scene);
 
-        void load_scene();
         void run();
     };
 

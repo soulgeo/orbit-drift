@@ -26,7 +26,7 @@ namespace Sputnik {
         void update() override;
         void draw();
 
-        Vector3 get_position() const;
+        Vector3 position() const;
         float alpha() const;
         bool draw_wires() const;
 

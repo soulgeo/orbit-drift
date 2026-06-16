@@ -19,7 +19,7 @@ namespace Sputnik {
         UnloadModel(model_);
     }
 
-    Vector3 RenderableComponent::get_position() const {
+    Vector3 RenderableComponent::position() const {
         return (Vector3){
             model_.transform.m12, 
             model_.transform.m13, 
@@ -54,25 +54,18 @@ namespace Sputnik {
     }
 
     void RenderableComponent::start() {
-        transform_ = owner_->get_component<TransformComponent>();
-        debug_ = owner_->get_component<DebugComponent>();
+        transform_ = owner_->component<TransformComponent>();
+        debug_ = owner_->component<DebugComponent>();
     }
 
     void RenderableComponent::update() {
         if (owner_ == nullptr) { return; }
         model_.transform = 
             initial_transform_ * 
-            transform_->get_visual_transform();
+            transform_->visual_transform();
 
-        Vector3 position = transform_->get_position();
-        Vector3 up = transform_->get_up();
-        // if (debug_) {
-        //     debug_->writeln(TextFormat("--- MODEL ---"));
-        //     debug_->writeln(TextFormat("Position: %.2f, %.2f, %.2f", 
-        //                                position.x, position.y, position.z));
-        //     debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
-        //                                up.x, up.y, up.z));
-        // }
+        Vector3 position = transform_->position();
+        Vector3 up = transform_->up();
     }
 
     void RenderableComponent::draw() {

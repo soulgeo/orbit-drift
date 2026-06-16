@@ -15,11 +15,11 @@ namespace Sputnik {
 
     TransformComponent::~TransformComponent() = default;
 
-    Matrix TransformComponent::get_transform() const {
+    Matrix TransformComponent::transform() const {
         return transform_;
     }
 
-    Matrix TransformComponent::get_visual_transform() const {
+    Matrix TransformComponent::visual_transform() const {
         return visual_transform_;
     }
 
@@ -32,18 +32,18 @@ namespace Sputnik {
     void TransformComponent::set_position_y(float y) {
         transform_.m13 = y;
     }
-    void TransformComponent::set_position_z(float x) {
-        transform_.m14 = x;
-    }
     void TransformComponent::set_position(float x, float y, float z) {
-        set_position_x(x);
-        set_position_y(y);
-        set_position_z(z);
+        transform_.m12 = x;
+        transform_.m13 = y;
+        transform_.m14 = z;
+    }
+    void TransformComponent::set_position_z(float z) {
+        transform_.m14 = z;
     }
     void TransformComponent::set_position(Vector3 position) {
-        set_position_x(position.x);
-        set_position_y(position.y);
-        set_position_z(position.z);
+        transform_.m12 = position.x;
+        transform_.m13 = position.y;
+        transform_.m14 = position.z;
     }
     void TransformComponent::move_global_x(float delta_x) { 
         transform_.m12 += delta_x; 
@@ -71,25 +71,25 @@ namespace Sputnik {
     //================================================================================== 
     // Local Movement
 
-    Vector3 TransformComponent::get_position() const { 
+    Vector3 TransformComponent::position() const { 
         return (Vector3){ transform_.m12, transform_.m13, transform_.m14 }; 
     }
 
-    Vector3 TransformComponent::get_previous_position() const { 
+    Vector3 TransformComponent::previous_position() const { 
         return (Vector3){ previous_transform_.m12, previous_transform_.m13, previous_transform_.m14 }; 
     }
 
-    Vector3 TransformComponent::get_visual_position() const { 
+    Vector3 TransformComponent::visual_position() const { 
         return (Vector3){ visual_transform_.m12, visual_transform_.m13, visual_transform_.m14 }; 
     }
 
-    Vector3 TransformComponent::get_right() const { 
+    Vector3 TransformComponent::right() const { 
         return (Vector3){ transform_.m0,  transform_.m1,  transform_.m2 }; 
     }
-    Vector3 TransformComponent::get_up() const { 
+    Vector3 TransformComponent::up() const { 
         return (Vector3){ transform_.m4,  transform_.m5,  transform_.m6 }; 
     }
-    Vector3 TransformComponent::get_forward() const { 
+    Vector3 TransformComponent::forward() const { 
         return (Vector3){ -transform_.m8, -transform_.m9, -transform_.m10 }; 
     }
 
@@ -130,7 +130,7 @@ namespace Sputnik {
 
     //================================================================================== 
     // Global Rotation
-    Quaternion TransformComponent::get_rotation() const {
+    Quaternion TransformComponent::rotation() const {
         return QuaternionFromMatrix(transform_);
     }
 
@@ -145,7 +145,7 @@ namespace Sputnik {
     }
 
     void TransformComponent::update() {
-        float alpha = engine_->get_interpolation_alpha();
+        float alpha = engine_->interpolation_alpha();
         
         Vector3 old_pos = { previous_transform_.m12, previous_transform_.m13, previous_transform_.m14 };
         Vector3 curr_pos = { transform_.m12, transform_.m13, transform_.m14 };

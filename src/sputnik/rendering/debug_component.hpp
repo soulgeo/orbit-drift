@@ -20,8 +20,8 @@ namespace Sputnik {
 
         void early_update() override;
         
-        int get_line_count() const;
-        const char* get_line(int index) const;
+        int line_count() const;
+        const char* line(int index) const;
     };
 
 }

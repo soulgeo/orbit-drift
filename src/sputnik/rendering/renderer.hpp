@@ -32,9 +32,14 @@ namespace Sputnik {
         void register_debug(DebugComponent* debug);
         void unregister_debug(DebugComponent* debug);
 
-        void register_camera(CameraComponent* camera_comp);
+        void register_camera(CameraComponent* camera_body);
+
+        void set_show_debug(bool show);
+        void toggle_show_debug();
+        bool is_showing_debug() const;
 
         void render(Engine& engine);
+
         void draw_3d();
         void draw_ui();
     };

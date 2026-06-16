@@ -20,17 +20,17 @@ namespace Sputnik {
         ~TransformComponent();
 
         // Getters
-        Matrix get_transform() const;
-        Matrix get_visual_transform() const;
+        Matrix transform() const;
+        Matrix visual_transform() const;
 
-        Vector3 get_position() const;
-        Vector3 get_previous_position() const;
-        Vector3 get_visual_position() const;
-        Vector3 get_forward() const;
-        Vector3 get_up() const;
-        Vector3 get_right() const;
+        Vector3 position() const;
+        Vector3 previous_position() const;
+        Vector3 visual_position() const;
+        Vector3 forward() const;
+        Vector3 up() const;
+        Vector3 right() const;
 
-        Quaternion get_rotation() const;
+        Quaternion rotation() const;
 
         // Setters
         void set_position_x(float x);

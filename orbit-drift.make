@@ -126,6 +126,7 @@ GENERATED += $(OBJDIR)/debug_component.o
 GENERATED += $(OBJDIR)/engine.o
 GENERATED += $(OBJDIR)/g_boost_component.o
 GENERATED += $(OBJDIR)/game_object.o
+GENERATED += $(OBJDIR)/global_control_component.o
 GENERATED += $(OBJDIR)/gravity_component.o
 GENERATED += $(OBJDIR)/input_handler.o
 GENERATED += $(OBJDIR)/main.o
@@ -146,6 +147,7 @@ OBJECTS += $(OBJDIR)/debug_component.o
 OBJECTS += $(OBJDIR)/engine.o
 OBJECTS += $(OBJDIR)/g_boost_component.o
 OBJECTS += $(OBJDIR)/game_object.o
+OBJECTS += $(OBJDIR)/global_control_component.o
 OBJECTS += $(OBJDIR)/gravity_component.o
 OBJECTS += $(OBJDIR)/input_handler.o
 OBJECTS += $(OBJDIR)/main.o
@@ -225,6 +227,9 @@ $(OBJDIR)/control_component.o: src/game/control_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/g_boost_component.o: src/game/g_boost_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/global_control_component.o: src/game/global_control_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/gravity_component.o: src/game/gravity_component.cpp

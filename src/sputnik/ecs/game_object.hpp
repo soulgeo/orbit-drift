@@ -22,13 +22,13 @@ namespace Sputnik {
 
         void add_component(std::unique_ptr<Component> comp);
 
-        size_t get_component_count() const;
-        Component* get_component_at(size_t index) const;
+        size_t component_count() const;
+        Component* component_at(size_t index) const;
 
         template <typename T> 
-        T* get_component() {
-            for (size_t i = 0; i < get_component_count(); ++i) {
-                T* result = dynamic_cast<T*>(get_component_at(i));
+        T* component() {
+            for (size_t i = 0; i < component_count(); ++i) {
+                T* result = dynamic_cast<T*>(component_at(i));
                 if (result) return result;
             }
             return nullptr;
@@ -49,7 +49,7 @@ namespace Sputnik {
 
         TransformComponent& transform();
 
-        Engine* get_engine();
+        Engine* engine();
     };
 
 }

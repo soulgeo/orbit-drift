@@ -38,8 +38,8 @@ namespace Sputnik {
 
         TransformComponent* transform();
 
-        size_t get_force_count() const;
-        Vector3 get_force_at(size_t index) const;
+        size_t force_count() const;
+        Vector3 force_at(size_t index) const;
 
         // void set_velocity(Vector3 v);
         // void set_acceleration(Vector3 a);

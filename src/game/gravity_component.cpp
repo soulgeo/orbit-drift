@@ -1,6 +1,6 @@
 #include "gravity_component.hpp"
 #include "sputnik/rendering/camera_component.hpp"
-#include "sputnik/control_component.hpp"
+#include "game/control_component.hpp"
 #include "sputnik/physics/physics_component.hpp"
 #include <raylib.h>
 #include <raymath.h>
@@ -18,12 +18,12 @@ GravityComponent::GravityComponent(GameObject* owner, float radius, float force_
 GravityComponent::~GravityComponent() {}
 
 void GravityComponent::start() {
-    transform_ = owner_->get_component<TransformComponent>();
-    debug_ = owner_->get_component<DebugComponent>();
+    transform_ = owner_->component<TransformComponent>();
+    debug_ = owner_->component<DebugComponent>();
 
-    Scene& scene = owner_->get_engine()->get_scene();
-    GameObject* camera_body = scene.get_game_object("camera_body");
-    camera_ = camera_body->get_component<CameraComponent>();
+    Scene& scene = owner_->engine()->scene();
+    GameObject* camera_body = scene.game_object("camera_body");
+    camera_ = camera_body->component<CameraComponent>();
 }
 
 void GravityComponent::late_update() {
@@ -34,22 +34,22 @@ void GravityComponent::late_update() {
 }
 
 void GravityComponent::on_trigger_enter(GameObject* other) {
-    auto control = other->get_component<ControlComponent>();
+    auto control = other->component<ControlComponent>();
     if (!control) return;
-    auto camera_profile = camera_->get_profile_id();
+    auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_DEFAULT) {
         camera_->switch_profile(CameraComponent::CP_IN_GRAVITY);
     }
 }
 
 void GravityComponent::on_trigger_stay(GameObject* other) {
-    auto other_physics = other->get_component<PhysicsComponent>();
+    auto other_physics = other->component<PhysicsComponent>();
     if (!other_physics) return;
 
-    auto other_transform = other->get_component<TransformComponent>();
-    auto other_position = other_transform->get_position();
+    auto other_transform = other->component<TransformComponent>();
+    auto other_position = other_transform->position();
 
-    center_ = transform_->get_position();
+    center_ = transform_->position();
 
     float distance = Vector3Distance(center_, other_position);
     float distanceFactor = 1.0f - Clamp(distance / radius_, 0.8f, 1.0f);
@@ -59,9 +59,9 @@ void GravityComponent::on_trigger_stay(GameObject* other) {
 }
 
 void GravityComponent::on_trigger_exit(GameObject* other) {
-    auto control = other->get_component<ControlComponent>();
+    auto control = other->component<ControlComponent>();
     if (!control) return;
-    auto camera_profile = camera_->get_profile_id();
+    auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_IN_GRAVITY) {
         camera_->switch_profile(CameraComponent::CP_DEFAULT);
     }

@@ -10,11 +10,11 @@ GBoostComponent::GBoostComponent(GameObject* owner) : Component(owner) {
 GBoostComponent::~GBoostComponent() = default;
 
 void GBoostComponent::start() {
-    physics_ = owner_->get_component<PhysicsComponent>();
+    physics_ = owner_->component<PhysicsComponent>();
 }
 
 void GBoostComponent::on_trigger_stay(GameObject* other) {
-    auto gravity = other->get_component<GravityComponent>();
+    auto gravity = other->component<GravityComponent>();
     if (!gravity || !physics_) return;
 
     float gravity_amp = gravity->force_amp();

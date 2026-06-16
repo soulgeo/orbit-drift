@@ -10,28 +10,36 @@ namespace Sputnik {
 
     InputHandler::~InputHandler() = default;
 
-    void InputHandler::bind_key(int key, InputType type, int command) {
+    void InputHandler::bind_key(int key, InputType type, int action_id) {
         bindings_[key].first = type;
-        bindings_[key].second = command;
+        bindings_[key].second = action_id;
         active_key_codes_.push_back({key, type});
     }
 
-    InputHandler::CommandList InputHandler::handle_input() {
-        CommandList list;
+    void InputHandler::update() {
+        active_actions_.count = 0;
 
         for (auto pair : active_key_codes_) {
-            if (list.count >= MAX_SIMULTANEOUS_INPUTS) break;
+            if (active_actions_.count >= MAX_SIMULTANEOUS_INPUTS) break;
             auto key = pair.first;
             auto inputType = pair.second;
 
             if ((inputType == DOWN && IsKeyDown(key)) || 
                 (inputType == PRESSED && IsKeyPressed(key))) {
 
-                int cmd = bindings_[key].second; 
-                list.commands[list.count++] = cmd;
+                int action = bindings_[key].second; 
+                active_actions_.commands[active_actions_.count++] = action;
             }
         }
-        return list;
+    }
+
+    bool InputHandler::is_action_active(int action_id) const {
+        for (size_t i = 0; i < active_actions_.count; ++i) {
+            if (active_actions_.commands[i] == action_id) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

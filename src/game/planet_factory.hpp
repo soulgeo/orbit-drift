@@ -4,6 +4,13 @@
 #include "sputnik/core/resource_manager.hpp"
 #include <memory>
 
+namespace Sputnik {
+    class Engine;
+    class Renderer;
+    class ResourceManager;
+    class Physics;
+}
+
 class PlanetFactory {
     Sputnik::Renderer* renderer_;
     Sputnik::ResourceManager* rsrc_manager_;
@@ -11,7 +18,7 @@ class PlanetFactory {
     Sputnik::Physics* physics_;
 
 public:
-    PlanetFactory(Sputnik::Engine* engine, Sputnik::Renderer* renderer, Sputnik::Physics* physics, Sputnik::ResourceManager* rsrc_manager);
+    PlanetFactory(Sputnik::Engine* engine);
     ~PlanetFactory() {};
 
     std::unique_ptr<Sputnik::GameObject> create(

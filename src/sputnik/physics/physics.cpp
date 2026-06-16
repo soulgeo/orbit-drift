@@ -32,7 +32,7 @@ namespace Sputnik {
     }
 
     void Physics::update(Engine* engine) {
-        float f_dt = engine->get_fixed_dt();
+        float f_dt = engine->fixed_dt();
 
         for (auto i = bodies_.begin(); i != bodies_.end(); i++) {
             (*i)->calculate_physics(f_dt);

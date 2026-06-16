@@ -20,24 +20,27 @@ namespace Sputnik {
         components_.push_back(std::move(comp));
     }
 
-    size_t GameObject::get_component_count() const {
+    size_t GameObject::component_count() const {
         return components_.size();
     }
 
-    Component* GameObject::get_component_at(size_t index) const {
-        return components_[index].get();
+    Component* GameObject::component_at(size_t index) const {
+        if (index < components_.size()) {
+            return components_[index].get();
+        }
+        return nullptr;
     }
 
     TransformComponent& GameObject::transform() {
         return *transform_;
     }
 
-    Engine* GameObject::get_engine() {
+    Engine* GameObject::engine() {
         return engine_;
     }
 
     void GameObject::start() {
-        transform_ = get_component<TransformComponent>();
+        transform_ = component<TransformComponent>();
         for (auto i = components_.begin(); i != components_.end(); i++) {
             (*i)->start();
         }

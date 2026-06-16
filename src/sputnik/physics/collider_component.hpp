@@ -58,8 +58,8 @@ namespace Sputnik {
         void add_tracked_collider(ColliderComponent* collider);
         void remove_tracked_collider(ColliderComponent* collider);
 
-        size_t get_tracked_collider_count() const;
-        ColliderComponent* get_tracked_collider_at(size_t index) const;
+        size_t tracked_collider_count() const;
+        ColliderComponent* tracked_collider_at(size_t index) const;
 
         void start() override;
         void fixed_update() override;

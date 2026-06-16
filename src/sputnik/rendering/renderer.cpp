@@ -82,17 +82,25 @@ namespace Sputnik {
         camera_body_ = camera_body;
     }
 
+    void Renderer::set_show_debug(bool show) {
+        show_debug_ = show;
+    }
+
+    void Renderer::toggle_show_debug() {
+        show_debug_ = !show_debug_;
+    }
+
+    bool Renderer::is_showing_debug() const {
+        return show_debug_;
+    }
+
     void Renderer::render(Engine& engine) {
         if (camera_body_) {
-            camera_.position = camera_body_->get_visual_position();
-            camera_.projection = camera_body_->get_projection();
-            camera_.fovy = (float)camera_body_->get_fovy();
-            camera_.target = camera_body_->get_target();
-            camera_.up = camera_body_->get_camera_up();
-        }
-
-        if (engine.is_active_input(INPUT_DEBUG)) {
-            show_debug_ = !show_debug_;
+            camera_.position = camera_body_->visual_position();
+            camera_.projection = camera_body_->projection();
+            camera_.fovy = (float)camera_body_->fovy();
+            camera_.target = camera_body_->target();
+            camera_.up = camera_body_->camera_up();
         }
 
         BeginDrawing();
@@ -111,8 +119,8 @@ namespace Sputnik {
 
         Vector3 camera_pos = camera_.position;
         std::sort(transparent_renderables_.begin(), transparent_renderables_.end(), [camera_pos](const RenderableComponent* a, const RenderableComponent* b) {
-            float dist_sq_a = Vector3DistanceSqr(a->get_position(), camera_pos);
-            float dist_sq_b = Vector3DistanceSqr(b->get_position(), camera_pos);
+            float dist_sq_a = Vector3DistanceSqr(a->position(), camera_pos);
+            float dist_sq_b = Vector3DistanceSqr(b->position(), camera_pos);
             return dist_sq_a > dist_sq_b;
         });
 
@@ -126,8 +134,8 @@ namespace Sputnik {
             int x = 30;
             int y = 50;
             for (auto i = debugs_.begin(); i != debugs_.end(); i++){
-                for (int j = 0; j < (*i)->get_line_count(); ++j) {
-                    DrawText((*i)->get_line(j), x, y, 20, YELLOW);
+                for (int j = 0; j < (*i)->line_count(); ++j) {
+                    DrawText((*i)->line(j), x, y, 20, YELLOW);
                     y += 25;
                 }
             }

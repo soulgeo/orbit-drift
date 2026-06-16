@@ -3,7 +3,7 @@
 #include "gravity_component.hpp"
 #include <raylib.h>
 #include "sputnik/rendering/renderable_component.hpp"
-#include "spytnik/physics/collider_component.hpp"
+#include "sputnik/physics/collider_component.hpp"
 #include <raymath.h>
 #include "sputnik/rendering/renderer.hpp"
 #include "sputnik/ecs/transform_component.hpp"
@@ -12,8 +12,12 @@
 
 using namespace Sputnik;
 
-PlanetFactory::PlanetFactory(Engine* engine, Renderer* renderer, Physics* physics, ResourceManager* rsrc_manager) : 
-    engine_(engine), renderer_(renderer), physics_(physics), rsrc_manager_(rsrc_manager) {}
+PlanetFactory::PlanetFactory(Engine* engine) : 
+    engine_(engine) {
+    renderer_ = &engine->renderer();
+    physics_ = &engine->physics();
+    rsrc_manager_ = &engine->resource_manager();
+}
 
 std::unique_ptr<GameObject> PlanetFactory::create(
     Vector3 position, 
@@ -23,7 +27,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     Color color
 ) {
     auto planet = std::make_unique<GameObject>(engine_);
-    planet->get_component<TransformComponent>()->set_position(position);
+    planet->component<TransformComponent>()->set_position(position);
 
     auto planet_gravity = std::make_unique<GravityComponent>(
             planet.get(), gravity_radius, gravity_force_amp
