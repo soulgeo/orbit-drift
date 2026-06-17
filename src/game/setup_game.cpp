@@ -1,35 +1,17 @@
+#include "game_input.hpp"
+#include "setup_game.hpp"
 #include <raylib.h>
 #include <raymath.h>
 
-#include "sputnik/core/engine.hpp"
-#include "sputnik/ecs/scene.hpp"
-#include "game_input.hpp"
-#include "sputnik/rendering/camera_component.hpp"
 #include "game/control_component.hpp"
-#include "sputnik/rendering/debug_component.hpp"
 #include "game/g_boost_component.hpp"
-#include "sputnik/physics/physics_component.hpp"
 #include "game/planet_factory.hpp"
 #include "game/global_control_component.hpp"
-#include "sputnik/rendering/renderable_component.hpp"
-#include "sputnik/rendering/renderer.hpp"
-#include "sputnik/core/resource_manager.hpp"
-#include "sputnik/physics/physics.hpp"
 
+namespace OrbitDrift {
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
-
-using namespace Sputnik;
-
-int main() {
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Orbit Drift");
-    SetTargetFPS(144);
-
-    Engine engine;
-    
-    // Bind keys to game actions
+void bind_inputs(Sputnik::Engine& engine) {
+    using namespace Sputnik;
     auto& input = engine.input_handler();
     input.bind_key(KEY_SPACE, DOWN, INPUT_MOVE_UP);
     input.bind_key(KEY_LEFT_SHIFT, DOWN, INPUT_MOVE_DOWN);
@@ -41,31 +23,37 @@ int main() {
     input.bind_key(KEY_Q, DOWN, INPUT_ROLL_CCW);
     input.bind_key(KEY_LEFT_ALT, PRESSED, INPUT_PAUSE);
     input.bind_key(KEY_F3, PRESSED, INPUT_DEBUG);
+}
 
-    // Initialize scene
-    auto scene = std::make_unique<Scene>(&engine);
 
-    ResourceManager* rsrc_manager = &engine.resource_manager();
-    Renderer* renderer = &engine.renderer();
-    Physics* physics = &engine.physics();
+std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
+    using namespace Sputnik;
 
-    auto player = std::make_unique<GameObject>(&engine);
+    auto scene = std::make_unique<Scene>(engine);
+
+    ResourceManager* rsrc_manager = &engine->resource_manager();
+    Renderer* renderer = &engine->renderer();
+    Physics* physics = &engine->physics();
+
+    // Player setup
+    auto player = std::make_unique<GameObject>(engine);
     auto player_model = rsrc_manager->load_model("resources/models/scene.gltf");
     auto texture = rsrc_manager->load_texture("resources/models/textures/Material_baseColor.png");
     player_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
     player_model.transform *= MatrixRotateX(180.0f * DEG2RAD) 
         * MatrixRotateZ(180.0f * DEG2RAD) 
         * MatrixScale(0.2f, 0.2f, 0.2f);
+    
     auto player_rend = std::make_unique<RenderableComponent>(player.get(), renderer, player_model);
     player_rend->set_initial_transform(player_model.transform);
     player_rend->set_color(RAYWHITE);
-
     player->add_component(std::move(player_rend));
 
     auto player_physics = std::make_unique<PhysicsComponent>(
         player.get(), physics, Vector3Zero(), Vector3Zero(), 10.0f);    
     player_physics->set_drag(10.0f);
     player->add_component(std::move(player_physics));
+    
     player->add_component(std::make_unique<ColliderComponent>(
         player.get(), physics, Vector3Zero(), 2.0f, true));
     player->add_component(std::make_unique<ControlComponent>(player.get()));
@@ -74,7 +62,8 @@ int main() {
 
     scene->add_game_object("player", std::move(player));
 
-    auto planet_factory = PlanetFactory(&engine);
+    // Planets
+    PlanetFactory planet_factory(engine);
     scene->add_game_object("planet1", planet_factory.create(
         (Vector3){-60.0f, 10.0f, -500.0f}, 40.0f, 200.0f, 7500.0f, PURPLE));
     scene->add_game_object("planet2", planet_factory.create(
@@ -84,7 +73,8 @@ int main() {
     scene->add_game_object("planet4", planet_factory.create(
         (Vector3){240.0f, -140.0f, -4500.0f}, 20.0f, 120.0f, 4500.0f, BLUE));
 
-    auto camera_body = std::make_unique<GameObject>(&engine);
+    // Camera setup
+    auto camera_body = std::make_unique<GameObject>(engine);
     camera_body->add_component(
         std::make_unique<CameraComponent>(camera_body.get(), scene.get(), renderer)
     );
@@ -97,11 +87,7 @@ int main() {
     
     scene->add_game_object("camera_body", std::move(camera_body));
 
-    engine.set_scene(std::move(scene));
+    return scene;
+}
 
-    engine.run();
-
-    CloseWindow();
-
-    return 0;
 }

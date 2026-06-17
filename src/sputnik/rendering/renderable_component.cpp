@@ -53,7 +53,7 @@ namespace Sputnik {
         initial_transform_ = transform;
     }
 
-    void RenderableComponent::start() {
+    void RenderableComponent::init() {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();
     }

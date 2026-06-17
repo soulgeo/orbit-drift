@@ -1,9 +1,7 @@
 #ifndef GBOOST_COMPONENT_HPP
 #define GBOOST_COMPONENT_HPP
 
-#include "sputnik/ecs/component.hpp"
-#include "sputnik/ecs/game_object.hpp"
-#include "sputnik/physics/physics_component.hpp"
+#include <sputnik.hpp>
 
 class GBoostComponent : public Sputnik::Component {
     Sputnik::PhysicsComponent* physics_;
@@ -13,7 +11,7 @@ public:
     GBoostComponent(Sputnik::GameObject* owner);
     ~GBoostComponent();
 
-    void start() override;
+    void init() override;
     void on_trigger_stay(Sputnik::GameObject* other) override;
     void on_trigger_exit(Sputnik::GameObject* other) override;
 

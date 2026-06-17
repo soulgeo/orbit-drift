@@ -1,13 +1,9 @@
 #include "planet_factory.hpp"
-#include "sputnik/ecs/game_object.hpp"
+#include <sputnik.hpp>
+#include "events/event_component.hpp"
 #include "gravity_component.hpp"
 #include <raylib.h>
-#include "sputnik/rendering/renderable_component.hpp"
-#include "sputnik/physics/collider_component.hpp"
 #include <raymath.h>
-#include "sputnik/rendering/renderer.hpp"
-#include "sputnik/ecs/transform_component.hpp"
-#include "sputnik/core/engine.hpp"
 #include <memory>
 
 using namespace Sputnik;
@@ -17,6 +13,7 @@ PlanetFactory::PlanetFactory(Engine* engine) :
     renderer_ = &engine->renderer();
     physics_ = &engine->physics();
     rsrc_manager_ = &engine->resource_manager();
+    event_dsp_ = &engine->event_dsp();
 }
 
 std::unique_ptr<GameObject> PlanetFactory::create(
@@ -61,6 +58,7 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     planet->add_component(std::move(planet_gravity));
     planet->add_component(std::move(planet_collider));
     planet->add_component(std::make_unique<DebugComponent>(planet.get(), renderer_));
+    planet->add_component(std::make_unique<EventComponent>(planet.get(), event_dsp_));
 
     return std::move(planet);
 }

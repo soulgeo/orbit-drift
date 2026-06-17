@@ -1,5 +1,6 @@
-#ifndef COMPONENT_HPP
-#define COMPONENT_HPP
+#pragma once
+
+#include "events/event.hpp"
 
 namespace Sputnik {
 
@@ -13,7 +14,7 @@ namespace Sputnik {
         Component(GameObject* owner);
         virtual ~Component();
 
-        virtual void start();
+        virtual void init();
         virtual void early_update();
         virtual void fixed_update();
         virtual void update();
@@ -25,8 +26,8 @@ namespace Sputnik {
         virtual void on_trigger_enter(GameObject* other);
         virtual void on_trigger_stay(GameObject* other);
         virtual void on_trigger_exit(GameObject* other);
+
+        virtual void on_event(Event event);
     };
 
 }
-
-#endif // COMPONENT_HPP

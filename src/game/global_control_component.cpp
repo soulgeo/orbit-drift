@@ -1,6 +1,6 @@
 #include "global_control_component.hpp"
-#include "sputnik/ecs/game_object.hpp"
-#include "sputnik/core/engine.hpp"
+#include <sputnik.hpp>
+#include <sputnik.hpp>
 #include "game_input.hpp"
 
 namespace Sputnik {

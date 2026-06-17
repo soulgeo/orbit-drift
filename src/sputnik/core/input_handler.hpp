@@ -1,5 +1,4 @@
-#ifndef INPUTHANDLER_HPP
-#define INPUTHANDLER_HPP
+#pragma once
 
 #include <array>
 #include <cstddef>
@@ -38,5 +37,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // INPUTHANDLER_HPP

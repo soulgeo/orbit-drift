@@ -1,5 +1,4 @@
-#ifndef GAMEOBJECT_HPP
-#define GAMEOBJECT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include <vector>
@@ -34,7 +33,7 @@ namespace Sputnik {
             return nullptr;
         }
 
-        void start();
+        void init();
         void early_update();
         void fixed_update();
         void update();
@@ -53,5 +52,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // GAMEOBJECT_HPP

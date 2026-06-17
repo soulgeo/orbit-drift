@@ -1,5 +1,4 @@
-#ifndef SCENE_HPP
-#define SCENE_HPP
+#pragma once
 
 #include "sputnik/ecs/game_object.hpp"
 #include <unordered_map>
@@ -29,5 +28,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // SCENE_HPP

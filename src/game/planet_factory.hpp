@@ -1,21 +1,13 @@
-#include "sputnik/ecs/game_object.hpp"
-#include "sputnik/physics/physics.hpp"
-#include "sputnik/rendering/renderer.hpp"
-#include "sputnik/core/resource_manager.hpp"
+#include "events/event_dispatcher.hpp"
+#include <sputnik.hpp>
 #include <memory>
-
-namespace Sputnik {
-    class Engine;
-    class Renderer;
-    class ResourceManager;
-    class Physics;
-}
 
 class PlanetFactory {
     Sputnik::Renderer* renderer_;
     Sputnik::ResourceManager* rsrc_manager_;
     Sputnik::Engine* engine_;
     Sputnik::Physics* physics_;
+    Sputnik::EventDispatcher* event_dsp_;
 
 public:
     PlanetFactory(Sputnik::Engine* engine);

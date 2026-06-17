@@ -1,4 +1,5 @@
 #include "sputnik/core/engine.hpp"
+#include "events/event_dispatcher.hpp"
 #include "sputnik/ecs/game_object.hpp"
 #include "sputnik/rendering/renderer.hpp"
 #include "sputnik/core/resource_manager.hpp"
@@ -10,7 +11,10 @@
 namespace Sputnik {
 
     Engine::Engine() : 
-        renderer_(Renderer()), physics_(Physics()), rsrc_manager_(ResourceManager())
+        rsrc_manager_(ResourceManager()),
+        renderer_(Renderer()), 
+        physics_(Physics()), 
+        event_dsp_(EventDispatcher())
     {
         is_running_ = true;
         is_paused_ = false;
@@ -32,6 +36,10 @@ namespace Sputnik {
 
     InputHandler& Engine::input_handler() {
         return input_handler_;
+    }
+    
+    EventDispatcher& Engine::event_dsp() {
+        return event_dsp_;
     }
 
     bool Engine::is_paused() const {
@@ -63,7 +71,7 @@ namespace Sputnik {
     }
 
     void Engine::run() {
-        start();
+        init();
         while (is_running_ && !WindowShouldClose()) {
             process_input();
             update();
@@ -71,9 +79,9 @@ namespace Sputnik {
         }
     }
 
-    void Engine::start() {
+    void Engine::init() {
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
-            obj.start();
+            obj.init();
         });
     }
 
@@ -87,10 +95,12 @@ namespace Sputnik {
 
         Timer timer("Engine::update");
 
+        // Early updates
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.early_update();
         });
 
+        // Fixed updates
         dt_ = GetFrameTime();
         accumulator_ += dt_;
         while (accumulator_ >= fixed_dt_){
@@ -98,13 +108,16 @@ namespace Sputnik {
                 obj.fixed_update();
             });
             physics_.update(this);
+            event_dsp_.update();
             accumulator_ -= fixed_dt_;
         }
 
+        // Updates
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.update();
         });
 
+        // Late updates
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.late_update();
         });

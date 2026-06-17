@@ -1,6 +1,6 @@
-#ifndef ENGINE_HPP
-#define ENGINE_HPP
+#pragma once
 
+#include "events/event_dispatcher.hpp"
 #include "sputnik/core/input_handler.hpp"
 #include "sputnik/physics/physics.hpp"
 #include "sputnik/rendering/renderer.hpp"
@@ -17,15 +17,16 @@ namespace Sputnik {
         Physics physics_;
         ResourceManager rsrc_manager_;
         InputHandler input_handler_;
+        EventDispatcher event_dsp_;
 
         std::unique_ptr<Scene> scene_;
         bool is_running_;
         bool is_paused_;
-        float dt_;
-        float fixed_dt_ = 0.005f;
+        float dt_;                   // Delta Time between frames
+        float fixed_dt_ = 0.005f;    // Delta Time between fixed updates
         float accumulator_ = 0.0f;
 
-        void start();
+        void init();
 
         void process_input();
         void update();
@@ -39,6 +40,7 @@ namespace Sputnik {
         ResourceManager& resource_manager();
         Physics& physics();
         InputHandler& input_handler();
+        EventDispatcher& event_dsp();
 
         void toggle_pause();
         bool is_paused() const;
@@ -53,5 +55,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // !ENGINE_HPP

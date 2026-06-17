@@ -1,5 +1,4 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#pragma once
 
 #include <raylib.h>
 #include <vector>
@@ -45,5 +44,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // !RENDERER_HPP

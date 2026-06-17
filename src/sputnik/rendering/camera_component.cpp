@@ -77,7 +77,7 @@ namespace Sputnik {
         trans_iter_ = 0;
     }
 
-    void CameraComponent::start() {
+    void CameraComponent::init() {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();
 

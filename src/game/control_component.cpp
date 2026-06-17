@@ -1,7 +1,5 @@
 #include "control_component.hpp"
-#include "sputnik/ecs/game_object.hpp"
-#include "sputnik/ecs/transform_component.hpp"
-#include "sputnik/core/engine.hpp"
+#include <sputnik.hpp>
 #include "game_input.hpp"
 
 using namespace Sputnik;
@@ -16,7 +14,7 @@ ControlComponent::ControlComponent(GameObject* owner) : Component(owner) {
 
 ControlComponent::~ControlComponent() = default;
 
-void ControlComponent::start() {
+void ControlComponent::init() {
     transform_ = owner_->component<TransformComponent>();
     physics_ = owner_->component<PhysicsComponent>();
 }

@@ -1,5 +1,4 @@
-#ifndef PHYSICS_COMPONENT_HPP
-#define PHYSICS_COMPONENT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include <raylib.h>
@@ -51,11 +50,8 @@ namespace Sputnik {
         void apply_force_local(Vector3 force);
         void clear_forces();
 
-        void start() override;
-        // void fixed_update() override;
+        void init() override;
         void late_update() override;
     };
 
 }
-
-#endif // !PHYSICS_COMPONENT_HPP

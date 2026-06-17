@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_COMPONENT_HPP
-#define TRANSFORM_COMPONENT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include <raylib.h>
@@ -65,5 +64,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // TRANSFORM_COMPONENT_HPP

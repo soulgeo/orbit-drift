@@ -1,5 +1,4 @@
-#ifndef DEBUG_COMPONENT_HPP
-#define DEBUG_COMPONENT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include "sputnik/rendering/renderer.hpp"
@@ -25,5 +24,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // DEBUG_HPP

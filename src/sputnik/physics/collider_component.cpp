@@ -122,7 +122,7 @@ namespace Sputnik {
         );
     }
 
-    void ColliderComponent::start() {
+    void ColliderComponent::init() {
         transform_ = owner_->component<TransformComponent>();
     }
 

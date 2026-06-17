@@ -9,7 +9,7 @@ GBoostComponent::GBoostComponent(GameObject* owner) : Component(owner) {
 
 GBoostComponent::~GBoostComponent() = default;
 
-void GBoostComponent::start() {
+void GBoostComponent::init() {
     physics_ = owner_->component<PhysicsComponent>();
 }
 

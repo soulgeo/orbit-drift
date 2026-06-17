@@ -1,5 +1,4 @@
-#ifndef PHYSICS_HPP
-#define PHYSICS_HPP
+#pragma once
 
 #include <vector>
 #include "sputnik/physics/physics_component.hpp"
@@ -32,5 +31,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // !PHYSICS_HPP

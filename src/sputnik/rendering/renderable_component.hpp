@@ -1,5 +1,4 @@
-#ifndef RENDERABLE_HPP
-#define RENDERABLE_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include <raylib.h>
@@ -22,7 +21,7 @@ namespace Sputnik {
         RenderableComponent(GameObject* owner, Renderer* renderer, Model& model);
         ~RenderableComponent();
 
-        void start() override;
+        void init() override;
         void update() override;
         void draw();
 
@@ -37,5 +36,3 @@ namespace Sputnik {
     };
 
 }
-
-#endif // !RENDERABLE_HPP

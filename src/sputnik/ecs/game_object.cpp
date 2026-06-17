@@ -39,10 +39,10 @@ namespace Sputnik {
         return engine_;
     }
 
-    void GameObject::start() {
+    void GameObject::init() {
         transform_ = component<TransformComponent>();
         for (auto i = components_.begin(); i != components_.end(); i++) {
-            (*i)->start();
+            (*i)->init();
         }
     }
 

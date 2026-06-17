@@ -28,7 +28,7 @@ ifeq ($(origin AR), default)
   AR = ar
 endif
 RESCOMP = windres
-INCLUDES += -Isrc -Isrc/game -Iinclude -Ibuild/external/raylib-master/src
+INCLUDES += -Isrc -Isrc/sputnik -Isrc/game -Iinclude -Ibuild/external/raylib-master/src
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
@@ -118,18 +118,24 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/application.o
+GENERATED += $(OBJDIR)/audio_component.o
+GENERATED += $(OBJDIR)/audio_manager.o
 GENERATED += $(OBJDIR)/camera_component.o
 GENERATED += $(OBJDIR)/collider_component.o
 GENERATED += $(OBJDIR)/component.o
 GENERATED += $(OBJDIR)/control_component.o
 GENERATED += $(OBJDIR)/debug_component.o
 GENERATED += $(OBJDIR)/engine.o
+GENERATED += $(OBJDIR)/entry_point.o
+GENERATED += $(OBJDIR)/event_component.o
+GENERATED += $(OBJDIR)/event_dispatcher.o
 GENERATED += $(OBJDIR)/g_boost_component.o
 GENERATED += $(OBJDIR)/game_object.o
 GENERATED += $(OBJDIR)/global_control_component.o
 GENERATED += $(OBJDIR)/gravity_component.o
 GENERATED += $(OBJDIR)/input_handler.o
-GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/orbit_drift.o
 GENERATED += $(OBJDIR)/physics.o
 GENERATED += $(OBJDIR)/physics_component.o
 GENERATED += $(OBJDIR)/planet_factory.o
@@ -137,20 +143,27 @@ GENERATED += $(OBJDIR)/renderable_component.o
 GENERATED += $(OBJDIR)/renderer.o
 GENERATED += $(OBJDIR)/resource_manager.o
 GENERATED += $(OBJDIR)/scene.o
+GENERATED += $(OBJDIR)/setup_game.o
 GENERATED += $(OBJDIR)/timer.o
 GENERATED += $(OBJDIR)/transform_component.o
+OBJECTS += $(OBJDIR)/application.o
+OBJECTS += $(OBJDIR)/audio_component.o
+OBJECTS += $(OBJDIR)/audio_manager.o
 OBJECTS += $(OBJDIR)/camera_component.o
 OBJECTS += $(OBJDIR)/collider_component.o
 OBJECTS += $(OBJDIR)/component.o
 OBJECTS += $(OBJDIR)/control_component.o
 OBJECTS += $(OBJDIR)/debug_component.o
 OBJECTS += $(OBJDIR)/engine.o
+OBJECTS += $(OBJDIR)/entry_point.o
+OBJECTS += $(OBJDIR)/event_component.o
+OBJECTS += $(OBJDIR)/event_dispatcher.o
 OBJECTS += $(OBJDIR)/g_boost_component.o
 OBJECTS += $(OBJDIR)/game_object.o
 OBJECTS += $(OBJDIR)/global_control_component.o
 OBJECTS += $(OBJDIR)/gravity_component.o
 OBJECTS += $(OBJDIR)/input_handler.o
-OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/orbit_drift.o
 OBJECTS += $(OBJDIR)/physics.o
 OBJECTS += $(OBJDIR)/physics_component.o
 OBJECTS += $(OBJDIR)/planet_factory.o
@@ -158,6 +171,7 @@ OBJECTS += $(OBJDIR)/renderable_component.o
 OBJECTS += $(OBJDIR)/renderer.o
 OBJECTS += $(OBJDIR)/resource_manager.o
 OBJECTS += $(OBJDIR)/scene.o
+OBJECTS += $(OBJDIR)/setup_game.o
 OBJECTS += $(OBJDIR)/timer.o
 OBJECTS += $(OBJDIR)/transform_component.o
 
@@ -235,13 +249,28 @@ $(OBJDIR)/global_control_component.o: src/game/global_control_component.cpp
 $(OBJDIR)/gravity_component.o: src/game/gravity_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/main.o: src/game/main.cpp
+$(OBJDIR)/orbit_drift.o: src/game/orbit_drift.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/planet_factory.o: src/game/planet_factory.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/setup_game.o: src/game/setup_game.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/audio_component.o: src/sputnik/audio/audio_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/audio_manager.o: src/sputnik/audio/audio_manager.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/application.o: src/sputnik/core/application.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/engine.o: src/sputnik/core/engine.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/entry_point.o: src/sputnik/core/entry_point.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/input_handler.o: src/sputnik/core/input_handler.cpp
@@ -263,6 +292,12 @@ $(OBJDIR)/scene.o: src/sputnik/ecs/scene.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/transform_component.o: src/sputnik/ecs/transform_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/event_component.o: src/sputnik/events/event_component.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/event_dispatcher.o: src/sputnik/events/event_dispatcher.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/collider_component.o: src/sputnik/physics/collider_component.cpp

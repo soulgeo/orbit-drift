@@ -1,7 +1,7 @@
 #ifndef GLOBAL_CONTROL_COMPONENT_HPP
 #define GLOBAL_CONTROL_COMPONENT_HPP
 
-#include "sputnik/ecs/component.hpp"
+#include <sputnik.hpp>
 
 namespace Sputnik {
     class GlobalControlComponent : public Component {

@@ -1,11 +1,9 @@
 #include "gravity_component.hpp"
-#include "sputnik/rendering/camera_component.hpp"
+#include "events/event_component.hpp"
 #include "game/control_component.hpp"
-#include "sputnik/physics/physics_component.hpp"
 #include <raylib.h>
 #include <raymath.h>
-#include "sputnik/ecs/transform_component.hpp"
-#include "sputnik/core/engine.hpp"
+#include <sputnik.hpp>
 
 using namespace Sputnik;
 
@@ -17,9 +15,10 @@ GravityComponent::GravityComponent(GameObject* owner, float radius, float force_
 
 GravityComponent::~GravityComponent() {}
 
-void GravityComponent::start() {
+void GravityComponent::init() {
     transform_ = owner_->component<TransformComponent>();
     debug_ = owner_->component<DebugComponent>();
+    event_ = owner_->component<EventComponent>();
 
     Scene& scene = owner_->engine()->scene();
     GameObject* camera_body = scene.game_object("camera_body");
@@ -36,6 +35,9 @@ void GravityComponent::late_update() {
 void GravityComponent::on_trigger_enter(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
+
+    event_->send((Event){"in_gravity"});
+
     auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_DEFAULT) {
         camera_->switch_profile(CameraComponent::CP_IN_GRAVITY);
@@ -61,6 +63,9 @@ void GravityComponent::on_trigger_stay(GameObject* other) {
 void GravityComponent::on_trigger_exit(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
+
+    event_->send((Event){"out_gravity"});
+
     auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_IN_GRAVITY) {
         camera_->switch_profile(CameraComponent::CP_DEFAULT);

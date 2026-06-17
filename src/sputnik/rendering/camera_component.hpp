@@ -1,5 +1,4 @@
-#ifndef CAMERA_COMPONENT_HPP
-#define CAMERA_COMPONENT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include "sputnik/ecs/game_object.hpp"
@@ -72,12 +71,10 @@ namespace Sputnik {
 
         void switch_profile(int target_profile);
 
-        void start() override;
+        void init() override;
 
         void fixed_update() override;
         void update() override;
     };
 
 }
-
-#endif // !CAMERA_COMPONENT_HPP

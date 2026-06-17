@@ -1,5 +1,4 @@
-#ifndef COLLIDER_COMPONENT_HPP
-#define COLLIDER_COMPONENT_HPP
+#pragma once
 
 #include "sputnik/ecs/component.hpp"
 #include "sputnik/ecs/game_object.hpp"
@@ -61,10 +60,8 @@ namespace Sputnik {
         size_t tracked_collider_count() const;
         ColliderComponent* tracked_collider_at(size_t index) const;
 
-        void start() override;
+        void init() override;
         void fixed_update() override;
     };
 
 }
-
-#endif // !COLLIDER_COMPONENT_HPP

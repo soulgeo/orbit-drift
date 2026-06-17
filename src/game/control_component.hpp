@@ -1,9 +1,7 @@
 #ifndef CONTROL_COMPONENT_HPP
 #define CONTROL_COMPONENT_HPP
 
-#include "sputnik/ecs/component.hpp"
-#include "sputnik/physics/physics_component.hpp"
-#include "sputnik/ecs/transform_component.hpp"
+#include <sputnik.hpp>
 
 class ControlComponent : public Sputnik::Component {
     int x_axis_;
@@ -25,7 +23,7 @@ public:
     ControlComponent(Sputnik::GameObject* owner);
     ~ControlComponent();
 
-    void start() override;
+    void init() override;
     void early_update() override;
     void fixed_update() override;
 };

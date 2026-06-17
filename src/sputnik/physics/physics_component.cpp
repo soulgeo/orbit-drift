@@ -86,7 +86,7 @@ namespace Sputnik {
         forces_.clear();
     }
 
-    void PhysicsComponent::start() {
+    void PhysicsComponent::init() {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();
     }
