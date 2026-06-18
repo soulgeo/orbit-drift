@@ -43,17 +43,17 @@ Texture2D ResourceManager::load_texture(const char* path) {
 }
 
 Sound ResourceManager::load_sound(const char* path) {
-    if (textures_.count(path)) {
+    if (sounds_.count(path)) {
         return sounds_[path];
     }
 
-    Texture2D texture = ::LoadTexture(path);
-    if (texture.id == 0) {
-        std::cerr << "ERROR: Failed to load texture: " << path << std::endl;
+    Sound sound = ::LoadSound(path);
+    if (sound.frameCount == 0) {
+        std::cerr << "ERROR: Failed to load sound: " << path << std::endl;
         return Sound{};
     }
 
-    textures_[path] = texture;
+    sounds_[path] = sound;
     return sounds_[path];
 }
 

@@ -12,7 +12,6 @@ namespace Sputnik {
 
     class GameObject {
         std::vector<std::unique_ptr<Component>> components_;
-        TransformComponent* transform_;
         Engine* engine_;
 
     public:
@@ -45,8 +44,6 @@ namespace Sputnik {
         void on_trigger_enter(GameObject* other);
         void on_trigger_stay(GameObject* other);
         void on_trigger_exit(GameObject* other);
-
-        TransformComponent& transform();
 
         Engine* engine();
     };

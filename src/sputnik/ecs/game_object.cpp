@@ -1,3 +1,4 @@
+#include "rendering/debug_component.hpp"
 #include "sputnik/core/engine.hpp"
 #include "sputnik/ecs/transform_component.hpp"
 #include "sputnik/ecs/game_object.hpp"
@@ -8,10 +9,13 @@ namespace Sputnik {
 
     GameObject::GameObject(Engine* engine) {
         engine_ = engine;
+        auto renderer = engine->renderer();
 
-        auto transform_comp = std::make_unique<TransformComponent>(this, engine_);
-        transform_ = transform_comp.get();
-        add_component(std::move(transform_comp));
+        auto transform = std::make_unique<TransformComponent>(this, engine_);
+        add_component(std::move(transform));
+
+        auto debug = std::make_unique<DebugComponent>(this, &renderer);
+        add_component(std::move(debug));
     }
 
     GameObject::~GameObject() = default;
@@ -31,16 +35,11 @@ namespace Sputnik {
         return nullptr;
     }
 
-    TransformComponent& GameObject::transform() {
-        return *transform_;
-    }
-
     Engine* GameObject::engine() {
         return engine_;
     }
 
     void GameObject::init() {
-        transform_ = component<TransformComponent>();
         for (auto i = components_.begin(); i != components_.end(); i++) {
             (*i)->init();
         }

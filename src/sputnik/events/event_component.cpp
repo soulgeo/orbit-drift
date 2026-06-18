@@ -9,7 +9,8 @@ EventComponent::EventComponent(GameObject* owner, EventDispatcher* event_dsp) :
 
 EventComponent::~EventComponent() = default;
 
-void EventComponent::send(Event event) {
+void EventComponent::send(std::string_view message) {
+    Event event = {std::string(message), owner_};
     event_dsp_->add_event(event);
 }
 

@@ -6,7 +6,7 @@ namespace Sputnik {
 
     class Application {
     protected:
-        Engine engine_;
+        std::unique_ptr<Engine> engine_;
 
     public:
         Application(const char* name);

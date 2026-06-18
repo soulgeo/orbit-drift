@@ -12,7 +12,7 @@ public:
     EventComponent(GameObject* owner, EventDispatcher* event_dsp);
     ~EventComponent();
 
-    void send(Event event);
+    void send(std::string_view message);
 };
 
 }

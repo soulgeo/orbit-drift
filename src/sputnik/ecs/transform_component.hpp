@@ -29,7 +29,7 @@ namespace Sputnik {
         Vector3 up() const;
         Vector3 right() const;
 
-        Quaternion rotation() const;
+        Quaternion orientation() const;
 
         // Setters
         void set_position_x(float x);
@@ -38,7 +38,7 @@ namespace Sputnik {
         void set_position(float x, float y, float z);
         void set_position(Vector3 position);
 
-        void set_rotation(Quaternion rotation);
+        void set_orientation(Quaternion orientation);
 
         // Global Movement
         virtual void move_global_x(float deltaX);

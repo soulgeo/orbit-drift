@@ -36,7 +36,7 @@ void GravityComponent::on_trigger_enter(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
 
-    event_->send((Event){"in_gravity"});
+    event_->send("enter_gravity");
 
     auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_DEFAULT) {
@@ -64,7 +64,7 @@ void GravityComponent::on_trigger_exit(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
 
-    event_->send((Event){"out_gravity"});
+    event_->send("exit_gravity");
 
     auto camera_profile = camera_->profile_id();
     if (camera_profile == CameraComponent::CP_IN_GRAVITY) {

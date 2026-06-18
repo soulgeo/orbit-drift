@@ -57,7 +57,6 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     planet->add_component(std::move(planet_gravity_rend));
     planet->add_component(std::move(planet_gravity));
     planet->add_component(std::move(planet_collider));
-    planet->add_component(std::make_unique<DebugComponent>(planet.get(), renderer_));
     planet->add_component(std::make_unique<EventComponent>(planet.get(), event_dsp_));
 
     return std::move(planet);

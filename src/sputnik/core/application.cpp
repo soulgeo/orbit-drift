@@ -11,15 +11,21 @@ namespace Sputnik {
 
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, name);
         SetTargetFPS(144);
+
+        InitAudioDevice();
+
+        engine_ = std::make_unique<Engine>();
     }
 
     Application::~Application() {
+        engine_.reset();
+        CloseAudioDevice();
         CloseWindow();
     }
 
     void Application::run() {
         startup();
-        engine_.run();
+        engine_->run();
     }
 
 }

@@ -19,7 +19,10 @@
 
 namespace Sputnik {
 
-    Renderer::Renderer() : show_debug_(false){
+    Renderer::Renderer() : 
+        camera_body_(nullptr),
+        show_debug_(false)
+    {
     }
 
     void Renderer::register_renderable(RenderableComponent* renderable) {

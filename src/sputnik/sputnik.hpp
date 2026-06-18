@@ -25,4 +25,7 @@
 #include "physics/collider_component.hpp"
 
 // Audio
-#include "audio/audio_component.hpp"
+#include "audio/audio_source_component.hpp"
+#include "audio/audio_listener_component.hpp"
+#include "audio/audio_manager.hpp"
+#include "audio/audio_mixer.hpp"

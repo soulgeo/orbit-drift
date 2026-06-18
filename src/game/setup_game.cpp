@@ -1,12 +1,14 @@
+#include "audio/audio_listener_component.hpp"
+#include "audio/audio_source_component.hpp"
 #include "game_input.hpp"
 #include "setup_game.hpp"
+#include <memory>
 #include <raylib.h>
 #include <raymath.h>
 
 #include "game/control_component.hpp"
 #include "game/g_boost_component.hpp"
 #include "game/planet_factory.hpp"
-#include "game/global_control_component.hpp"
 
 namespace OrbitDrift {
 
@@ -25,7 +27,6 @@ void bind_inputs(Sputnik::Engine& engine) {
     input.bind_key(KEY_F3, PRESSED, INPUT_DEBUG);
 }
 
-
 std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
     using namespace Sputnik;
 
@@ -34,6 +35,7 @@ std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
     ResourceManager* rsrc_manager = &engine->resource_manager();
     Renderer* renderer = &engine->renderer();
     Physics* physics = &engine->physics();
+    EventDispatcher* event_dsp = &engine->event_dsp();
 
     // Player setup
     auto player = std::make_unique<GameObject>(engine);
@@ -57,8 +59,25 @@ std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
     player->add_component(std::make_unique<ColliderComponent>(
         player.get(), physics, Vector3Zero(), 2.0f, true));
     player->add_component(std::make_unique<ControlComponent>(player.get()));
-    player->add_component(std::make_unique<DebugComponent>(player.get(), renderer));
     player->add_component(std::make_unique<GBoostComponent>(player.get()));
+    
+    auto camera_body = scene->game_object("camera_body");
+    auto listener = camera_body->component<AudioListenerComponent>();
+
+    auto player_audio = std::make_unique<AudioSourceComponent>(player.get(), listener, event_dsp);
+    player_audio->add_sound(
+        "enter_gravity", rsrc_manager->load_sound("resources/audio/sfx/enter_orbit.wav")
+    );
+    player_audio->assign_sound_to_event(
+        "enter_gravity", "enter_gravity", SOUND_ACTION_PLAY
+    );
+    player_audio->add_sound(
+        "exit_gravity", rsrc_manager->load_sound("resources/audio/sfx/exit_orbit.wav")
+    );
+    player_audio->assign_sound_to_event(
+        "exit_gravity", "exit_gravity", SOUND_ACTION_PLAY
+    );
+    player->add_component(std::move(player_audio));
 
     scene->add_game_object("player", std::move(player));
 
@@ -72,20 +91,6 @@ std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
         (Vector3){600.0f, -60.0f, -2800.0f}, 160.0f, 480.0f, 15000.0f, YELLOW));
     scene->add_game_object("planet4", planet_factory.create(
         (Vector3){240.0f, -140.0f, -4500.0f}, 20.0f, 120.0f, 4500.0f, BLUE));
-
-    // Camera setup
-    auto camera_body = std::make_unique<GameObject>(engine);
-    camera_body->add_component(
-        std::make_unique<CameraComponent>(camera_body.get(), scene.get(), renderer)
-    );
-    camera_body->add_component(
-        std::make_unique<DebugComponent>(camera_body.get(), renderer)
-    );
-    camera_body->add_component(
-        std::make_unique<GlobalControlComponent>(camera_body.get())
-    );
-    
-    scene->add_game_object("camera_body", std::move(camera_body));
 
     return scene;
 }

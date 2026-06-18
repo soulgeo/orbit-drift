@@ -119,8 +119,9 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/application.o
-GENERATED += $(OBJDIR)/audio_component.o
+GENERATED += $(OBJDIR)/audio_listener_component.o
 GENERATED += $(OBJDIR)/audio_manager.o
+GENERATED += $(OBJDIR)/audio_source_component.o
 GENERATED += $(OBJDIR)/camera_component.o
 GENERATED += $(OBJDIR)/collider_component.o
 GENERATED += $(OBJDIR)/component.o
@@ -147,8 +148,9 @@ GENERATED += $(OBJDIR)/setup_game.o
 GENERATED += $(OBJDIR)/timer.o
 GENERATED += $(OBJDIR)/transform_component.o
 OBJECTS += $(OBJDIR)/application.o
-OBJECTS += $(OBJDIR)/audio_component.o
+OBJECTS += $(OBJDIR)/audio_listener_component.o
 OBJECTS += $(OBJDIR)/audio_manager.o
+OBJECTS += $(OBJDIR)/audio_source_component.o
 OBJECTS += $(OBJDIR)/camera_component.o
 OBJECTS += $(OBJDIR)/collider_component.o
 OBJECTS += $(OBJDIR)/component.o
@@ -258,10 +260,13 @@ $(OBJDIR)/planet_factory.o: src/game/planet_factory.cpp
 $(OBJDIR)/setup_game.o: src/game/setup_game.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/audio_component.o: src/sputnik/audio/audio_component.cpp
+$(OBJDIR)/audio_listener_component.o: src/sputnik/audio/audio_listener_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/audio_manager.o: src/sputnik/audio/audio_manager.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/audio_source_component.o: src/sputnik/audio/audio_source_component.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/application.o: src/sputnik/core/application.cpp

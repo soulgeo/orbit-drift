@@ -81,7 +81,15 @@ namespace Sputnik {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();
 
+        // Resolve null targets (e.g. if they weren't in the scene during constructor)
+        for (auto& profile : camera_profiles_) {
+            if (!profile.target) {
+                profile.target = engine_->scene().game_object("player");
+            }
+        }
+
         Profile& active = camera_profiles_[active_profile_id_];
+        if (!active.target) return;
         
         // Initialize current state from active profile
         curr_state_.pos_offset = active.pos_offset;
@@ -92,12 +100,12 @@ namespace Sputnik {
 
         // Get target transform info
         GameObject& camera_target = *active.target;
-        TransformComponent& camera_target_transform = camera_target.transform();
+        auto camera_target_transform = camera_target.component<TransformComponent>();
 
-        Vector3 target_position = camera_target_transform.position();
-        Vector3 target_forward = camera_target_transform.forward();
-        Vector3 target_up = camera_target_transform.up();
-        Vector3 target_right = camera_target_transform.right();
+        Vector3 target_position = camera_target_transform->position();
+        Vector3 target_forward = camera_target_transform->forward();
+        Vector3 target_up = camera_target_transform->up();
+        Vector3 target_right = camera_target_transform->right();
 
         // Calculate initial target position
         Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
@@ -132,6 +140,7 @@ namespace Sputnik {
         prev_up_ = up_;
 
         Profile& active = camera_profiles_[active_profile_id_];
+        if (!active.target) return;
 
         // If new transition is starting, save the current camera state
         if (new_profile_id_ >= 0 && trans_iter_ == 0) {
@@ -181,12 +190,12 @@ namespace Sputnik {
 
         // Update Camera Target
         GameObject& camera_target = *active.target;
-        TransformComponent& camera_target_transform = camera_target.transform();
+        auto camera_target_transform = camera_target.component<TransformComponent>();
 
-        Vector3 target_position = camera_target_transform.position();
-        Vector3 target_forward = camera_target_transform.forward();
-        Vector3 target_up = camera_target_transform.up();
-        Vector3 target_right = camera_target_transform.right();
+        Vector3 target_position = camera_target_transform->position();
+        Vector3 target_forward = camera_target_transform->forward();
+        Vector3 target_up = camera_target_transform->up();
+        Vector3 target_right = camera_target_transform->right();
 
         float follow_speed = 100.0f;
 

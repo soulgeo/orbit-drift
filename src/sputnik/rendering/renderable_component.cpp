@@ -16,7 +16,6 @@ namespace Sputnik {
      
     RenderableComponent::~RenderableComponent() {
         renderer_->unregister_renderable(this);
-        UnloadModel(model_);
     }
 
     Vector3 RenderableComponent::position() const {

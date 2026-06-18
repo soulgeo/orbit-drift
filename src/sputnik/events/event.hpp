@@ -1,5 +1,13 @@
 #pragma once
 
+#include "ecs/game_object.hpp"
+#include <string>
+
+namespace Sputnik {
+
 struct Event {
-    const char* name;
+    std::string message;
+    GameObject* sender;
 };
+
+}

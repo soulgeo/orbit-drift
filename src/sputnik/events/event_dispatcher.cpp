@@ -10,6 +10,10 @@ void EventDispatcher::add_event(Event event) {
     events_.push_back(event);
 }
 
+void EventDispatcher::add_subscriber(Component* component) {
+    subscribers_.push_back(component);
+}
+
 void EventDispatcher::update() {
     for (auto i = events_.begin(); i != events_.end(); ++i){
         for (auto j = subscribers_.begin(); j != subscribers_.end(); ++j) {

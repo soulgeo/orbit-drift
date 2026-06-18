@@ -1,10 +1,9 @@
 #pragma once
 
-#include "events/event.hpp"
-
 namespace Sputnik {
 
     class GameObject;
+    class Event;
 
     class Component {
     protected:

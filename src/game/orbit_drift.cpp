@@ -6,9 +6,9 @@ namespace OrbitDrift {
         Application() : Sputnik::Application("Orbit Drift") {}
 
         virtual void startup() override {
-            bind_inputs(engine_);
-            auto scene = create_main_scene(&engine_);
-            engine_.set_scene(std::move(scene));
+            bind_inputs(*engine_);
+            auto scene = create_main_scene(engine_.get());
+            engine_->set_scene(std::move(scene));
         }
     };
 }

@@ -130,12 +130,12 @@ namespace Sputnik {
 
     //================================================================================== 
     // Global Rotation
-    Quaternion TransformComponent::rotation() const {
+    Quaternion TransformComponent::orientation() const {
         return QuaternionFromMatrix(transform_);
     }
 
-    void TransformComponent::set_rotation(Quaternion rotation) {
-        Matrix rotation_matrix = QuaternionToMatrix(rotation);
+    void TransformComponent::set_orientation(Quaternion orientation) {
+        Matrix rotation_matrix = QuaternionToMatrix(orientation);
         transform_ = rotation_matrix * transform_;
     }
 
