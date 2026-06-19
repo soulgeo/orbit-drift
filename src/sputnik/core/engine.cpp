@@ -5,14 +5,14 @@
 #include "sputnik/core/resource_manager.hpp"
 #include <memory>
 #include <string>
-#include "sputnik/core/timer.hpp"
+// #include "sputnik/core/timer.hpp"
 #include "sputnik/physics/physics.hpp"
 
 namespace Sputnik {
 
     Engine::Engine() : 
-        rsrc_manager_(ResourceManager()),
-        renderer_(Renderer()), 
+        resource_mgr_(ResourceManager()),
+        renderer_(Renderer(&resource_mgr_)), 
         physics_(Physics()), 
         event_dsp_(EventDispatcher())
     {
@@ -27,7 +27,7 @@ namespace Sputnik {
     }
 
     ResourceManager& Engine::resource_manager() {
-        return rsrc_manager_;
+        return resource_mgr_;
     }
 
     Physics& Engine::physics() {

@@ -33,6 +33,8 @@ namespace Sputnik {
         void set_alpha(float alpha);
         void set_draw_wires(bool draw_wires);
         void set_initial_transform(Matrix transform);
+
+        void set_model_shader(Shader shader);
     };
 
 }

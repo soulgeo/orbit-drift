@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/resource_manager.hpp"
 #include <raylib.h>
 #include <vector>
 
@@ -16,12 +17,12 @@ namespace Sputnik {
         std::vector<DebugComponent*> debugs_;
         Camera camera_ = {0};
         CameraComponent* camera_body_;
-        Shader fog_;
+        Shader shader_;
         float dt_;
         bool show_debug_;
 
     public:
-        Renderer();
+        Renderer(ResourceManager* resource_mgr);
         ~Renderer();
 
         void register_renderable(RenderableComponent* renderable);

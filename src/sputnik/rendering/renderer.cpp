@@ -1,8 +1,8 @@
 #include "sputnik/rendering/renderer.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <vector>
+#include "core/resource_manager.hpp"
 #include "sputnik/ecs/game_object.hpp"
 #include <raylib.h>
 #include "sputnik/rendering/camera_component.hpp"
@@ -11,24 +11,29 @@
 #include "sputnik/rendering/debug_component.hpp"
 
 #if defined(PLATFORM_DESKTOP)
-#define GLSL_VERSION 330
+    #define GLSL_VERSION 330
 #else
-#define GLSL_VERSION 100
+    #define GLSL_VERSION 100
 #endif
 
 #include <raymath.h>
 
 namespace Sputnik {
 
-    Renderer::Renderer() : 
+    Renderer::Renderer(ResourceManager* resource_mgr) : 
         camera_body_(nullptr),
         show_debug_(false)
     {
+        shader_ = resource_mgr->load_shader(
+            TextFormat("resources/shaders/ambient.vert", GLSL_VERSION),
+            TextFormat("resources/shaders/ambient.frag", GLSL_VERSION)
+        );
     }
 
     Renderer::~Renderer() = default;
 
     void Renderer::register_renderable(RenderableComponent* renderable) {
+        renderable->set_model_shader(shader_);
         if (renderable->alpha() >= 1.0f) {
             opaque_renderables_.push_back(renderable);
         } else {
@@ -106,6 +111,10 @@ namespace Sputnik {
             camera_.target = camera_body_->target();
             camera_.up = camera_body_->camera_up();
         }
+        int distLoc = GetShaderLocation(shader_, "viewPos");
+        SetShaderValue(shader_, distLoc, &camera_.position, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader_, shader_.locs[SHADER_LOC_VECTOR_VIEW], &camera_.position,
+                       SHADER_UNIFORM_VEC3);
 
         BeginDrawing();
             ClearBackground(BLACK);

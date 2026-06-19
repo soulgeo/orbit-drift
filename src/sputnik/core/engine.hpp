@@ -13,9 +13,9 @@ namespace Sputnik {
     class Physics;
 
     class Engine {
-        Renderer renderer_;
         Physics physics_;
-        ResourceManager rsrc_manager_;
+        ResourceManager resource_mgr_;
+        Renderer renderer_;
         InputHandler input_handler_;
         EventDispatcher event_dsp_;
 

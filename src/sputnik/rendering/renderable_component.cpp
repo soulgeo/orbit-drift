@@ -52,6 +52,10 @@ namespace Sputnik {
         initial_transform_ = transform;
     }
 
+    void RenderableComponent::set_model_shader(Shader shader){
+        model_.materials[0].shader = shader; 
+    }
+
     void RenderableComponent::init() {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();

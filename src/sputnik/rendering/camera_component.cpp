@@ -345,6 +345,5 @@ namespace Sputnik {
     //     }
     //     stateRef->value = targetValue;
     // }
-    // }
 
 }
