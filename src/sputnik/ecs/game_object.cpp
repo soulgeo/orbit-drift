@@ -9,7 +9,7 @@ namespace Sputnik {
 
     GameObject::GameObject(Engine* engine) {
         engine_ = engine;
-        auto renderer = engine->renderer();
+        auto& renderer = engine->renderer();
 
         auto transform = std::make_unique<TransformComponent>(this, engine_);
         add_component(std::move(transform));
