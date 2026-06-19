@@ -1,6 +1,5 @@
 #include "planet_factory.hpp"
 #include <sputnik.hpp>
-#include "events/event_component.hpp"
 #include "gravity_component.hpp"
 #include <raylib.h>
 #include <raymath.h>
@@ -26,38 +25,31 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     auto planet = std::make_unique<GameObject>(engine_);
     planet->component<TransformComponent>()->set_position(position);
 
-    auto planet_gravity = std::make_unique<GravityComponent>(
-            planet.get(), gravity_radius, gravity_force_amp
-        );
+    auto planet_gravity = planet->add_component<GravityComponent>(
+        gravity_radius, gravity_force_amp
+    );
     
-    auto planet_collider = std::make_unique<ColliderComponent>(
-        planet.get(), physics_, Vector3Zero(), gravity_radius, true
+    auto planet_collider = planet->add_component<ColliderComponent>(
+        physics_, Vector3Zero(), gravity_radius, true
     );
 
     auto model = LoadModelFromMesh(GenMeshSphere(1.0f, 48.0f, 48.0f));
     model.transform *= MatrixScale(radius, radius, radius);
-    auto planet_rend = std::make_unique<RenderableComponent>(
-        planet.get(), renderer_, model
-    );
+    auto planet_rend = planet->add_component<RenderableComponent>(renderer_, model);
     planet_rend->set_initial_transform(model.transform);
     planet_rend->set_color(color);
 
     auto gravity_model = LoadModelFromMesh(GenMeshSphere(1.0f, 48.0f, 48.0f));
     gravity_model.transform *= 
         MatrixScale(gravity_radius, gravity_radius, gravity_radius);
-    auto planet_gravity_rend = std::make_unique<RenderableComponent>(
-        planet.get(), renderer_, gravity_model
-    );
-    planet_gravity_rend->set_initial_transform(gravity_model.transform);
-    planet_gravity_rend->set_color(GRAY);
-    planet_gravity_rend->set_alpha(0.1f);
-    planet_gravity_rend->set_draw_wires(true);
 
-    planet->add_component(std::move(planet_rend));
-    planet->add_component(std::move(planet_gravity_rend));
-    planet->add_component(std::move(planet_gravity));
-    planet->add_component(std::move(planet_collider));
-    planet->add_component(std::make_unique<EventComponent>(planet.get(), event_dsp_));
+    // auto planet_gravity_rend = planet->add_component<RenderableComponent>(
+    //     renderer_, gravity_model
+    // );
+    // planet_gravity_rend->set_initial_transform(gravity_model.transform);
+    // planet_gravity_rend->set_color(GRAY);
+    // planet_gravity_rend->set_alpha(0.1f);
+    // planet_gravity_rend->set_draw_wires(true);
 
     return std::move(planet);
 }

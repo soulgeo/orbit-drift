@@ -11,18 +11,11 @@ namespace Sputnik {
         engine_ = engine;
         auto& renderer = engine->renderer();
 
-        auto transform = std::make_unique<TransformComponent>(this, engine_);
-        add_component(std::move(transform));
-
-        auto debug = std::make_unique<DebugComponent>(this, &renderer);
-        add_component(std::move(debug));
+        add_component<TransformComponent>(engine);
+        add_component<DebugComponent>(&renderer);
     }
 
     GameObject::~GameObject() = default;
-
-    void GameObject::add_component(std::unique_ptr<Component> comp) {
-        components_.push_back(std::move(comp));
-    }
 
     size_t GameObject::component_count() const {
         return components_.size();

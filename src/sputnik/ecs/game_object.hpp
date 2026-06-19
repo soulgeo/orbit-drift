@@ -18,7 +18,13 @@ namespace Sputnik {
         GameObject(Engine* engine);
         ~GameObject();
 
-        void add_component(std::unique_ptr<Component> comp);
+        template<typename T, typename... Args>
+        T* add_component(Args&&... args) {
+            auto component = std::make_unique<T>(this, std::forward<Args>(args)...);
+            T* ptr = component.get();
+            components_.push_back(std::move(component));
+            return ptr; // Return raw pointer if further config is needed
+        }
 
         size_t component_count() const;
         Component* component_at(size_t index) const;
