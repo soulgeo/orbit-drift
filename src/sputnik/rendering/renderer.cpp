@@ -1,6 +1,7 @@
 #include "sputnik/rendering/renderer.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include "sputnik/ecs/game_object.hpp"
 #include <raylib.h>
@@ -24,6 +25,8 @@ namespace Sputnik {
         show_debug_(false)
     {
     }
+
+    Renderer::~Renderer() = default;
 
     void Renderer::register_renderable(RenderableComponent* renderable) {
         if (renderable->alpha() >= 1.0f) {
@@ -78,8 +81,6 @@ namespace Sputnik {
             debugs_.end()
         );
     }
-
-    Renderer::~Renderer() = default;
 
     void Renderer::register_camera(CameraComponent* camera_body) {
         camera_body_ = camera_body;

@@ -1,4 +1,5 @@
 #include "global_control_component.hpp"
+#include <iostream>
 #include <sputnik.hpp>
 #include <sputnik.hpp>
 #include "game_input.hpp"

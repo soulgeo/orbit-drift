@@ -29,6 +29,10 @@ namespace Sputnik {
         Vector3 up() const;
         Vector3 right() const;
 
+        Vector3 visual_forward() const;
+        Vector3 visual_up() const;
+        Vector3 visual_right() const;
+
         Quaternion orientation() const;
 
         // Setters

@@ -1,5 +1,6 @@
 #include "audio/audio_listener_component.hpp"
 #include "audio/audio_source_component.hpp"
+#include "ecs/transform_component.hpp"
 #include "game_input.hpp"
 #include "setup_game.hpp"
 #include <memory>
@@ -66,16 +67,16 @@ std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
 
     auto player_audio = std::make_unique<AudioSourceComponent>(player.get(), listener, event_dsp);
     player_audio->add_sound(
-        "enter_gravity", rsrc_manager->load_sound("resources/audio/sfx/enter_orbit.wav")
+        "enter gravity", rsrc_manager->load_sound("resources/audio/sfx/enter_orbit.wav")
     );
     player_audio->assign_sound_to_event(
-        "enter_gravity", "enter_gravity", SOUND_ACTION_PLAY
+        "enter gravity", "enter gravity", SOUND_ACTION_PLAY
     );
     player_audio->add_sound(
-        "exit_gravity", rsrc_manager->load_sound("resources/audio/sfx/exit_orbit.wav")
+        "exit gravity", rsrc_manager->load_sound("resources/audio/sfx/exit_orbit.wav")
     );
     player_audio->assign_sound_to_event(
-        "exit_gravity", "exit_gravity", SOUND_ACTION_PLAY
+        "exit gravity", "exit gravity", SOUND_ACTION_PLAY
     );
     player->add_component(std::move(player_audio));
 
@@ -91,6 +92,27 @@ std::unique_ptr<Sputnik::Scene> create_main_scene(Sputnik::Engine* engine) {
         (Vector3){600.0f, -60.0f, -2800.0f}, 160.0f, 480.0f, 15000.0f, YELLOW));
     scene->add_game_object("planet4", planet_factory.create(
         (Vector3){240.0f, -140.0f, -4500.0f}, 20.0f, 120.0f, 4500.0f, BLUE));
+
+    auto camera_comp = camera_body->component<CameraComponent>();
+    camera_comp->add_profile("default flight", (CameraComponent::Profile) {
+        scene->game_object("player")->component<TransformComponent>(),
+        Vector3Zero(),
+        Vector3Zero(),
+        (Vector3) {0.0f, 1.0f, -2.5f},
+        (Vector3) {0.0f, 1.0f, 3.0f},
+        70.0f
+    });
+    camera_comp->add_profile("in gravity flight", (CameraComponent::Profile) {
+        scene->game_object("player")->component<TransformComponent>(),
+        Vector3Zero(),
+        Vector3Zero(),
+        (Vector3) {0.0f, 1.0f, -2.8f},
+        (Vector3) {0.0f, 1.0f, 3.0f},
+        80.0f
+    });
+    camera_comp->set_active_profile("default flight");
+    camera_comp->assign_profile_to_event("enter gravity", "in gravity flight");
+    camera_comp->assign_profile_to_event("exit gravity", "default flight");
 
     return scene;
 }

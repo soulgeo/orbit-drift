@@ -1,46 +1,40 @@
 #include "sputnik/rendering/camera_component.hpp"
+#include "events/event_dispatcher.hpp"
 #include "sputnik/rendering/debug_component.hpp"
 #include "sputnik/core/engine.hpp"
 #include <raylib.h>
 #include "sputnik/rendering/renderer.hpp"
 #include <raymath.h>
+#include <string>
+#include <string_view>
 #include "sputnik/ecs/transform_component.hpp"
 
 namespace Sputnik {
 
-    CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* renderer) :
-        Component(owner) 
+    CameraComponent::CameraComponent(GameObject* owner, Scene* c_scene, Renderer* renderer, EventDispatcher* event_dsp) :
+        Component(owner), projection_(CAMERA_PERSPECTIVE), follow_speed_(100.0f) 
     {
-        // Define Camera Profiles
-        Profile default_camera;
-        default_camera.target = c_scene->game_object("player");
-        default_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
-        default_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
-        default_camera.fovy = 70.0f;
-        camera_profiles_.push_back(default_camera);
-
-        Profile in_gravity_camera;
-        in_gravity_camera.target = c_scene->game_object("player");
-        in_gravity_camera.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.6f};
-        in_gravity_camera.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
-        in_gravity_camera.fovy = 80.0f;
-        camera_profiles_.push_back(in_gravity_camera);
-
-        active_profile_id_ = CP_DEFAULT;
+        // Define Default Profile
+        Profile default_profile;
+        default_profile.target_transform = nullptr;
+        default_profile.pos_local_offset = (Vector3) {0.0f, 1.0f, -2.5f};
+        default_profile.targ_local_offset = (Vector3) {0.0f, 0.0f, 3.0f};
+        default_profile.fovy = 70.0f;
+        profiles_["default"] = default_profile;
+        active_profile_ = &profiles_["default"];
+        active_profile_name_ = "default";
+        next_profile_name_ = "";
 
         renderer->register_camera(this);
+        event_dsp->add_subscriber(this);
 
         engine_ = owner_->engine();
     }
 
     CameraComponent::~CameraComponent() = default;
 
-    int CameraComponent::profile_id() {
-        return active_profile_id_;
-    }
-
-    int CameraComponent::new_profile_id() {
-        return new_profile_id_;
+    CameraComponent::Profile* CameraComponent::active_profile() {
+        return active_profile_;
     }
 
     int CameraComponent::trans_iter() {
@@ -72,40 +66,63 @@ namespace Sputnik {
         return visual_up_; 
     }
 
-    void CameraComponent::switch_profile(int target_profile) {
-        new_profile_id_ = target_profile;
+    void CameraComponent::add_profile(
+        std::string_view name, CameraComponent::Profile profile) 
+    {
+        profiles_[std::string(name)] = profile;
+    }
+
+    void CameraComponent::set_active_profile(std::string_view next_profile_name) {
+        auto it = profiles_.find(std::string(next_profile_name));
+        if (it == profiles_.end()) { return; }
+        active_profile_ = &it->second;
+        active_profile_name_ = std::string(next_profile_name);
+    }
+
+    void CameraComponent::switch_profile(std::string_view next_profile_name) {
+        auto it = profiles_.find(std::string(next_profile_name));
+        if (it == profiles_.end() || &it->second == active_profile_) { return; }
+        next_profile_ = &it->second;
+        next_profile_name_ = std::string(next_profile_name);
         trans_iter_ = 0;
+    }
+
+    void CameraComponent::assign_profile_to_event(
+        std::string_view event_name, std::string_view profile_name)
+    {
+        event_to_profile_map_[std::string(event_name)] = std::string(profile_name);
+    }
+
+    void CameraComponent::on_event(Event event) {
+        auto it = event_to_profile_map_.find(event.message);
+        if (it == event_to_profile_map_.end()) { return; }
+        switch_profile(it->second);
     }
 
     void CameraComponent::init() {
         transform_ = owner_->component<TransformComponent>();
         debug_ = owner_->component<DebugComponent>();
 
-        // Resolve null targets (e.g. if they weren't in the scene during constructor)
-        for (auto& profile : camera_profiles_) {
-            if (!profile.target) {
-                profile.target = engine_->scene().game_object("player");
-            }
-        }
+        Profile& active = *active_profile_;
 
-        Profile& active = camera_profiles_[active_profile_id_];
-        if (!active.target) return;
+        Vector3 target_position = Vector3Zero();
+        Vector3 target_right = {1.0f, 0.0f, 0.0f};
+        Vector3 target_up = {0.0f, 1.0f, 0.0f};
+        Vector3 target_forward = {0.0f, 0.0f, 1.0f};
+        if (active.target_transform) {
+            target_position = active.target_transform->position();
+            target_up = active.target_transform->up();
+            target_right = active.target_transform->right();
+            target_forward = active.target_transform->forward();
+        }
         
         // Initialize current state from active profile
-        curr_state_.pos_offset = active.pos_offset;
-        curr_state_.targ_offset = active.targ_offset;
+        curr_state_.target = target_position;
+        curr_state_.pos_upright_offset = active.pos_upright_offset;
+        curr_state_.targ_upright_offset = active.targ_upright_offset;
         curr_state_.pos_local_offset = active.pos_local_offset;
         curr_state_.targ_local_offset = active.targ_local_offset;
         curr_state_.fovy = active.fovy;
-
-        // Get target transform info
-        GameObject& camera_target = *active.target;
-        auto camera_target_transform = camera_target.component<TransformComponent>();
-
-        Vector3 target_position = camera_target_transform->position();
-        Vector3 target_forward = camera_target_transform->forward();
-        Vector3 target_up = camera_target_transform->up();
-        Vector3 target_right = camera_target_transform->right();
 
         // Calculate initial target position
         Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
@@ -113,7 +130,7 @@ namespace Sputnik {
         Vector3 forward_offset = curr_state_.targ_local_offset.z * target_forward;
         Vector3 targ_translated_offset = right_offset + up_offset + forward_offset;
 
-        curr_target_pos_ = target_position + curr_state_.targ_offset + targ_translated_offset;
+        curr_target_pos_ = target_position + curr_state_.targ_upright_offset + targ_translated_offset;
         prev_target_pos_ = curr_target_pos_;
         visual_target_pos_ = curr_target_pos_;
 
@@ -123,7 +140,7 @@ namespace Sputnik {
         forward_offset = curr_state_.pos_local_offset.z * target_forward;
         Vector3 pos_translated_offset = right_offset + up_offset + forward_offset;
 
-        Vector3 world_position = target_position + curr_state_.pos_offset + pos_translated_offset;
+        Vector3 world_position = target_position + curr_state_.pos_upright_offset + pos_translated_offset;
         transform_->set_position(world_position);
         
         // Initialize Up vector
@@ -139,36 +156,65 @@ namespace Sputnik {
         prev_target_pos_ = curr_target_pos_;
         prev_up_ = up_;
 
-        Profile& active = camera_profiles_[active_profile_id_];
-        if (!active.target) return;
+        Profile& active = *active_profile_;
 
-        // If new transition is starting, save the current camera state
-        if (new_profile_id_ >= 0 && trans_iter_ == 0) {
-            saved_state_.pos_offset = curr_state_.pos_offset;
-            saved_state_.targ_offset = curr_state_.targ_offset;
+        Vector3 target_position = Vector3Zero();
+        Vector3 target_right = {1.0f, 0.0f, 0.0f};
+        Vector3 target_up = {0.0f, 1.0f, 0.0f};
+        Vector3 target_forward = {0.0f, 0.0f, 1.0f};
+        if (active.target_transform) {
+            target_position = active.target_transform->position();
+            target_forward = active.target_transform->forward();
+            target_up = active.target_transform->up();
+            target_right = active.target_transform->right();
+        }
+
+        // If a profile transition is starting, save the current profile state
+        if (next_profile_.has_value() && trans_iter_ == 0) {
+            saved_state_.target = curr_state_.target;
+            saved_state_.pos_upright_offset = curr_state_.pos_upright_offset;
+            saved_state_.targ_upright_offset = curr_state_.targ_upright_offset;
             saved_state_.pos_local_offset = curr_state_.pos_local_offset;
             saved_state_.targ_local_offset = curr_state_.targ_local_offset;
             saved_state_.fovy = curr_state_.fovy;
         }
 
-        if (new_profile_id_ < 0) {
-            // Just set calced offsets to the active profile ones
-            curr_state_.pos_offset = active.pos_offset;
-            curr_state_.targ_offset = active.targ_offset;
+        // --- Current profile state calculation ---
+        if (!next_profile_.has_value()) {
+            // Just set current profile state to the active profile
+            curr_state_.target = target_position;
+            curr_state_.pos_upright_offset = active.pos_upright_offset;
+            curr_state_.targ_upright_offset = active.targ_upright_offset;
             curr_state_.pos_local_offset = active.pos_local_offset;
             curr_state_.targ_local_offset = active.targ_local_offset;
             curr_state_.fovy = active.fovy;
         } else {
-            // Get calced offsets for transition from saved state to new profile
-            Profile& next = camera_profiles_[new_profile_id_];
-            curr_state_.targ_offset = Vector3Lerp(
-                saved_state_.targ_offset, 
-                next.targ_offset, 
+            // Profile transition: calc intermediate state, set current state equal to it
+            Profile& next = *next_profile_.value();
+            Vector3 next_target_position = Vector3Zero();
+            bool new_target = false;
+            if (next.target_transform) {
+                next_target_position = next.target_transform->position();
+                if (active.target_transform != next.target_transform){
+                    new_target = true;
+                }
+            }
+            curr_state_.target = target_position;
+            if (new_target){
+                curr_state_.target = Vector3Lerp(
+                    saved_state_.target, 
+                    next_target_position, 
+                    (float)trans_iter_/max_trans_iter_
+                );
+            }
+            curr_state_.targ_upright_offset = Vector3Lerp(
+                saved_state_.targ_upright_offset, 
+                next.targ_upright_offset, 
                 (float)trans_iter_/max_trans_iter_
             );
-            curr_state_.pos_offset = Vector3Lerp(
-                saved_state_.pos_offset, 
-                next.pos_offset, 
+            curr_state_.pos_upright_offset = Vector3Lerp(
+                saved_state_.pos_upright_offset, 
+                next.pos_upright_offset, 
                 (float)trans_iter_/max_trans_iter_
             );
             curr_state_.targ_local_offset = Vector3Lerp(
@@ -188,17 +234,6 @@ namespace Sputnik {
             );
         }
 
-        // Update Camera Target
-        GameObject& camera_target = *active.target;
-        auto camera_target_transform = camera_target.component<TransformComponent>();
-
-        Vector3 target_position = camera_target_transform->position();
-        Vector3 target_forward = camera_target_transform->forward();
-        Vector3 target_up = camera_target_transform->up();
-        Vector3 target_right = camera_target_transform->right();
-
-        float follow_speed = 100.0f;
-
         // Translate local offset from local to upright space
         Vector3 targ_translated_offset;
         Vector3 right_offset = curr_state_.targ_local_offset.x * target_right;
@@ -208,11 +243,11 @@ namespace Sputnik {
 
         // Translate to world space
         Vector3 world_target = 
-            target_position + curr_state_.targ_offset + targ_translated_offset;
+            curr_state_.target + curr_state_.targ_upright_offset + targ_translated_offset;
 
         curr_target_pos_ = 
             Vector3Lerp(
-                curr_target_pos_, world_target, follow_speed * engine_->fixed_dt()
+                curr_target_pos_, world_target, follow_speed_ * engine_->fixed_dt()
             );
 
         // Translate local offset from local to upright space
@@ -224,20 +259,22 @@ namespace Sputnik {
 
         // Translate to world space
         Vector3 world_position = 
-            target_position + curr_state_.pos_offset + pos_translated_offset;
+            curr_state_.target + curr_state_.pos_upright_offset + pos_translated_offset;
 
         transform_->set_position(
-            Vector3Lerp(position(), world_position, follow_speed * engine_->fixed_dt())
+            Vector3Lerp(position(), world_position, follow_speed_ * engine_->fixed_dt())
         );
 
         // Update Camera Up
         up_ = target_up;
 
         // Manage transition loop
-        if (new_profile_id_ >= 0) {
+        if (next_profile_.has_value()) {
             if (trans_iter_ >= max_trans_iter_) {
-                active_profile_id_ = new_profile_id_;
-                new_profile_id_ = -1;
+                active_profile_ = next_profile_.value();
+                active_profile_name_ = next_profile_name_;
+                next_profile_.reset();
+                next_profile_name_ = "";
                 trans_iter_ = 0;
             } else {
                 trans_iter_++;
@@ -259,11 +296,12 @@ namespace Sputnik {
                                        position.x, position.y, position.z));
             debug_->writeln(TextFormat("Up Vector: %.2f, %.2f, %.2f", 
                                        visual_up_.x, visual_up_.y, visual_up_.z));
-            debug_->writeln(TextFormat("Active Profile: %d", active_profile_id_));
             debug_->writeln(TextFormat("Current Target Pos: %.2f, %.2f, %.2f",
                                        visual_target_pos_.x, 
                                        visual_target_pos_.y, 
                                        visual_target_pos_.z));
+            debug_->writeln(TextFormat("Active Profile: %s", active_profile_name_.c_str()));
+            debug_->writeln(TextFormat("Next Profile: %s", next_profile_name_.c_str()));
         }
     }
 

@@ -18,10 +18,13 @@ namespace Sputnik {
     Scene::Scene(Engine* engine) {
         engine_ = engine;
         auto& renderer = engine->renderer();
+        auto& event_dsp = engine->event_dsp();
 
         auto camera_body = std::make_unique<GameObject>(engine);
         camera_body->add_component(
-            std::make_unique<CameraComponent>(camera_body.get(), this, &renderer)
+            std::make_unique<CameraComponent>(
+                camera_body.get(), this, &renderer, &event_dsp
+            )
         );
         camera_body->add_component(
             std::make_unique<GlobalControlComponent>(camera_body.get())

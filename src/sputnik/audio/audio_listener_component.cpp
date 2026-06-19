@@ -13,15 +13,15 @@ void AudioListenerComponent::init() {
 }
 
 Vector3 AudioListenerComponent::position() {
-    return transform_->position();
+    return transform_->visual_position();
 }
 
 Vector3 AudioListenerComponent::forward() {
-    return transform_->forward();
+    return transform_->visual_forward();
 }
 
 Vector3 AudioListenerComponent::up() {
-    return transform_->up();
+    return transform_->visual_up();
 }
 
 }

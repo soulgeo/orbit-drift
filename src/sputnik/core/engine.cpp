@@ -93,7 +93,7 @@ namespace Sputnik {
     void Engine::update() {
         if (is_paused_) return;
 
-        Timer timer("Engine::update");
+        // Timer timer("Engine::update");
 
         // Early updates
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
@@ -108,11 +108,11 @@ namespace Sputnik {
                 obj.fixed_update();
             });
             physics_.update(this);
-            event_dsp_.update();
             accumulator_ -= fixed_dt_;
         }
 
         // Updates
+        event_dsp_.update();
         scene_->for_each_game_object([this](const std::string& s, GameObject& obj){
             obj.update();
         });

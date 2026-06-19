@@ -93,6 +93,16 @@ namespace Sputnik {
         return (Vector3){ -transform_.m8, -transform_.m9, -transform_.m10 }; 
     }
 
+    Vector3 TransformComponent::visual_right() const { 
+        return (Vector3){ visual_transform_.m0,  visual_transform_.m1,  visual_transform_.m2 }; 
+    }
+    Vector3 TransformComponent::visual_up() const { 
+        return (Vector3){ visual_transform_.m4,  visual_transform_.m5,  visual_transform_.m6 }; 
+    }
+    Vector3 TransformComponent::visual_forward() const { 
+        return (Vector3){ -visual_transform_.m8, -visual_transform_.m9, -visual_transform_.m10 }; 
+    }
+
     void TransformComponent::move_local_right(float distance) {
         Matrix moveMat = MatrixTranslate(distance, 0.0f, 0.0f);
         transform_ = moveMat * transform_;
