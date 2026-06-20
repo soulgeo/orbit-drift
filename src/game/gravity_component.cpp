@@ -36,7 +36,7 @@ void GravityComponent::on_trigger_enter(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
 
-    event_->send("enter gravity");
+    if (event_) { event_->send("enter gravity"); }
 }
 
 void GravityComponent::on_trigger_stay(GameObject* other) {
@@ -59,7 +59,7 @@ void GravityComponent::on_trigger_exit(GameObject* other) {
     auto control = other->component<ControlComponent>();
     if (!control) return;
 
-    event_->send("exit gravity");
+    if (event_) { event_->send("exit gravity"); }
 }
 
 float GravityComponent::force_amp() const {

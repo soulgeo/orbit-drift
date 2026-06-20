@@ -1,6 +1,7 @@
 #include "sputnik/ecs/scene.hpp"
 
 #include "audio/audio_listener_component.hpp"
+#include "ecs/game_object.hpp"
 #include "global_control_component.hpp"
 #include "sputnik/core/engine.hpp"
 #include <memory>
@@ -30,27 +31,28 @@ namespace Sputnik {
 
     Scene::~Scene() = default;
 
-    GameObject* Scene::game_object(const std::string& name) {
-        auto it = game_objects_.find(name);
-        if (it != game_objects_.end()) {
-            return it->second.get();
+    GameObject* Scene::game_object(std::string_view name) {
+        auto it = name_index_.find(std::string(name));
+        if (it != name_index_.end()) {
+            return it->second;
         }
         return nullptr;
     }
 
-    void Scene::add_game_object(std::string name, std::unique_ptr<GameObject> game_object) {
-        game_objects_[name] = std::move(game_object);
+    void Scene::add_game_object(std::string_view name, std::unique_ptr<GameObject> game_object) {
+        name_index_[std::string(name)] = game_object.get();
+        game_objects_.push_back(std::move(game_object));
     }
 
-    void Scene::for_each_game_object(std::function<void(const std::string&, GameObject&)> func) {
-        for (auto& [name, object] : game_objects_) {
-            if (name != "camera_body") func(name, *object);
-        }
+    size_t Scene::game_object_count() const {
+        return game_objects_.size();
+    }
 
-        auto it = game_objects_.find("camera_body");
-        if (it != game_objects_.end()) {
-            func(it->first, *it->second);
+    GameObject* Scene::game_object_at(size_t index) const {
+        if (index < game_objects_.size()) {
+            return game_objects_[index].get();
         }
+        return nullptr;
     }
 
 }

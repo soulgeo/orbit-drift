@@ -1,5 +1,6 @@
 #include "planet_factory.hpp"
 #include <sputnik.hpp>
+#include "events/event_component.hpp"
 #include "gravity_component.hpp"
 #include <raylib.h>
 #include <raymath.h>
@@ -42,6 +43,8 @@ std::unique_ptr<GameObject> PlanetFactory::create(
     auto gravity_model = LoadModelFromMesh(GenMeshSphere(1.0f, 48.0f, 48.0f));
     gravity_model.transform *= 
         MatrixScale(gravity_radius, gravity_radius, gravity_radius);
+
+    planet->add_component<EventComponent>(event_dsp_);
 
     // auto planet_gravity_rend = planet->add_component<RenderableComponent>(
     //     renderer_, gravity_model

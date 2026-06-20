@@ -1,9 +1,11 @@
 #pragma once
 
 #include "sputnik/ecs/game_object.hpp"
+#include <memory>
+#include <string_view>
 #include <unordered_map>
 #include <string>
-#include <functional>
+#include <vector>
 
 namespace Sputnik {
 
@@ -12,7 +14,8 @@ namespace Sputnik {
     class Physics;
 
     class Scene {
-        std::unordered_map<std::string, std::unique_ptr<GameObject>> game_objects_;
+        std::vector<std::unique_ptr<GameObject>> game_objects_;
+        std::unordered_map<std::string, GameObject*> name_index_;
         Engine* engine_;
 
     public:
@@ -21,10 +24,10 @@ namespace Sputnik {
 
         static constexpr size_t MAX_GAMEOBJECT_COUNT = 200;
 
-        GameObject* game_object(const std::string& name);
-        void add_game_object(std::string name, std::unique_ptr<GameObject> game_object);
+        GameObject* game_object(std::string_view name);
+        void add_game_object(std::string_view name, std::unique_ptr<GameObject> game_object);
 
-        void for_each_game_object(std::function<void(const std::string&, GameObject&)> func);
+        size_t game_object_count() const;
+        GameObject* game_object_at(size_t index) const;
     };
-
 }
